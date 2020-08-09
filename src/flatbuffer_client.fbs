@@ -1,0 +1,44 @@
+// Messages for the FFI layer between the Rust client and other languages.
+
+namespace ButtplugFFI;
+
+enum DeviceCommunicationManagerTypes: ushort (bit_flags) {
+  Btleplug,
+  XInput,
+  SerialPort,
+  LovenseHIDDongle,
+  LovenseSerialDongle,
+}
+
+union ClientMessageType {
+  ConnectLocal,
+  ConnectWebsocket,
+  StartScanning,
+  StopScanning,
+  RequestDeviceList,
+}
+
+table ConnectLocal {
+  server_name: string;
+  max_ping_time: uint;
+  comm_manager_types: ushort;
+}
+
+table ConnectWebsocket {
+}
+
+table StartScanning {
+}
+
+table StopScanning {
+}
+
+table RequestDeviceList {
+}
+
+table ClientMessage {
+  id: uint;
+  message: ClientMessageType;
+}
+
+root_type ClientMessage;

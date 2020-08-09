@@ -1,0 +1,22 @@
+[package]
+name = "buttplug-rs-ffi"
+version = "0.1.0"
+authors = ["Kyle Machulis <kyle@nonpolynomial.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+buttplug = { version = "0.6.0", features = ["async-std-runtime", "client", "server", "serialize-json", "btleplug-manager", "websockets", "xinput-manager", "serial-manager", "lovense-dongle-manager"] }
+async-std = "1.6.2"
+flatbuffers = "0.6.1"
+lazy_static = "1.4.0"
+dashmap = "3.11.10"
+tracing-subscriber = "0.2.10"
+futures = "0.3.5"
+
+
+[lib]
+name = "buttplug_ffi"
+path = "src/lib.rs"
+crate-type = ["cdylib"]

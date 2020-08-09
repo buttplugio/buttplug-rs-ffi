@@ -1,0 +1,35 @@
+namespace ButtplugFFI;
+
+union ServerMessageType {
+  Ok,
+  Error,
+  ScanningFinished,
+  DeviceList,
+  DeviceAdded,
+  DeviceRemoved,
+}
+
+table Ok {
+}
+
+table Error {
+}
+
+table ScanningFinished {
+}
+
+table DeviceList {
+}
+
+table DeviceAdded {
+}
+
+table DeviceRemoved {
+}
+
+table ServerMessage {
+  id: uint;
+  message: ServerMessageType;
+}
+
+root_type ServerMessage;
