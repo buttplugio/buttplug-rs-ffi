@@ -1,13 +1,10 @@
 #[macro_use]
-extern crate lazy_static;
-#[macro_use]
 extern crate tracing;
 
 mod flatbuffer_create_client_generated;
 mod flatbuffer_client_generated;
 mod flatbuffer_server_generated;
 
-use std::os::raw::c_int;
 use std::slice;
 use buttplug::{
   client::{ButtplugClient, ButtplugClientEvent},
@@ -25,22 +22,19 @@ use buttplug::{
 };
 #[cfg(target_os = "windows")]
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
-use dashmap::DashMap;
 use flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, ConnectLocal, ConnectWebsocket, get_root_as_client_message};
 use flatbuffer_create_client_generated::buttplug_ffi::get_root_as_create_client;
 use flatbuffer_server_generated::buttplug_ffi::{Ok, OkArgs, DeviceAdded, DeviceAddedArgs, ServerMessage, ServerMessageArgs, ServerMessageType, get_root_as_server_message};
-use std::sync::{Arc, atomic::{AtomicU32, Ordering}};
+use std::sync::Arc;
 use flatbuffers::{FlatBufferBuilder, WIPOffset, UnionWIPOffset};
 use async_std::sync::RwLock;
 use futures::StreamExt;
 
 type FFICallback = extern "C" fn(*const u8, u32);
 
-pub struct ButtplugFFIClient {
-  name: String,
-  callback: FFICallback,
-  client: Arc<RwLock<Option<ButtplugClient>>>
-}
+/*************************************************
+* Utility Methods
+*************************************************/
 
 fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: ServerMessageType, union: WIPOffset<UnionWIPOffset>, callback: FFICallback) {
   let server_msg = ServerMessage::create(&mut builder, &ServerMessageArgs {
@@ -87,6 +81,22 @@ fn send_event(event: ButtplugClientEvent, callback: FFICallback) {
     ButtplugClientEvent::PingTimeout => {
 
     }
+  }
+}
+
+/*************************************************
+* Client/Device structs
+*************************************************/
+
+pub struct ButtplugFFIClient {
+  name: String,
+  callback: FFICallback,
+  client: Arc<RwLock<Option<ButtplugClient>>>
+}
+
+impl Drop for ButtplugFFIClient {
+  fn drop(&mut self) {
+    info!("DROPPED RUST FFI CLIENT");
   }
 }
 
@@ -165,6 +175,10 @@ impl ButtplugFFIClient {
     }).unwrap();
   }
 }
+
+/*************************************************
+* Export Methods
+*************************************************/
 
 #[no_mangle]
 pub extern "C" fn buttplug_create_client(callback: FFICallback, buf: *const u8, buf_len: i32) -> *mut ButtplugFFIClient {
