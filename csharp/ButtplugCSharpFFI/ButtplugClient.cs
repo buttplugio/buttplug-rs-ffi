@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ButtplugCSharpFFI
 {
-    public class ButtplugClient
+    public class ButtplugClient : IDisposable
     {
         /// <summary>
         /// Name of the client, used for server UI/permissions.
@@ -105,6 +105,11 @@ namespace ButtplugCSharpFFI
         public async Task StopScanning()
         {
             await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle);
+        }
+
+        public void Dispose()
+        {
+            _clientHandle.Dispose();
         }
     }
 }

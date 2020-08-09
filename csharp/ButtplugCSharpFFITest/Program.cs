@@ -20,9 +20,12 @@ namespace ButtplugCSharpFFITest
         {
             Console.WriteLine("Hello World!");
             var client = new ButtplugCSharpFFI.ButtplugClient("Test Client");
-            client.DeviceAdded += (obj, args) => Console.WriteLine($"DEVICE GOTTEN: {args.DeviceName}");
+//            client.DeviceAdded += (obj, args) => Console.WriteLine($"DEVICE GOTTEN: {args.DeviceName}");
             await client.ConnectLocal();
             await client.StartScanning();
+            await WaitForKey();
+            client.Dispose();
+            client = null;
             await WaitForKey();
         }
 
