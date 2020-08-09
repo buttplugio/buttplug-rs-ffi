@@ -61,13 +61,13 @@ namespace ButtplugCSharpFFI
 
         public ButtplugClient(string aClientName) {
             Name = aClientName;
-            _clientHandle = ButtplugFFI.TryCreateClient(aClientName, this.SorterCallback);
+            _clientHandle = ButtplugFFI.SendCreateClient(aClientName, this.SorterCallback);
         }
 
         public async Task ConnectLocal()
         {
             Console.WriteLine("Trying to connect");
-            await ButtplugFFI.TryConnectLocal(_messageSorter, _clientHandle, "Test Server", 0);
+            await ButtplugFFI.SendConnectLocal(_messageSorter, _clientHandle, "Test Server", 0);
             Console.WriteLine("Connected");
         }
 
@@ -82,18 +82,29 @@ namespace ButtplugCSharpFFI
                 Span<byte> byteArray = new Span<byte>(buf.ToPointer(), buf_length);
                 ByteBuffer byteBuf = new ByteBuffer(byteArray.ToArray());
                 var server_message = ServerMessage.GetRootAsServerMessage(byteBuf);
-                _messageSorter.CheckMessage(server_message);
+                if (server_message.Id > 0)
+                {
+                    _messageSorter.CheckMessage(server_message);
+                }
+                else
+                {
+                    if (server_message.MessageType == ServerMessageType.DeviceAdded) {
+                        var device_added_message = server_message.Message<DeviceAdded>();
+                        DeviceAdded.Invoke(this,
+                            new DeviceAddedEventArgs(device_added_message.Value.Name));
+                    }
+                }
             }
         }
 
         public async Task StartScanning()
         {
-
+            await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle);
         }
 
         public async Task StopScanning()
         {
-
+            await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle);
         }
     }
 }

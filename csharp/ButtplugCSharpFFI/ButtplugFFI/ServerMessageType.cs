@@ -11,9 +11,8 @@ public enum ServerMessageType : byte
   Ok = 1,
   Error = 2,
   ScanningFinished = 3,
-  DeviceList = 4,
-  DeviceAdded = 5,
-  DeviceRemoved = 6,
+  DeviceAdded = 4,
+  DeviceRemoved = 5,
 };
 
 

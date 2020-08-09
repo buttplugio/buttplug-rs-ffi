@@ -25,14 +25,13 @@ pub enum ServerMessageType {
   Ok = 1,
   Error = 2,
   ScanningFinished = 3,
-  DeviceList = 4,
-  DeviceAdded = 5,
-  DeviceRemoved = 6,
+  DeviceAdded = 4,
+  DeviceRemoved = 5,
 
 }
 
 pub const ENUM_MIN_SERVER_MESSAGE_TYPE: u8 = 0;
-pub const ENUM_MAX_SERVER_MESSAGE_TYPE: u8 = 6;
+pub const ENUM_MAX_SERVER_MESSAGE_TYPE: u8 = 5;
 
 impl<'a> flatbuffers::Follow<'a> for ServerMessageType {
   type Inner = Self;
@@ -66,23 +65,21 @@ impl flatbuffers::Push for ServerMessageType {
 }
 
 #[allow(non_camel_case_types)]
-pub const ENUM_VALUES_SERVER_MESSAGE_TYPE:[ServerMessageType; 7] = [
+pub const ENUM_VALUES_SERVER_MESSAGE_TYPE:[ServerMessageType; 6] = [
   ServerMessageType::NONE,
   ServerMessageType::Ok,
   ServerMessageType::Error,
   ServerMessageType::ScanningFinished,
-  ServerMessageType::DeviceList,
   ServerMessageType::DeviceAdded,
   ServerMessageType::DeviceRemoved
 ];
 
 #[allow(non_camel_case_types)]
-pub const ENUM_NAMES_SERVER_MESSAGE_TYPE:[&'static str; 7] = [
+pub const ENUM_NAMES_SERVER_MESSAGE_TYPE:[&'static str; 6] = [
     "NONE",
     "Ok",
     "Error",
     "ScanningFinished",
-    "DeviceList",
     "DeviceAdded",
     "DeviceRemoved"
 ];
@@ -282,69 +279,6 @@ impl<'a: 'b, 'b> ScanningFinishedBuilder<'a, 'b> {
   }
 }
 
-pub enum DeviceListOffset {}
-#[derive(Copy, Clone, Debug, PartialEq)]
-
-pub struct DeviceList<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for DeviceList<'a> {
-    type Inner = DeviceList<'a>;
-    #[inline]
-    fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-        Self {
-            _tab: flatbuffers::Table { buf: buf, loc: loc },
-        }
-    }
-}
-
-impl<'a> DeviceList<'a> {
-    #[inline]
-    pub fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-        DeviceList {
-            _tab: table,
-        }
-    }
-    #[allow(unused_mut)]
-    pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
-        _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
-        _args: &'args DeviceListArgs) -> flatbuffers::WIPOffset<DeviceList<'bldr>> {
-      let mut builder = DeviceListBuilder::new(_fbb);
-      builder.finish()
-    }
-
-}
-
-pub struct DeviceListArgs {
-}
-impl<'a> Default for DeviceListArgs {
-    #[inline]
-    fn default() -> Self {
-        DeviceListArgs {
-        }
-    }
-}
-pub struct DeviceListBuilder<'a: 'b, 'b> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b> DeviceListBuilder<'a, 'b> {
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DeviceListBuilder<'a, 'b> {
-    let start = _fbb.start_table();
-    DeviceListBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<DeviceList<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
 pub enum DeviceAddedOffset {}
 #[derive(Copy, Clone, Debug, PartialEq)]
 
@@ -372,19 +306,28 @@ impl<'a> DeviceAdded<'a> {
     #[allow(unused_mut)]
     pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
         _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
-        _args: &'args DeviceAddedArgs) -> flatbuffers::WIPOffset<DeviceAdded<'bldr>> {
+        args: &'args DeviceAddedArgs<'args>) -> flatbuffers::WIPOffset<DeviceAdded<'bldr>> {
       let mut builder = DeviceAddedBuilder::new(_fbb);
+      if let Some(x) = args.name { builder.add_name(x); }
       builder.finish()
     }
 
+    pub const VT_NAME: flatbuffers::VOffsetT = 4;
+
+  #[inline]
+  pub fn name(&self) -> Option<&'a str> {
+    self._tab.get::<flatbuffers::ForwardsUOffset<&str>>(DeviceAdded::VT_NAME, None)
+  }
 }
 
-pub struct DeviceAddedArgs {
+pub struct DeviceAddedArgs<'a> {
+    pub name: Option<flatbuffers::WIPOffset<&'a  str>>,
 }
-impl<'a> Default for DeviceAddedArgs {
+impl<'a> Default for DeviceAddedArgs<'a> {
     #[inline]
     fn default() -> Self {
         DeviceAddedArgs {
+            name: None,
         }
     }
 }
@@ -393,6 +336,10 @@ pub struct DeviceAddedBuilder<'a: 'b, 'b> {
   start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
 impl<'a: 'b, 'b> DeviceAddedBuilder<'a, 'b> {
+  #[inline]
+  pub fn add_name(&mut self, name: flatbuffers::WIPOffset<&'b  str>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(DeviceAdded::VT_NAME, name);
+  }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> DeviceAddedBuilder<'a, 'b> {
     let start = _fbb.start_table();
@@ -547,16 +494,6 @@ impl<'a> ServerMessage<'a> {
   pub fn message_as_scanning_finished(&self) -> Option<ScanningFinished<'a>> {
     if self.message_type() == ServerMessageType::ScanningFinished {
       self.message().map(|u| ScanningFinished::init_from_table(u))
-    } else {
-      None
-    }
-  }
-
-  #[inline]
-  #[allow(non_snake_case)]
-  pub fn message_as_device_list(&self) -> Option<DeviceList<'a>> {
-    if self.message_type() == ServerMessageType::DeviceList {
-      self.message().map(|u| DeviceList::init_from_table(u))
     } else {
       None
     }

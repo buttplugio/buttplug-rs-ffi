@@ -19,8 +19,23 @@ public struct DeviceAdded : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public DeviceAdded __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
+  public string Name { get { int o = __p.__offset(4); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(4, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(4); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(4); }
 
-  public static void StartDeviceAdded(FlatBufferBuilder builder) { builder.StartTable(0); }
+  public static Offset<ButtplugFFI.DeviceAdded> CreateDeviceAdded(FlatBufferBuilder builder,
+      StringOffset nameOffset = default(StringOffset)) {
+    builder.StartTable(1);
+    DeviceAdded.AddName(builder, nameOffset);
+    return DeviceAdded.EndDeviceAdded(builder);
+  }
+
+  public static void StartDeviceAdded(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(0, nameOffset.Value, 0); }
   public static Offset<ButtplugFFI.DeviceAdded> EndDeviceAdded(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ButtplugFFI.DeviceAdded>(o);

@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate tracing;
 
 mod flatbuffer_create_client_generated;
 mod flatbuffer_client_generated;
@@ -8,7 +10,7 @@ mod flatbuffer_server_generated;
 use std::os::raw::c_int;
 use std::slice;
 use buttplug::{
-  client::ButtplugClient,
+  client::{ButtplugClient, ButtplugClientEvent},
   connector::ButtplugInProcessClientConnector,
   server::{
     comm_managers::{
@@ -26,64 +28,66 @@ use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use dashmap::DashMap;
 use flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, ConnectLocal, ConnectWebsocket, get_root_as_client_message};
 use flatbuffer_create_client_generated::buttplug_ffi::get_root_as_create_client;
-use flatbuffer_server_generated::buttplug_ffi::{Ok, OkArgs, ServerMessage, ServerMessageArgs, ServerMessageType, get_root_as_server_message};
+use flatbuffer_server_generated::buttplug_ffi::{Ok, OkArgs, DeviceAdded, DeviceAddedArgs, ServerMessage, ServerMessageArgs, ServerMessageType, get_root_as_server_message};
 use std::sync::{Arc, atomic::{AtomicU32, Ordering}};
-use flatbuffers::FlatBufferBuilder;
+use flatbuffers::{FlatBufferBuilder, WIPOffset, UnionWIPOffset};
 use async_std::sync::RwLock;
 use futures::StreamExt;
 
 type FFICallback = extern "C" fn(*const u8, u32);
 
-/*
-
-lazy_static! {
-  static ref FFI_CLIENT_MANAGER: ButtplugFFIManager = ButtplugFFIManager::default();
-}
-
-struct ButtplugFFIManager {
-  client_map: Arc<DashMap<u32, ButtplugFFIClient>>,
-  counter: AtomicU32,
-}
-
-impl Default for ButtplugFFIManager {
-  fn default() -> Self {
-    Self {
-      client_map: Arc::new(DashMap::new()),
-      counter: AtomicU32::default()
-    }
-  }
-}
-
-impl ButtplugFFIManager {
-  pub fn add_client_local(&self, msg_id: u32, create_local_client: &CreateLocal, callback: FFICallback) -> u32 {
-    tracing_subscriber::fmt::init();
-    let counter_value = self.counter.load(Ordering::SeqCst);
-    self.counter.store(counter_value + 1, Ordering::SeqCst);
-    let connector = ButtplugInProcessClientConnector::new(create_local_client.server_name().unwrap().clone(), create_local_client.max_ping_time() as u64);
-    let client_map = self.client_map.clone();
-    let client_name = create_local_client.client_name().unwrap().to_owned();
-    let client_id = counter_value;
-    async_manager::spawn(async move {
-      let (client, event_stream) = ButtplugClient::connect(&client_name, connector).await.unwrap();
-      client_map.insert(counter_value, ButtplugFFIClient::new(callback, client));
-      let mut builder = FlatBufferBuilder::new_with_capacity(1024);
-      let client_connected = ClientConnected::create(&mut builder, &ClientConnectedArgs {
-        id: msg_id,
-        client_id,
-      });
-      builder.finish(client_connected, None);
-      let msg = builder.finished_data();
-      callback(msg.len() as u32, msg);
-    }).unwrap();
-    counter_value
-  }
-}
-*/
-
 pub struct ButtplugFFIClient {
   name: String,
   callback: FFICallback,
   client: Arc<RwLock<Option<ButtplugClient>>>
+}
+
+fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: ServerMessageType, union: WIPOffset<UnionWIPOffset>, callback: FFICallback) {
+  let server_msg = ServerMessage::create(&mut builder, &ServerMessageArgs {
+    id: id,
+    message_type: msg_type,
+    message: Some(union),
+  });
+  builder.finish(server_msg, None);
+  let msg = builder.finished_data();
+  callback(msg.as_ptr(), msg.len() as u32);
+}
+
+fn send_ok_message(id: u32, callback: FFICallback) {
+  let mut builder = FlatBufferBuilder::new_with_capacity(1024);
+  let ok_msg = Ok::create(&mut builder, &OkArgs {});
+  send_server_message(builder, id, ServerMessageType::Ok, ok_msg.as_union_value(), callback);
+}
+
+fn send_event(event: ButtplugClientEvent, callback: FFICallback) {
+  let mut builder = FlatBufferBuilder::new_with_capacity(1024);
+  match event {
+    ButtplugClientEvent::DeviceAdded(device) => {
+      let device_name = builder.create_string(&device.name);
+      let device_added_msg = DeviceAdded::create(&mut builder, &DeviceAddedArgs {
+        name: Some(device_name)
+      });
+      send_server_message(builder, 0, ServerMessageType::DeviceAdded, device_added_msg.as_union_value(), callback);
+    },
+    ButtplugClientEvent::DeviceRemoved(device) => {
+
+    },
+    ButtplugClientEvent::Error(error) => {
+
+    },
+    ButtplugClientEvent::Log(log_level, log_msg) => {
+
+    },
+    ButtplugClientEvent::ScanningFinished => {
+
+    },
+    ButtplugClientEvent::ServerDisconnect => {
+
+    },
+    ButtplugClientEvent::PingTimeout => {
+
+    }
+  }
 }
 
 impl ButtplugFFIClient {
@@ -103,11 +107,13 @@ impl ButtplugFFIClient {
     let client_msg = get_root_as_client_message(msg);
     match client_msg.message_type() {
       ClientMessageType::ConnectLocal => self.connect_local(&client_msg),
+      ClientMessageType::StartScanning => self.start_scanning(client_msg.id()),
+      ClientMessageType::StopScanning => self.stop_scanning(client_msg.id()),
       _ => println!("Unhandled message type")
     }
   }
 
-  pub fn connect_local(&self, client_msg: &ClientMessage) {
+  fn connect_local(&self, client_msg: &ClientMessage) {
     let connect_local = client_msg.message_as_connect_local().unwrap();
     println!("Making client with name {}, id {}", self.name, client_msg.id());
     let client = self.client.clone();
@@ -119,27 +125,44 @@ impl ButtplugFFIClient {
 
     async_manager::spawn(async move {
       let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
+      connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>();
       let (bp_client, mut event_stream) = ButtplugClient::connect(&client_name, connector).await.unwrap();
       *(client.write().await) = Some(bp_client);
       let event_callback = callback.clone();
       async_manager::spawn(async move {
         while let Some(e) = event_stream.next().await {
           println!("Client Event!");
-          //event_callback()
+          send_event(e, event_callback);
         }
       }).unwrap();
-      let mut builder = FlatBufferBuilder::new_with_capacity(1024);
-      let ok_msg = Ok::create(&mut builder, &OkArgs {});
-      let server_msg = ServerMessage::create(&mut builder, &ServerMessageArgs {
-        id: client_msg_id,
-        message_type: ServerMessageType::Ok,
-        message: Some(ok_msg.as_union_value())
-      });
-      builder.finish(server_msg, None);
-      let msg = builder.finished_data();
-      callback(msg.as_ptr(), msg.len() as u32);
+      send_ok_message(client_msg_id, callback);
     }).unwrap();
+  }
 
+  fn start_scanning(&self, id: u32) {
+    let client = self.client.clone();
+    let callback = self.callback.clone();
+    async_manager::spawn(async move {
+      if let Some(usable_client) = &(*client.read().await) {
+        usable_client.start_scanning().await;
+      } else {
+        error!("No client to scan!");
+      }
+      send_ok_message(id, callback);
+    }).unwrap();
+  }
+
+  fn stop_scanning(&self, id: u32) {
+    let client = self.client.clone();
+    let callback = self.callback.clone();
+    async_manager::spawn(async move {
+      if let Some(usable_client) = &(*client.read().await) {
+        usable_client.stop_scanning().await;
+      } else {
+        error!("No client to scan!");
+      }
+      send_ok_message(id, callback);
+    }).unwrap();
   }
 }
 

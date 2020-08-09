@@ -4,7 +4,6 @@ union ServerMessageType {
   Ok,
   Error,
   ScanningFinished,
-  DeviceList,
   DeviceAdded,
   DeviceRemoved,
 }
@@ -18,10 +17,8 @@ table Error {
 table ScanningFinished {
 }
 
-table DeviceList {
-}
-
 table DeviceAdded {
+  name: string;
 }
 
 table DeviceRemoved {

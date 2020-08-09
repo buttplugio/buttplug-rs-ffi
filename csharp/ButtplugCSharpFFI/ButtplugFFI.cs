@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using ButtplugFFI;
 using FlatBuffers;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace ButtplugCSharpFFI
 {
@@ -45,7 +46,7 @@ namespace ButtplugCSharpFFI
     internal class ButtplugFFI
     {
 
-        internal static ButtplugFFIClientHandle TryCreateClient(string aClientName, ButtplugCallback aCallback)
+        internal static ButtplugFFIClientHandle SendCreateClient(string aClientName, ButtplugCallback aCallback)
         {
             var builder = new FlatBufferBuilder(1024);
             var client_name = builder.CreateString(aClientName);
@@ -55,27 +56,40 @@ namespace ButtplugCSharpFFI
             return ButtplugFFICalls.buttplug_create_client(aCallback, buf, buf.Length);
         }
 
-        internal static Task<ServerMessage> TryConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime)
+        internal static Task<ServerMessage> SendClientMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, FlatBufferBuilder aBuilder, ClientMessageType aType, int aOffset)
         {
-            var builder = new FlatBufferBuilder(1024);
-            var connect_local_msg = ConnectLocal.CreateConnectLocal(builder, builder.CreateString(aServerName), aMaxPingTime, 0);
-            var offset_msg = new Offset<ConnectLocal>();
-            offset_msg = connect_local_msg;
-            ClientMessage.StartClientMessage(builder);
-            ClientMessage.AddMessageType(builder, ClientMessageType.ConnectLocal);
-            ClientMessage.AddMessage(builder, offset_msg.Value);
-            var task = aSorter.PrepareMessage(builder);
-            var create_client_msg = CreateClient.EndCreateClient(builder);
-            builder.Finish(create_client_msg.Value);
-            var buf = builder.SizedByteArray();
+            ClientMessage.StartClientMessage(aBuilder);
+            ClientMessage.AddMessageType(aBuilder, aType);
+            ClientMessage.AddMessage(aBuilder, aOffset);
+            var task = aSorter.PrepareMessage(aBuilder);
+            var create_client_msg = CreateClient.EndCreateClient(aBuilder);
+            aBuilder.Finish(create_client_msg.Value);
+            var buf = aBuilder.SizedByteArray();
             ButtplugFFICalls.buttplug_parse_client_message(aHandle, buf, buf.Length);
             return task;
         }
-        /*
-        internal static void Callback(uint length, UIntPtr msg_array)
+
+        internal static Task<ServerMessage> SendConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime)
         {
-            Debug.WriteLine("Got message!");
+            var builder = new FlatBufferBuilder(1024);
+            var msg = ConnectLocal.CreateConnectLocal(builder, builder.CreateString(aServerName), aMaxPingTime, 0);
+            return ButtplugFFI.SendClientMessage(aSorter, aHandle, builder, ClientMessageType.ConnectLocal, msg.Value);
         }
-        */
+
+        internal static Task<ServerMessage> SendStartScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
+        {
+            var builder = new FlatBufferBuilder(1024);
+            StartScanning.StartStartScanning(builder);
+            var msg = StartScanning.EndStartScanning(builder);
+            return ButtplugFFI.SendClientMessage(aSorter, aHandle, builder, ClientMessageType.StartScanning, msg.Value);
+        }
+
+        internal static Task<ServerMessage> SendStopScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
+        {
+            var builder = new FlatBufferBuilder(1024);
+            StopScanning.StartStopScanning(builder);
+            var msg = StopScanning.EndStopScanning(builder);
+            return ButtplugFFI.SendClientMessage(aSorter, aHandle, builder, ClientMessageType.StopScanning, msg.Value);
+        }
     }
 }
