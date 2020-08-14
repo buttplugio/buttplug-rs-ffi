@@ -1,0 +1,14 @@
+namespace ButtplugFFI;
+
+union DeviceEventType {
+    Disconnect,
+    BatteryLevelReading,
+    RSSILevelReading,
+}
+
+table DeviceEvent {
+    device_index: uint;
+    event: DeviceEventType;
+}
+
+root_type DeviceEvent

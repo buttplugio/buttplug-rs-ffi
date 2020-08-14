@@ -23,8 +23,6 @@ use buttplug::{
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use futures::StreamExt;
 
-
-
 pub struct ButtplugFFIClient {
   name: String,
   callback: FFICallback,

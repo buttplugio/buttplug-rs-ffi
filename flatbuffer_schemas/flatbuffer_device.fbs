@@ -1,0 +1,52 @@
+namespace ButtplugFFI;
+
+union DeviceMessageType {
+  VibrateCmd,
+  RotateCmd,
+  LinearCmd,
+  StopDeviceCmd,
+  RawReadCmd,
+  RawWriteCmd,
+  BatteryLevelCmd,
+  RSSILevelCmd,
+}
+
+struct VibrateCmd {
+
+}
+
+struct RotateCmd {
+
+}
+
+struct LinearCmd {
+
+}
+
+struct StopDeviceCmd {
+
+}
+
+struct RawReadCmd {
+
+}
+
+struct RawWriteCmd {
+
+}
+
+struct BatteryLevelCmd {
+
+}
+
+struct RSSILevelCmd {
+
+}
+
+table DeviceMessage {
+  id: uint;
+  device_index: uint;
+  message: DeviceMessageType;
+}
+
+root_type DeviceMessage;

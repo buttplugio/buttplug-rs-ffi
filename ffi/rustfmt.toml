@@ -1,1 +1,4 @@
 edition = "2018"
+tab_spaces = 2
+empty_item_single_line = false
+imports_layout = "HorizontalVertical"
