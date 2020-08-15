@@ -71,7 +71,7 @@ namespace ButtplugCSharpFFI
             Console.WriteLine("Connected");
         }
 
-        public async Task ConnectWebsocket()
+        public void ConnectWebsocket()
         {
 
         }
@@ -90,8 +90,10 @@ namespace ButtplugCSharpFFI
                 {
                     if (server_message.MessageType == ServerMessageType.DeviceAdded) {
                         var device_added_message = server_message.Message<DeviceAdded>();
+                        var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Value.Index);
+                        var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Value.Index, device_added_message.Value.Name);
                         DeviceAdded.Invoke(this,
-                            new DeviceAddedEventArgs(device_added_message.Value.Name));
+                            new DeviceAddedEventArgs(device));
                     }
                 }
             }

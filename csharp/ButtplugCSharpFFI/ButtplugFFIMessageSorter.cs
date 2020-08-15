@@ -45,7 +45,7 @@ namespace ButtplugCSharpFFI
             }
         }
 
-        public Task<ServerMessage> PrepareMessage(FlatBufferBuilder aBuilder)
+        public Task<ServerMessage> PrepareClientMessage(FlatBufferBuilder aBuilder)
         {
             var id = NextMsgId;
             // The client always increments the IDs on outgoing messages
@@ -53,7 +53,19 @@ namespace ButtplugCSharpFFI
 
             var promise = new TaskCompletionSource<ServerMessage>();
             _waitingMsgs.TryAdd(id, promise);
-            Console.WriteLine($"Sending a message with Id {id}");
+            Console.WriteLine($"Sending a client message with Id {id}");
+            return promise.Task;
+        }
+
+        public Task<ServerMessage> PrepareDeviceMessage(FlatBufferBuilder aBuilder)
+        {
+            var id = NextMsgId;
+            // The client always increments the IDs on outgoing messages
+            DeviceMessage.AddId(aBuilder, id);
+
+            var promise = new TaskCompletionSource<ServerMessage>();
+            _waitingMsgs.TryAdd(id, promise);
+            Console.WriteLine($"Sending a device message with Id {id}");
             return promise.Task;
         }
 

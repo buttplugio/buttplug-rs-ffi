@@ -26,16 +26,20 @@ public struct DeviceAdded : IFlatbufferObject
   public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(4); }
 #endif
   public byte[] GetNameArray() { return __p.__vector_as_array<byte>(4); }
+  public uint Index { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUint(o + __p.bb_pos) : (uint)0; } }
 
   public static Offset<ButtplugFFI.DeviceAdded> CreateDeviceAdded(FlatBufferBuilder builder,
-      StringOffset nameOffset = default(StringOffset)) {
-    builder.StartTable(1);
+      StringOffset nameOffset = default(StringOffset),
+      uint index = 0) {
+    builder.StartTable(2);
+    DeviceAdded.AddIndex(builder, index);
     DeviceAdded.AddName(builder, nameOffset);
     return DeviceAdded.EndDeviceAdded(builder);
   }
 
-  public static void StartDeviceAdded(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void StartDeviceAdded(FlatBufferBuilder builder) { builder.StartTable(2); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(0, nameOffset.Value, 0); }
+  public static void AddIndex(FlatBufferBuilder builder, uint index) { builder.AddUint(1, index, 0); }
   public static Offset<ButtplugFFI.DeviceAdded> EndDeviceAdded(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ButtplugFFI.DeviceAdded>(o);

@@ -16,15 +16,15 @@ namespace ButtplugCSharpFFI
         /// The client representation of a Buttplug Device.
         /// </summary>
         //public readonly ButtplugClientDevice Device;
-        public readonly string DeviceName;
+        public readonly ButtplugClientDevice Device;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceAddedEventArgs"/> class.
         /// </summary>
         /// <param name="aDevice">Device being added.</param>
-        public DeviceAddedEventArgs(string aDeviceName)
+        public DeviceAddedEventArgs(ButtplugClientDevice aDevice)
         {
-            DeviceName = aDeviceName;
+            Device = aDevice;
         }
     }
 }
