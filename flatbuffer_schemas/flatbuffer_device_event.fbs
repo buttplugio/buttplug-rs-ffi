@@ -6,9 +6,18 @@ union DeviceEventType {
     RSSILevelReading,
 }
 
+table Disconnect {
+}
+
+table BatteryLevelReading {
+}
+
+table RSSILevelReading {
+}
+
 table DeviceEvent {
     device_index: uint;
     event: DeviceEventType;
 }
 
-root_type DeviceEvent
+root_type DeviceEvent;

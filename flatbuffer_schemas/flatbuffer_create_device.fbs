@@ -1,0 +1,7 @@
+namespace ButtplugFFI;
+
+table CreateDevice {
+  index: uint;
+}
+
+root_type CreateDevice;

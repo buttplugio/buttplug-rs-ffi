@@ -19,6 +19,7 @@ table ScanningFinished {
 
 table DeviceAdded {
   name: string;
+  index: uint;
 }
 
 table DeviceRemoved {

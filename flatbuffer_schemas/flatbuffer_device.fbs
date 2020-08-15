@@ -11,35 +11,35 @@ union DeviceMessageType {
   RSSILevelCmd,
 }
 
-struct VibrateCmd {
+table VibrateCmd {
+  speeds: [double];
+}
+
+table RotateCmd {
 
 }
 
-struct RotateCmd {
+table LinearCmd {
 
 }
 
-struct LinearCmd {
+table StopDeviceCmd {
 
 }
 
-struct StopDeviceCmd {
+table RawReadCmd {
 
 }
 
-struct RawReadCmd {
+table RawWriteCmd {
 
 }
 
-struct RawWriteCmd {
+table BatteryLevelCmd {
 
 }
 
-struct BatteryLevelCmd {
-
-}
-
-struct RSSILevelCmd {
+table RSSILevelCmd {
 
 }
 
