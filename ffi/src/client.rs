@@ -1,12 +1,14 @@
 use super::{
   FFICallback,
+  device::ButtplugFFIDevice,
   flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, get_root_as_client_message},
+  flatbuffer_create_device_generated::buttplug_ffi::get_root_as_create_device,
   util::{send_ok_message, send_event}
 };
 use std::{slice, sync::Arc};
 use async_std::sync::RwLock;
 use buttplug::{
-  client::{ButtplugClient, ButtplugClientEvent},
+  client::{ButtplugClient, ButtplugClientEvent, device::ButtplugClientDevice},
   connector::ButtplugInProcessClientConnector,
   server::{
     comm_managers::{
@@ -19,6 +21,7 @@ use buttplug::{
   },
   util::async_manager
 };
+use dashmap::DashMap;
 #[cfg(target_os = "windows")]
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use futures::StreamExt;
@@ -26,7 +29,8 @@ use futures::StreamExt;
 pub struct ButtplugFFIClient {
   name: String,
   callback: FFICallback,
-  client: Arc<RwLock<Option<ButtplugClient>>>
+  client: Arc<RwLock<Option<ButtplugClient>>>,
+  devices: Arc<DashMap<u32, ButtplugClientDevice>>
 }
 
 impl Drop for ButtplugFFIClient {
@@ -40,11 +44,27 @@ impl ButtplugFFIClient {
     Self {
       name: name.to_owned(),
       callback,
-      client: Arc::new(RwLock::new(None))
+      client: Arc::new(RwLock::new(None)),
+      devices: Arc::new(DashMap::new())
     }
   }
 
-  pub fn parse_client_message(&self, buf: *const u8, buf_len: i32) {
+  pub fn get_device(&self, buf: *const u8, buf_len: i32) -> Option<ButtplugFFIDevice> {
+    let msg: &[u8];
+    unsafe {
+      msg = slice::from_raw_parts(buf, buf_len as usize);
+    }
+    let get_device_msg = get_root_as_create_device(msg);
+    if self.devices.contains_key(&get_device_msg.index()) {
+      let device = self.devices.get(&get_device_msg.index()).unwrap();
+      Some(ButtplugFFIDevice::new(device.value().clone(), self.callback))
+    } else {
+      error!("Device id {} not available.", get_device_msg.index());
+      None
+    }
+  }
+
+  pub fn parse_message(&self, buf: *const u8, buf_len: i32) {
     let msg: &[u8];
     unsafe {
       msg = slice::from_raw_parts(buf, buf_len as usize);
@@ -54,7 +74,7 @@ impl ButtplugFFIClient {
       ClientMessageType::ConnectLocal => self.connect_local(&client_msg),
       ClientMessageType::StartScanning => self.start_scanning(client_msg.id()),
       ClientMessageType::StopScanning => self.stop_scanning(client_msg.id()),
-      _ => println!("Unhandled message type")
+      _ => error!("Unhandled message type")
     }
   }
 
@@ -67,6 +87,7 @@ impl ButtplugFFIClient {
     let max_ping_time = connect_local.max_ping_time();
     let client_msg_id = client_msg.id();
     let callback = self.callback.clone();
+    let device_map = self.devices.clone();
 
     async_manager::spawn(async move {
       let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
@@ -76,7 +97,15 @@ impl ButtplugFFIClient {
       let event_callback = callback.clone();
       async_manager::spawn(async move {
         while let Some(e) = event_stream.next().await {
-          println!("Client Event!");
+          match &e {
+            ButtplugClientEvent::DeviceAdded(device) => {
+              device_map.insert(device.index(), device.clone());
+            },
+            ButtplugClientEvent::DeviceRemoved(device) => {
+              device_map.remove(&device.device_index);
+            }
+            _ => {}
+          };
           send_event(e, event_callback);
         }
       }).unwrap();

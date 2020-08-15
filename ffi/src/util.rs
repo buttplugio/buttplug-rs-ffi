@@ -28,7 +28,8 @@ pub fn send_event(event: ButtplugClientEvent, callback: FFICallback) {
     ButtplugClientEvent::DeviceAdded(device) => {
       let device_name = builder.create_string(&device.name);
       let device_added_msg = DeviceAdded::create(&mut builder, &DeviceAddedArgs {
-        name: Some(device_name)
+        name: Some(device_name),
+        index: device.index()
       });
       send_server_message(builder, 0, ServerMessageType::DeviceAdded, device_added_msg.as_union_value(), callback);
     },
