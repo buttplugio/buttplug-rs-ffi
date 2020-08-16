@@ -12,7 +12,7 @@ use super::{
     StopDeviceCmd,
     VibrateCmd,
   },
-  util::send_ok_message,
+  util::return_client_result,
   FFICallback,
 };
 use buttplug::{
@@ -69,8 +69,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     let id = msg.id();
     async_manager::spawn(async move {
-      device.vibrate(params).await;
-      send_ok_message(id, callback);
+      return_client_result(device.vibrate(params).await, id, callback);
     })
     .unwrap();
   }
@@ -89,8 +88,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     let id = msg.id();
     async_manager::spawn(async move {
-      device.rotate(params).await;
-      send_ok_message(id, callback);
+      return_client_result(device.rotate(params).await, id, callback);
     })
     .unwrap();
   }
@@ -109,8 +107,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     let id = msg.id();
     async_manager::spawn(async move {
-      device.linear(params).await;
-      send_ok_message(id, callback);
+      return_client_result(device.linear(params).await, id, callback);
     })
     .unwrap();
   }
@@ -120,8 +117,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     let id = msg.id();
     async_manager::spawn(async move {
-      device.stop().await;
-      send_ok_message(id, callback);
+      return_client_result(device.stop().await, id, callback);
     })
     .unwrap();
   }
@@ -147,8 +143,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     let id = msg.id();
     async_manager::spawn(async move {
-      // device.().await;
-      send_ok_message(id, callback);
+      return_client_result(Ok(()), id, callback);
     })
     .unwrap();
   }
@@ -158,8 +153,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     let id = msg.id();
     async_manager::spawn(async move {
-      // device.().await;
-      send_ok_message(id, callback);
+      return_client_result(Ok(()), id, callback);
     })
     .unwrap();
   }

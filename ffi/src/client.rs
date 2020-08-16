@@ -3,13 +3,13 @@ use super::{
   device::ButtplugFFIDevice,
   flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, get_root_as_client_message},
   flatbuffer_create_device_generated::buttplug_ffi::get_root_as_create_device,
-  util::{send_ok_message, send_event}
+  util::{return_client_result, return_ok, return_error, send_event}
 };
 use std::{slice, sync::Arc};
 use async_std::sync::RwLock;
 use buttplug::{
   client::{ButtplugClient, ButtplugClientEvent, device::ButtplugClientDevice},
-  connector::ButtplugInProcessClientConnector,
+  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugConnectorError},
   server::{
     comm_managers::{
       btleplug::BtlePlugCommunicationManager,
@@ -91,25 +91,31 @@ impl ButtplugFFIClient {
 
     async_manager::spawn(async move {
       let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
-      connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>();
-      let (bp_client, mut event_stream) = ButtplugClient::connect(&client_name, connector).await.unwrap();
-      *(client.write().await) = Some(bp_client);
-      let event_callback = callback.clone();
-      async_manager::spawn(async move {
-        while let Some(e) = event_stream.next().await {
-          match &e {
-            ButtplugClientEvent::DeviceAdded(device) => {
-              device_map.insert(device.index(), device.clone());
-            },
-            ButtplugClientEvent::DeviceRemoved(device) => {
-              device_map.remove(&device.device_index);
+      connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap();
+      match ButtplugClient::connect(&client_name, connector).await {
+        Ok((bp_client, mut event_stream)) => {
+          *(client.write().await) = Some(bp_client);
+          let event_callback = callback.clone();
+          async_manager::spawn(async move {
+            while let Some(e) = event_stream.next().await {
+              match &e {
+                ButtplugClientEvent::DeviceAdded(device) => {
+                  device_map.insert(device.index(), device.clone());
+                },
+                ButtplugClientEvent::DeviceRemoved(device) => {
+                  device_map.remove(&device.device_index);
+                }
+                _ => {}
+              };
+              send_event(e, event_callback);
             }
-            _ => {}
-          };
-          send_event(e, event_callback);
+          }).unwrap();
+          return_ok(client_msg_id, callback);    
+        },
+        Err(e) => {
+          return_error(client_msg_id, e, callback);
         }
-      }).unwrap();
-      send_ok_message(client_msg_id, callback);
+      }
     }).unwrap();
   }
 
@@ -118,11 +124,10 @@ impl ButtplugFFIClient {
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        usable_client.start_scanning().await;
+        return_client_result(usable_client.start_scanning().await, id, callback);
       } else {
-        error!("No client to scan!");
+        return_error(id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
       }
-      send_ok_message(id, callback);
     }).unwrap();
   }
 
@@ -131,11 +136,10 @@ impl ButtplugFFIClient {
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        usable_client.stop_scanning().await;
+        return_client_result(usable_client.start_scanning().await, id, callback);
       } else {
-        error!("No client to scan!");
+        return_error(id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
       }
-      send_ok_message(id, callback);
     }).unwrap();
   }
 }

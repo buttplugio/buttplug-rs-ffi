@@ -10,6 +10,15 @@ union ServerMessageType {
   DeviceRemoved,
 }
 
+enum ButtplugErrorType: byte {
+  ButtplugConnectorError,
+  ButtplugHandshakeError,
+  ButtplugDeviceError,
+  ButtplugPingError,
+  ButtplugMessageError,
+  ButtplugUnknownError,
+}
+
 enum MessageAttributeType: ushort {
   VibrateCmd,
   RotateCmd,
@@ -37,6 +46,9 @@ table Ok {
 }
 
 table Error {
+  error_type: ButtplugErrorType;
+  message: string;
+  backtrace: string;
 }
 
 table ScanningFinished {

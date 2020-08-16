@@ -2,15 +2,17 @@ use super::{
   FFICallback,
   flatbuffer_server_generated::buttplug_ffi::{ServerMessage, ServerMessageArgs, ServerMessageType, DeviceAdded, 
     DeviceAddedArgs, Ok, OkArgs, MessageAttributes as SerializedMessageAttributes, MessageAttributeType, MessageAttributesArgs,
+    Error as FlatBufBPError, ErrorArgs, ButtplugErrorType
   },
   flatbuffer_enums_generated::Endpoint as SerializedEndpoint,
 };
 use flatbuffers::{FlatBufferBuilder, WIPOffset, UnionWIPOffset};
 use buttplug::{
-  client::ButtplugClientEvent,
-  core::messages::{MessageAttributesMap, MessageAttributes, ButtplugDeviceMessageType},
+  client::{ButtplugClientEvent, ButtplugClientError},
+  core::{errors::ButtplugError, messages::ButtplugDeviceMessageType},
   device::Endpoint,
 };
+use std::error::Error;
 
 fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: ServerMessageType, union: WIPOffset<UnionWIPOffset>, callback: FFICallback) {
   let server_msg = ServerMessage::create(&mut builder, &ServerMessageArgs {
@@ -23,7 +25,44 @@ fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: Server
   callback(msg.as_ptr(), msg.len() as u32);
 }
 
-pub fn send_ok_message(id: u32, callback: FFICallback) {
+pub fn return_client_result(result: Result<(), ButtplugClientError>, id: u32, callback: FFICallback) {
+  match result {
+    Ok(_) => return_ok(id, callback),
+    Err(error) => return_error(id, error, callback)
+  };
+}
+
+pub fn return_error(id: u32, error: ButtplugClientError, callback: FFICallback) {
+  let mut builder = FlatBufferBuilder::new_with_capacity(1024);
+  let error_args = match error {
+    ButtplugClientError::ButtplugConnectorError(conn_err) => {
+      ErrorArgs {
+        error_type: ButtplugErrorType::ButtplugConnectorError,
+        message: Some(builder.create_string(&format!("{}", conn_err))),
+        backtrace: Some(builder.create_string(&format!("{:?}", conn_err.source())))
+      }
+    }
+    ButtplugClientError::ButtplugError(bp_err) => {
+      let error_type = match &bp_err {
+        ButtplugError::ButtplugDeviceError(_) => ButtplugErrorType::ButtplugDeviceError,
+        ButtplugError::ButtplugPingError(_) => ButtplugErrorType::ButtplugPingError,
+        ButtplugError::ButtplugHandshakeError(_) => ButtplugErrorType::ButtplugHandshakeError,
+        ButtplugError::ButtplugMessageError(_) => ButtplugErrorType::ButtplugMessageError,
+        ButtplugError::ButtplugUnknownError(_) => ButtplugErrorType::ButtplugUnknownError,
+      };
+      ErrorArgs {
+        error_type,
+        message: Some(builder.create_string(&format!("{}", bp_err))),
+        backtrace: Some(builder.create_string(&format!("{:?}", bp_err.source())))
+      }
+    }
+  };
+
+  let error_msg = FlatBufBPError::create(&mut builder, &error_args);
+  send_server_message(builder, id, ServerMessageType::Error, error_msg.as_union_value(), callback);
+}
+
+pub fn return_ok(id: u32, callback: FFICallback) {
   let mut builder = FlatBufferBuilder::new_with_capacity(1024);
   let ok_msg = Ok::create(&mut builder, &OkArgs {});
   send_server_message(builder, id, ServerMessageType::Ok, ok_msg.as_union_value(), callback);
