@@ -27,19 +27,27 @@ public struct DeviceAdded : IFlatbufferObject
 #endif
   public byte[] GetNameArray() { return __p.__vector_as_array<byte>(4); }
   public uint Index { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUint(o + __p.bb_pos) : (uint)0; } }
+  public ButtplugFFI.MessageAttributes? Attributes(int j) { int o = __p.__offset(8); return o != 0 ? (ButtplugFFI.MessageAttributes?)(new ButtplugFFI.MessageAttributes()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
+  public int AttributesLength { get { int o = __p.__offset(8); return o != 0 ? __p.__vector_len(o) : 0; } }
 
   public static Offset<ButtplugFFI.DeviceAdded> CreateDeviceAdded(FlatBufferBuilder builder,
       StringOffset nameOffset = default(StringOffset),
-      uint index = 0) {
-    builder.StartTable(2);
+      uint index = 0,
+      VectorOffset attributesOffset = default(VectorOffset)) {
+    builder.StartTable(3);
+    DeviceAdded.AddAttributes(builder, attributesOffset);
     DeviceAdded.AddIndex(builder, index);
     DeviceAdded.AddName(builder, nameOffset);
     return DeviceAdded.EndDeviceAdded(builder);
   }
 
-  public static void StartDeviceAdded(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void StartDeviceAdded(FlatBufferBuilder builder) { builder.StartTable(3); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(0, nameOffset.Value, 0); }
   public static void AddIndex(FlatBufferBuilder builder, uint index) { builder.AddUint(1, index, 0); }
+  public static void AddAttributes(FlatBufferBuilder builder, VectorOffset attributesOffset) { builder.AddOffset(2, attributesOffset.Value, 0); }
+  public static VectorOffset CreateAttributesVector(FlatBufferBuilder builder, Offset<ButtplugFFI.MessageAttributes>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateAttributesVectorBlock(FlatBufferBuilder builder, Offset<ButtplugFFI.MessageAttributes>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static void StartAttributesVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
   public static Offset<ButtplugFFI.DeviceAdded> EndDeviceAdded(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ButtplugFFI.DeviceAdded>(o);

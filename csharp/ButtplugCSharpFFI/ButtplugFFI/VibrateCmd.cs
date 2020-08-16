@@ -19,14 +19,8 @@ public struct VibrateCmd : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public VibrateCmd __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public double Speeds(int j) { int o = __p.__offset(4); return o != 0 ? __p.bb.GetDouble(__p.__vector(o) + j * 8) : (double)0; }
+  public ButtplugFFI.VibrateComponent? Speeds(int j) { int o = __p.__offset(4); return o != 0 ? (ButtplugFFI.VibrateComponent?)(new ButtplugFFI.VibrateComponent()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
   public int SpeedsLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
-#if ENABLE_SPAN_T
-  public Span<double> GetSpeedsBytes() { return __p.__vector_as_span<double>(4, 8); }
-#else
-  public ArraySegment<byte>? GetSpeedsBytes() { return __p.__vector_as_arraysegment(4); }
-#endif
-  public double[] GetSpeedsArray() { return __p.__vector_as_array<double>(4); }
 
   public static Offset<ButtplugFFI.VibrateCmd> CreateVibrateCmd(FlatBufferBuilder builder,
       VectorOffset speedsOffset = default(VectorOffset)) {
@@ -37,9 +31,9 @@ public struct VibrateCmd : IFlatbufferObject
 
   public static void StartVibrateCmd(FlatBufferBuilder builder) { builder.StartTable(1); }
   public static void AddSpeeds(FlatBufferBuilder builder, VectorOffset speedsOffset) { builder.AddOffset(0, speedsOffset.Value, 0); }
-  public static VectorOffset CreateSpeedsVector(FlatBufferBuilder builder, double[] data) { builder.StartVector(8, data.Length, 8); for (int i = data.Length - 1; i >= 0; i--) builder.AddDouble(data[i]); return builder.EndVector(); }
-  public static VectorOffset CreateSpeedsVectorBlock(FlatBufferBuilder builder, double[] data) { builder.StartVector(8, data.Length, 8); builder.Add(data); return builder.EndVector(); }
-  public static void StartSpeedsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(8, numElems, 8); }
+  public static VectorOffset CreateSpeedsVector(FlatBufferBuilder builder, Offset<ButtplugFFI.VibrateComponent>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateSpeedsVectorBlock(FlatBufferBuilder builder, Offset<ButtplugFFI.VibrateComponent>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static void StartSpeedsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
   public static Offset<ButtplugFFI.VibrateCmd> EndVibrateCmd(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ButtplugFFI.VibrateCmd>(o);

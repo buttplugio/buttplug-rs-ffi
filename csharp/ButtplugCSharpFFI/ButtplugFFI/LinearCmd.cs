@@ -19,8 +19,21 @@ public struct LinearCmd : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public LinearCmd __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
+  public ButtplugFFI.LinearComponent? Movements(int j) { int o = __p.__offset(4); return o != 0 ? (ButtplugFFI.LinearComponent?)(new ButtplugFFI.LinearComponent()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
+  public int MovementsLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
 
-  public static void StartLinearCmd(FlatBufferBuilder builder) { builder.StartTable(0); }
+  public static Offset<ButtplugFFI.LinearCmd> CreateLinearCmd(FlatBufferBuilder builder,
+      VectorOffset movementsOffset = default(VectorOffset)) {
+    builder.StartTable(1);
+    LinearCmd.AddMovements(builder, movementsOffset);
+    return LinearCmd.EndLinearCmd(builder);
+  }
+
+  public static void StartLinearCmd(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void AddMovements(FlatBufferBuilder builder, VectorOffset movementsOffset) { builder.AddOffset(0, movementsOffset.Value, 0); }
+  public static VectorOffset CreateMovementsVector(FlatBufferBuilder builder, Offset<ButtplugFFI.LinearComponent>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateMovementsVectorBlock(FlatBufferBuilder builder, Offset<ButtplugFFI.LinearComponent>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static void StartMovementsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
   public static Offset<ButtplugFFI.LinearCmd> EndLinearCmd(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ButtplugFFI.LinearCmd>(o);

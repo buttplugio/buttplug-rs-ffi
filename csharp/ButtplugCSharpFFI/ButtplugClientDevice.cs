@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using ButtplugFFI;
 
 namespace ButtplugCSharpFFI
 {
@@ -24,7 +27,7 @@ namespace ButtplugCSharpFFI
         /// <summary>
         /// The Buttplug Protocol messages supported by this device, with additional attributes.
         /// </summary>
-        //public Dictionary<Type, MessageAttributes> AllowedMessages { get; }
+        public Dictionary<MessageAttributeType, ButtplugMessageAttributes> AllowedMessages { get; }
 
         private ButtplugFFIMessageSorter Sorter;
 
@@ -40,26 +43,14 @@ namespace ButtplugCSharpFFI
         internal ButtplugClientDevice(ButtplugFFIMessageSorter aSorter,
             ButtplugFFIDeviceHandle aHandle,
             uint aIndex,
-            string aName)
-//            Dictionary<string, MessageAttributes> aMessages)
+            string aName,
+            Dictionary<MessageAttributeType, ButtplugMessageAttributes> aAllowedMessages)
         {
             Sorter = aSorter;
             Handle = aHandle;
             Index = aIndex;
             Name = aName;
-            /*
-            AllowedMessages = new Dictionary<Type, MessageAttributes>();
-            foreach (var msg in aMessages)
-            {
-                var msgType = ButtplugUtils.GetMessageType(msg.Key);
-                if (msgType == null)
-                {
-                    throw new ButtplugDeviceException($"Message type {msg.Key} does not exist.");
-                }
-
-                AllowedMessages[msgType] = msg.Value;
-            }
-            */
+            AllowedMessages = aAllowedMessages;
         }
 
         public void Dispose()
@@ -97,80 +88,51 @@ namespace ButtplugCSharpFFI
             return Index == aDevice.Index;
         }
 
-        /*
-        public void CheckGenericSubcommandList<T>(IEnumerable<T> aCmdList, uint aLimitValue)
-            where T : GenericMessageSubcommand
-        {
-            if (!aCmdList.Any() || aCmdList.Count() > aLimitValue)
-            {
-                if (aLimitValue == 1)
-                {
-                    throw new ButtplugDeviceException(_bpLogger, $"{typeof(T).Name} requires 1 subcommand for this device, {aCmdList.Count()} present.");
-                }
-
-                throw new ButtplugDeviceException(_bpLogger, $"{typeof(T).Name} requires between 1 and {aLimitValue} subcommands for this device, {aCmdList.Count()} present.");
-            }
-
-            foreach (var cmd in aCmdList)
-            {
-                if (cmd.Index >= aLimitValue)
-                {
-                    throw new ButtplugDeviceException(_bpLogger, $"Index {cmd.Index} is out of bounds for {typeof(T).Name} for this device.");
-                }
-            }
-        }
-
-        private void CheckAllowedMessageType<T>()
-        where T : ButtplugDeviceMessage
-        {
-            if (!AllowedMessages.ContainsKey(typeof(T)))
-            {
-                throw new ButtplugDeviceException($"Device {Name} does not support message type {typeof(T).Name}");
-            }
-        }
-        */
-
         public Task SendVibrateCmd(double aSpeed)
         {
-            return ButtplugFFI.SendVibrateCmd(Sorter, Handle, Index, new List<double>() { aSpeed });
-            //await SendMessageAsync(VibrateCmd.Create(aSpeed, GetMessageAttributes<VibrateCmd>().FeatureCount.Value)).ConfigureAwait(false);
-        }
-        /*
-        public async Task SendVibrateCmd(IEnumerable<double> aCmds)
-        {
-            var msg = VibrateCmd.Create(aCmds);
-            CheckGenericSubcommandList(msg.Speeds, GetMessageAttributes<VibrateCmd>().FeatureCount.Value);
-            await SendMessageAsync(VibrateCmd.Create(aCmds)).ConfigureAwait(false);
+            return SendVibrateCmd(new Dictionary<uint, double>() { { 0, aSpeed } });
         }
 
-        public async Task SendRotateCmd(double aSpeed, bool aClockwise)
+        public Task SendVibrateCmd(IEnumerable<double> aCmds)
         {
-            CheckAllowedMessageType<RotateCmd>();
-            await SendMessageAsync(RotateCmd.Create(aSpeed, aClockwise, GetMessageAttributes<RotateCmd>().FeatureCount.Value)).ConfigureAwait(false);
+            return SendVibrateCmd(aCmds.Select((cmd, index) => (cmd, index)).ToDictionary(x => (uint)x.index, x => x.cmd));
         }
 
-        public async Task SendRotateCmd(IEnumerable<(double, bool)> aCmds)
+        public Task SendVibrateCmd(Dictionary<uint, double> aCmds)
         {
-            CheckAllowedMessageType<RotateCmd>();
-            var msg = RotateCmd.Create(aCmds);
-            CheckGenericSubcommandList(msg.Rotations, GetMessageAttributes<RotateCmd>().FeatureCount.Value);
-            await SendMessageAsync(RotateCmd.Create(aCmds)).ConfigureAwait(false);
+            return ButtplugFFI.SendVibrateCmd(Sorter, Handle, Index, aCmds);
         }
 
-        public async Task SendLinearCmd(uint aDuration, double aPosition)
+        public Task SendRotateCmd(double aSpeed, bool aClockwise)
         {
-            CheckAllowedMessageType<LinearCmd>();
-            await SendMessageAsync(LinearCmd.Create(aDuration, aPosition, GetMessageAttributes<LinearCmd>().FeatureCount.Value)).ConfigureAwait(false);
+            return SendRotateCmd(new Dictionary<uint, (double, bool)>() { { 0, (aSpeed, aClockwise) } });
         }
 
-        public async Task SendLinearCmd(IEnumerable<(uint, double)> aCmds)
+        public Task SendRotateCmd(IEnumerable<(double, bool)> aCmds)
         {
-            CheckAllowedMessageType<LinearCmd>();
-            var msg = LinearCmd.Create(aCmds);
-            CheckGenericSubcommandList(msg.Vectors, GetMessageAttributes<LinearCmd>().FeatureCount.Value);
-            await SendMessageAsync(LinearCmd.Create(aCmds)).ConfigureAwait(false);
+            return SendRotateCmd(aCmds.Select((cmd, index) => (cmd, index)).ToDictionary(x => (uint)x.index, x => x.cmd));
         }
-        */
+
+        public Task SendRotateCmd(Dictionary<uint, (double, bool)> aCmds)
+        {
+            return ButtplugFFI.SendRotateCmd(Sorter, Handle, Index, aCmds);
+        }
+
+        public Task SendLinearCmd(uint aDuration, double aPosition)
+        {
+            return SendLinearCmd(new Dictionary<uint, (uint, double)>() { { 0, (aDuration, aPosition) } });
+        }
+
+        public Task SendLinearCmd(IEnumerable<(uint, double)> aCmds)
+        {
+            return SendLinearCmd(aCmds.Select((cmd, index) => (cmd, index)).ToDictionary(x => (uint)x.index, x => x.cmd));
+        }
+
+        public Task SendLinearCmd(Dictionary<uint, (uint, double)> aCmds)
+        {
+            return ButtplugFFI.SendLinearCmd(Sorter, Handle, Index, aCmds);
+        }
+
 
         public Task StopDeviceCmd()
         {

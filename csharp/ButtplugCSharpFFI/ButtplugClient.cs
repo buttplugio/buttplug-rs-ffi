@@ -91,9 +91,17 @@ namespace ButtplugCSharpFFI
                     if (server_message.MessageType == ServerMessageType.DeviceAdded) {
                         var device_added_message = server_message.Message<DeviceAdded>();
                         var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Value.Index);
-                        var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Value.Index, device_added_message.Value.Name);
-                        DeviceAdded.Invoke(this,
-                            new DeviceAddedEventArgs(device));
+                        var attribute_dict = new Dictionary<MessageAttributeType, ButtplugMessageAttributes>();
+                        for (var i = 0; i < device_added_message.Value.AttributesLength; ++i)
+                        {
+                            Endpoint a;
+                            var attributes = device_added_message.Value.Attributes(i).Value;
+                            var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.GetStepCountArray(), 
+                                attributes.GetEndpointsArray(), attributes.GetMaxDurationArray(), null, null);
+                            attribute_dict.Add(attributes.MessageType, device_message_attributes);
+                        }
+                        var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Value.Index, device_added_message.Value.Name, attribute_dict);
+                        DeviceAdded.Invoke(this, new DeviceAddedEventArgs(device));
                     }
                 }
             }

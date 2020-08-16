@@ -14,8 +14,10 @@ public enum DeviceMessageType : byte
   StopDeviceCmd = 4,
   RawReadCmd = 5,
   RawWriteCmd = 6,
-  BatteryLevelCmd = 7,
-  RSSILevelCmd = 8,
+  RawSubscribeCmd = 7,
+  RawUnsubscribeCmd = 8,
+  BatteryLevelCmd = 9,
+  RSSILevelCmd = 10,
 };
 
 

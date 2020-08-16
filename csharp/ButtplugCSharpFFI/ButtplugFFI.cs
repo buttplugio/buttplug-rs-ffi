@@ -6,6 +6,7 @@ using ButtplugFFI;
 using FlatBuffers;
 using System.Runtime.InteropServices.ComTypes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ButtplugCSharpFFI
 {
@@ -144,13 +145,62 @@ namespace ButtplugCSharpFFI
             return task;
         }
 
-        internal static Task<ServerMessage> SendVibrateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceindex, List<double> aSpeeds) {
+        internal static Task<ServerMessage> SendVibrateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceindex, Dictionary<uint, double> aSpeeds) {
             var builder = new FlatBufferBuilder(1024);
-            var speed_array = VibrateCmd.CreateSpeedsVector(builder, aSpeeds.ToArray());
+            var command_list = new List<Offset<VibrateComponent>>();
+            foreach (var pair in aSpeeds)
+            {
+                VibrateComponent.StartVibrateComponent(builder);
+                VibrateComponent.AddIndex(builder, pair.Key);
+                VibrateComponent.AddSpeed(builder, pair.Value);
+                var component = VibrateComponent.EndVibrateComponent(builder);
+                command_list.Add(component);
+            }
+            var param_array = VibrateCmd.CreateSpeedsVector(builder, command_list.ToArray());
             VibrateCmd.StartVibrateCmd(builder);
-            VibrateCmd.AddSpeeds(builder, speed_array);
+            VibrateCmd.AddSpeeds(builder, param_array);
             var cmd = VibrateCmd.EndVibrateCmd(builder);
             return SendDeviceMessage(aSorter, aHandle, aDeviceindex, builder, DeviceMessageType.VibrateCmd, cmd.Value);
+        }
+
+        internal static Task<ServerMessage> SendRotateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceindex, Dictionary<uint, (double, bool)> aRotations)
+        {
+            var builder = new FlatBufferBuilder(1024);
+            var command_list = new List<Offset<RotateComponent>>();
+            foreach (var pair in aRotations)
+            {
+                RotateComponent.StartRotateComponent(builder);
+                RotateComponent.AddIndex(builder, pair.Key);
+                RotateComponent.AddSpeed(builder, pair.Value.Item1);
+                RotateComponent.AddClockwise(builder, pair.Value.Item2);
+                var component = RotateComponent.EndRotateComponent(builder);
+                command_list.Add(component);
+            }
+            var param_array = RotateCmd.CreateRotationsVector(builder, command_list.ToArray());
+            RotateCmd.StartRotateCmd(builder);
+            RotateCmd.AddRotations(builder, param_array);
+            var cmd = RotateCmd.EndRotateCmd(builder);
+            return SendDeviceMessage(aSorter, aHandle, aDeviceindex, builder, DeviceMessageType.RotateCmd, cmd.Value);
+        }
+
+        internal static Task<ServerMessage> SendLinearCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceindex, Dictionary<uint, (uint, double)> aLinears)
+        {
+            var builder = new FlatBufferBuilder(1024);
+            var command_list = new List<Offset<LinearComponent>>();
+            foreach (var pair in aLinears)
+            {
+                LinearComponent.StartLinearComponent(builder);
+                LinearComponent.AddIndex(builder, pair.Key);
+                LinearComponent.AddDuration(builder, pair.Value.Item1);
+                LinearComponent.AddPosition(builder, pair.Value.Item2);
+                var component = LinearComponent.EndLinearComponent(builder);
+                command_list.Add(component);
+            }
+            var param_array = LinearCmd.CreateMovementsVector(builder, command_list.ToArray());
+            LinearCmd.StartLinearCmd(builder);
+            LinearCmd.AddMovements(builder, param_array);
+            var cmd = LinearCmd.EndLinearCmd(builder);
+            return SendDeviceMessage(aSorter, aHandle, aDeviceindex, builder, DeviceMessageType.LinearCmd, cmd.Value);
         }
 
         internal static Task<ServerMessage> SendStopDeviceCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceindex)
