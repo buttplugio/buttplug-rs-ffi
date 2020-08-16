@@ -18,16 +18,13 @@ namespace ButtplugCSharpFFITest
 
         private static async Task RunExample()
         {
-            Console.WriteLine("Hello World!");
             var client = new ButtplugCSharpFFI.ButtplugClient("Test Client"); 
             client.DeviceAdded += async (obj, args) =>
             {
                 var device = args.Device;
-                Console.WriteLine($"DEVICE GOTTEN: {device.Name}");
-                Console.WriteLine(device.AllowedMessages);
                 if (device.AllowedMessages.ContainsKey(ButtplugFFI.MessageAttributeType.VibrateCmd))
                 {
-                    await device.SendVibrateCmd(0.5);
+                    await device.SendRotateCmd(0.5, true);
                 }
                 device.Dispose();
                 device = null;

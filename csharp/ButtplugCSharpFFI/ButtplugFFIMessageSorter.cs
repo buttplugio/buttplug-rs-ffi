@@ -85,13 +85,12 @@ namespace ButtplugCSharpFFI
                 throw new ButtplugMessageException("Message with non-matching ID received.");
             }
 
-            /*
-            if (aMsg is Error errMsg)
+            if (aMsg.MessageType is ServerMessageType.Error)
             {
-                queued.SetException(ButtplugException.FromError(errMsg));
+
+                queued.SetException(ButtplugException.FromError(aMsg));
                 return;
             }
-            */
 
             queued.SetResult(aMsg);
         }

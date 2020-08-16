@@ -94,7 +94,6 @@ namespace ButtplugCSharpFFI
                         var attribute_dict = new Dictionary<MessageAttributeType, ButtplugMessageAttributes>();
                         for (var i = 0; i < device_added_message.Value.AttributesLength; ++i)
                         {
-                            Endpoint a;
                             var attributes = device_added_message.Value.Attributes(i).Value;
                             var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.GetStepCountArray(), 
                                 attributes.GetEndpointsArray(), attributes.GetMaxDurationArray(), null, null);
