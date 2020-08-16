@@ -25,6 +25,10 @@ mod flatbuffer_device_generated;
 #[path = "../target/flatbuffers/flatbuffer_device_event_generated.rs"]
 mod flatbuffer_device_event_generated;
 
+#[allow(non_snake_case)]
+#[path = "../target/flatbuffers/flatbuffer_enums_generated.rs"]
+mod flatbuffer_enums_generated;
+
 mod client;
 mod device;
 mod export;
