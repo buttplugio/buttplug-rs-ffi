@@ -1,0 +1,17 @@
+// Do not wrap these types in namespaces, it will break rust!
+// See https://github.com/google/flatbuffers/issues/5275
+
+enum Endpoint: ushort {
+  Tx,
+  Rx,
+  RxPressure,
+  RxTouch,
+  RxAccel,
+  Command,
+  Firmware,
+  TxMode,
+  TxVibrate,
+  TxShock,
+  TxVendorControl,
+  Whitelist,
+}

@@ -1,3 +1,5 @@
+include "flatbuffer_enums.fbs";
+
 namespace ButtplugFFI;
 
 union ServerMessageType {
@@ -6,6 +8,29 @@ union ServerMessageType {
   ScanningFinished,
   DeviceAdded,
   DeviceRemoved,
+}
+
+enum MessageAttributeType: ushort {
+  VibrateCmd,
+  RotateCmd,
+  LinearCmd,
+  StopDeviceCmd,
+  RawReadCmd,
+  RawWriteCmd,
+  RawSubscribeCmd,
+  RawUnsubscribeCmd,
+  BatteryLevelCmd,
+  RSSILevelCmd,
+}
+
+table MessageAttributes {
+  message_type: MessageAttributeType;
+  feature_count: uint;
+  step_count: [uint];
+  endpoints: [Endpoint];
+  max_duration: [uint];
+  // TODO Patterns
+  // TODO Actuator Type
 }
 
 table Ok {
@@ -20,9 +45,11 @@ table ScanningFinished {
 table DeviceAdded {
   name: string;
   index: uint;
+  attributes: [MessageAttributes];
 }
 
 table DeviceRemoved {
+  index: uint;
 }
 
 table ServerMessage {
