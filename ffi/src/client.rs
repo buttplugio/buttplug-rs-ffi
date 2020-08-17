@@ -8,8 +8,9 @@ use super::{
 use std::{slice, sync::Arc};
 use async_std::sync::RwLock;
 use buttplug::{
+  core::messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer},
   client::{ButtplugClient, ButtplugClientEvent, device::ButtplugClientDevice},
-  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugConnectorError},
+  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugConnectorError, ButtplugWebsocketClientTransport, ButtplugRemoteClientConnector},
   server::{
     comm_managers::{
       btleplug::BtlePlugCommunicationManager,
@@ -55,6 +56,7 @@ impl ButtplugFFIClient {
       msg = slice::from_raw_parts(buf, buf_len as usize);
     }
     let get_device_msg = get_root_as_create_device(msg);
+    error!("{:?}", get_device_msg);
     if self.devices.contains_key(&get_device_msg.index()) {
       let device = self.devices.get(&get_device_msg.index()).unwrap();
       Some(ButtplugFFIDevice::new(device.value().clone(), self.callback))
@@ -72,26 +74,22 @@ impl ButtplugFFIClient {
     let client_msg = get_root_as_client_message(msg);
     match client_msg.message_type() {
       ClientMessageType::ConnectLocal => self.connect_local(&client_msg),
+      ClientMessageType::ConnectWebsocket => self.connect_websocket(&client_msg),
       ClientMessageType::StartScanning => self.start_scanning(client_msg.id()),
       ClientMessageType::StopScanning => self.stop_scanning(client_msg.id()),
       _ => error!("Unhandled message type")
     }
   }
 
-  fn connect_local(&self, client_msg: &ClientMessage) {
-    let connect_local = client_msg.message_as_connect_local().unwrap();
-    println!("Making client with name {}, id {}", self.name, client_msg.id());
+  fn connect<T>(&self, client_msg_id: u32, connector: T) 
+  where T: ButtplugConnector<ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage>  + 'static {
+    info!("Making client with name {}, id {}", self.name, client_msg_id);
     let client = self.client.clone();
     let client_name = self.name.clone();
-    let server_name = connect_local.server_name().unwrap().to_owned();
-    let max_ping_time = connect_local.max_ping_time();
-    let client_msg_id = client_msg.id();
     let callback = self.callback.clone();
     let device_map = self.devices.clone();
 
     async_manager::spawn(async move {
-      let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
-      connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap();
       match ButtplugClient::connect(&client_name, connector).await {
         Ok((bp_client, mut event_stream)) => {
           *(client.write().await) = Some(bp_client);
@@ -117,6 +115,31 @@ impl ButtplugFFIClient {
         }
       }
     }).unwrap();
+  }
+
+  fn connect_local(&self, client_msg: &ClientMessage) {
+    let connect_local = client_msg.message_as_connect_local().unwrap();
+    let server_name = connect_local.server_name().unwrap().to_owned();
+    let max_ping_time = connect_local.max_ping_time();
+    let client_msg_id = client_msg.id();
+    let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
+    connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap();
+    self.connect(client_msg_id, connector);
+  }
+
+  fn connect_websocket(&self, client_msg: &ClientMessage) {
+    let connect_websocket = client_msg.message_as_connect_websocket().unwrap();
+    let address = connect_websocket.address().unwrap().to_owned();
+    let bypass_cert_verify = connect_websocket.bypass_cert_verification();
+    let client_msg_id = client_msg.id();
+    let connector: ButtplugRemoteClientConnector<_, ButtplugClientJSONSerializer> = if address.contains("wss://") {
+      let transport = ButtplugWebsocketClientTransport::new_secure_connector(&address, bypass_cert_verify);
+      ButtplugRemoteClientConnector::new(transport)
+    } else {
+      let transport = ButtplugWebsocketClientTransport::new_insecure_connector(&address);
+      ButtplugRemoteClientConnector::new(transport)
+    };
+    self.connect(client_msg_id, connector);
   }
 
   fn start_scanning(&self, id: u32) {

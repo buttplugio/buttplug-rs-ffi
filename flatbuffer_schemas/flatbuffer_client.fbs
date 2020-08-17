@@ -25,6 +25,8 @@ table ConnectLocal {
 }
 
 table ConnectWebsocket {
+  address: string;
+  bypass_cert_verification: bool;
 }
 
 table StartScanning {
