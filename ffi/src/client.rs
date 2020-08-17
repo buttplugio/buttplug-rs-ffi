@@ -1,7 +1,7 @@
 use super::{
   FFICallback,
   device::ButtplugFFIDevice,
-  flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, get_root_as_client_message},
+  flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, get_root_as_client_message, DeviceCommunicationManagerTypes},
   flatbuffer_create_device_generated::buttplug_ffi::get_root_as_create_device,
   util::{return_client_result, return_ok, return_error, send_event}
 };
@@ -123,7 +123,23 @@ impl ButtplugFFIClient {
     let max_ping_time = connect_local.max_ping_time();
     let client_msg_id = client_msg.id();
     let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
-    connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap();
+    let device_mgrs = connect_local.comm_manager_types();
+    if device_mgrs & DeviceCommunicationManagerTypes::LovenseHIDDongle as u16 > 0 {
+      connector.server_ref().add_comm_manager::<LovenseHIDDongleCommunicationManager>().unwrap(); 
+    }
+    if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u16 > 0 {
+      connector.server_ref().add_comm_manager::<LovenseSerialDongleCommunicationManager>().unwrap(); 
+    }
+    if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u16 > 0 {
+      connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap(); 
+    }
+    #[cfg(target_os="windows")]
+    if device_mgrs & DeviceCommunicationManagerTypes::XInput as u16 > 0 {
+      connector.server_ref().add_comm_manager::<XInputDeviceCommunicationManager>().unwrap(); 
+    }
+    if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u16 > 0 {
+      connector.server_ref().add_comm_manager::<SerialPortCommunicationManager>().unwrap(); 
+    }
     self.connect(client_msg_id, connector);
   }
 
