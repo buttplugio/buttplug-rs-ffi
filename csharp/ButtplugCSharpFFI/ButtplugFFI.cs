@@ -99,10 +99,10 @@ namespace ButtplugCSharpFFI
             return task;
         }
 
-        internal static Task<ServerMessage> SendConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime)
+        internal static Task<ServerMessage> SendConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime, ushort aDeviceCommManagerTypes)
         {
             var builder = new FlatBufferBuilder(1024);
-            var msg = ConnectLocal.CreateConnectLocal(builder, builder.CreateString(aServerName), aMaxPingTime, 0);
+            var msg = ConnectLocal.CreateConnectLocal(builder, builder.CreateString(aServerName), aMaxPingTime, aDeviceCommManagerTypes);
             return SendClientMessage(aSorter, aHandle, builder, ClientMessageType.ConnectLocal, msg.Value);
         }
 

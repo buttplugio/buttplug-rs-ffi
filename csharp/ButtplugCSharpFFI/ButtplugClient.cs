@@ -64,10 +64,17 @@ namespace ButtplugCSharpFFI
             _clientHandle = ButtplugFFI.SendCreateClient(aClientName, this.SorterCallback);
         }
 
-        public async Task ConnectLocal()
+        public async Task ConnectLocal(
+            ushort aDeviceCommManagerTypes = 
+            (ushort) (DeviceCommunicationManagerTypes.Btleplug | 
+            DeviceCommunicationManagerTypes.LovenseHIDDongle | 
+            DeviceCommunicationManagerTypes.LovenseSerialDongle |
+            DeviceCommunicationManagerTypes.SerialPort |
+            DeviceCommunicationManagerTypes.XInput), 
+            string aServerName = "Buttplug C# FFI In-Process Server", uint aMaxPingTime = 0)
         {
             Console.WriteLine("Trying to connect");
-            await ButtplugFFI.SendConnectLocal(_messageSorter, _clientHandle, "Test Server", 0);
+            await ButtplugFFI.SendConnectLocal(_messageSorter, _clientHandle, aServerName, aMaxPingTime, aDeviceCommManagerTypes);
             Console.WriteLine("Connected");
         }
 
