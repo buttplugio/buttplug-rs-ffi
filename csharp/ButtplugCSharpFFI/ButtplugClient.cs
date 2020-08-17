@@ -71,9 +71,9 @@ namespace ButtplugCSharpFFI
             Console.WriteLine("Connected");
         }
 
-        public void ConnectWebsocket()
+        public async Task ConnectWebsocket()
         {
-
+            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, "ws://127.0.0.1:12345", false);
         }
 
         public void SorterCallback(UIntPtr buf, int buf_length)

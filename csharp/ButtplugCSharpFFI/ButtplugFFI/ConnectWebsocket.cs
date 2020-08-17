@@ -19,8 +19,27 @@ public struct ConnectWebsocket : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public ConnectWebsocket __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
+  public string Address { get { int o = __p.__offset(4); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetAddressBytes() { return __p.__vector_as_span<byte>(4, 1); }
+#else
+  public ArraySegment<byte>? GetAddressBytes() { return __p.__vector_as_arraysegment(4); }
+#endif
+  public byte[] GetAddressArray() { return __p.__vector_as_array<byte>(4); }
+  public bool BypassCertVerification { get { int o = __p.__offset(6); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
 
-  public static void StartConnectWebsocket(FlatBufferBuilder builder) { builder.StartTable(0); }
+  public static Offset<ButtplugFFI.ConnectWebsocket> CreateConnectWebsocket(FlatBufferBuilder builder,
+      StringOffset addressOffset = default(StringOffset),
+      bool bypass_cert_verification = false) {
+    builder.StartTable(2);
+    ConnectWebsocket.AddAddress(builder, addressOffset);
+    ConnectWebsocket.AddBypassCertVerification(builder, bypass_cert_verification);
+    return ConnectWebsocket.EndConnectWebsocket(builder);
+  }
+
+  public static void StartConnectWebsocket(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddAddress(FlatBufferBuilder builder, StringOffset addressOffset) { builder.AddOffset(0, addressOffset.Value, 0); }
+  public static void AddBypassCertVerification(FlatBufferBuilder builder, bool bypassCertVerification) { builder.AddBool(1, bypassCertVerification, false); }
   public static Offset<ButtplugFFI.ConnectWebsocket> EndConnectWebsocket(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<ButtplugFFI.ConnectWebsocket>(o);

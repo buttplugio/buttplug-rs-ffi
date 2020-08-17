@@ -103,7 +103,14 @@ namespace ButtplugCSharpFFI
         {
             var builder = new FlatBufferBuilder(1024);
             var msg = ConnectLocal.CreateConnectLocal(builder, builder.CreateString(aServerName), aMaxPingTime, 0);
-            return ButtplugFFI.SendClientMessage(aSorter, aHandle, builder, ClientMessageType.ConnectLocal, msg.Value);
+            return SendClientMessage(aSorter, aHandle, builder, ClientMessageType.ConnectLocal, msg.Value);
+        }
+
+        internal static Task<ServerMessage> SendConnectWebsocket(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aAddress, bool aIgnoreCert)
+        {
+            var builder = new FlatBufferBuilder(1024);
+            var msg = ConnectWebsocket.CreateConnectWebsocket(builder, builder.CreateString(aAddress), aIgnoreCert);
+            return SendClientMessage(aSorter, aHandle, builder, ClientMessageType.ConnectWebsocket, msg.Value);
         }
 
         internal static Task<ServerMessage> SendStartScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
@@ -111,7 +118,7 @@ namespace ButtplugCSharpFFI
             var builder = new FlatBufferBuilder(1024);
             StartScanning.StartStartScanning(builder);
             var msg = StartScanning.EndStartScanning(builder);
-            return ButtplugFFI.SendClientMessage(aSorter, aHandle, builder, ClientMessageType.StartScanning, msg.Value);
+            return SendClientMessage(aSorter, aHandle, builder, ClientMessageType.StartScanning, msg.Value);
         }
 
         internal static Task<ServerMessage> SendStopScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
@@ -119,15 +126,16 @@ namespace ButtplugCSharpFFI
             var builder = new FlatBufferBuilder(1024);
             StopScanning.StartStopScanning(builder);
             var msg = StopScanning.EndStopScanning(builder);
-            return ButtplugFFI.SendClientMessage(aSorter, aHandle, builder, ClientMessageType.StopScanning, msg.Value);
+            return SendClientMessage(aSorter, aHandle, builder, ClientMessageType.StopScanning, msg.Value);
         }
 
         internal static ButtplugFFIDeviceHandle SendCreateDevice(ButtplugFFIClientHandle aHandle, uint aDeviceIndex)
         {
-            var builder = new FlatBufferBuilder(1024);
+            var builder = new FlatBufferBuilder(128);
             CreateDevice.StartCreateDevice(builder);
             CreateDevice.AddIndex(builder, aDeviceIndex);
             var get_device_msg = CreateDevice.EndCreateDevice(builder);
+            builder.Finish(get_device_msg.Value);
             var buf = builder.SizedByteArray();
             return ButtplugFFICalls.buttplug_create_device(aHandle, buf, buf.Length);
         }
@@ -137,6 +145,7 @@ namespace ButtplugCSharpFFI
             DeviceMessage.StartDeviceMessage(aBuilder);
             DeviceMessage.AddMessageType(aBuilder, aType);
             DeviceMessage.AddMessage(aBuilder, aOffset);
+            DeviceMessage.AddDeviceIndex(aBuilder, aDeviceIndex);
             var task = aSorter.PrepareClientMessage(aBuilder);
             var device_msg = DeviceMessage.EndDeviceMessage(aBuilder);
             aBuilder.Finish(device_msg.Value);

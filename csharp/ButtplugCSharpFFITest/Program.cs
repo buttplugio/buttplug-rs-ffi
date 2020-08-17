@@ -18,18 +18,19 @@ namespace ButtplugCSharpFFITest
 
         private static async Task RunExample()
         {
-            var client = new ButtplugCSharpFFI.ButtplugClient("Test Client"); 
+            var client = new ButtplugClient("Test Client"); 
             client.DeviceAdded += async (obj, args) =>
             {
                 var device = args.Device;
                 if (device.AllowedMessages.ContainsKey(ButtplugFFI.MessageAttributeType.VibrateCmd))
                 {
-                    await device.SendRotateCmd(0.5, true);
+                    await device.SendVibrateCmd(0.5);
                 }
                 device.Dispose();
                 device = null;
             };
             await client.ConnectLocal();
+            //await client.ConnectWebsocket();
             await client.StartScanning();
             await WaitForKey();
             client.Dispose();
