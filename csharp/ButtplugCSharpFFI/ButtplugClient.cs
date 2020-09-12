@@ -1,4 +1,4 @@
-﻿using ButtplugFFI;
+using ButtplugFFI;
 using FlatBuffers;
 using System;
 using System.Collections.Generic;
@@ -111,14 +111,13 @@ namespace ButtplugCSharpFFI
                     }
                 }
             }
-        }
 
-        public async Task StartScanning()
+        public async Task StartScanningAsync()
         {
             await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle);
         }
 
-        public async Task StopScanning()
+        public async Task StopScanningAsync()
         {
             await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle);
         }

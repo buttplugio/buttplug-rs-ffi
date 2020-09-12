@@ -31,7 +31,7 @@ namespace ButtplugCSharpFFITest
             };
             await client.ConnectLocal();
             //await client.ConnectWebsocket();
-            await client.StartScanning();
+            await client.StartScanningAsync();
             await WaitForKey();
             client.Dispose();
             client = null;
