@@ -175,7 +175,7 @@ impl ButtplugFFIClient {
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(usable_client.start_scanning().await, id, callback);
+        return_client_result(usable_client.stop_scanning().await, id, callback);
       } else {
         return_error(id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
       }
