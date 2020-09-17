@@ -7,9 +7,10 @@ use super::{
 use std::slice;
 
 #[no_mangle]
-pub extern "C" fn buttplug_create_client(callback: FFICallback, buf: *const u8, buf_len: i32) -> *mut ButtplugFFIClient {
-  println!("Seeing if println works here.");
-  tracing_subscriber::fmt::init();
+pub extern "C" fn buttplug_create_client(callback: Option<FFICallback>, buf: *const u8, buf_len: i32) -> *mut ButtplugFFIClient {
+  if callback.is_none() {
+    error!("NULL CALLBACK SPECIFIED. NO MESSAGES WILL BE RETURNED, NOR WILL EVENTS BE EMITTED.");
+  }
   let msg: &[u8];
   unsafe {
     msg = slice::from_raw_parts(buf, buf_len as usize);

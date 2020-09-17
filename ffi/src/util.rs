@@ -15,7 +15,10 @@ use buttplug::{
 use std::convert::{TryFrom, TryInto};
 use std::error::Error;
 
-fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: ServerMessageType, union: WIPOffset<UnionWIPOffset>, callback: FFICallback) {
+fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: ServerMessageType, union: WIPOffset<UnionWIPOffset>, callback: Option<FFICallback>) {
+  if callback.is_none() {
+    return;
+  }
   let server_msg = ServerMessage::create(&mut builder, &ServerMessageArgs {
     id: id,
     message_type: msg_type,
@@ -23,17 +26,17 @@ fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: Server
   });
   builder.finish(server_msg, None);
   let msg = builder.finished_data();
-  callback(msg.as_ptr(), msg.len() as u32);
+  callback.unwrap()(msg.as_ptr(), msg.len() as u32);
 }
 
-pub fn return_client_result(result: Result<(), ButtplugClientError>, id: u32, callback: FFICallback) {
+pub fn return_client_result(result: Result<(), ButtplugClientError>, id: u32, callback: Option<FFICallback>) {
   match result {
     Ok(_) => return_ok(id, callback),
     Err(error) => return_error(id, error, callback)
   };
 }
 
-pub fn return_error(id: u32, error: ButtplugClientError, callback: FFICallback) {
+pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICallback>) {
   let mut builder = FlatBufferBuilder::new_with_capacity(1024);
   let error_args = match error {
     ButtplugClientError::ButtplugConnectorError(conn_err) => {
@@ -63,7 +66,7 @@ pub fn return_error(id: u32, error: ButtplugClientError, callback: FFICallback) 
   send_server_message(builder, id, ServerMessageType::Error, error_msg.as_union_value(), callback);
 }
 
-pub fn return_ok(id: u32, callback: FFICallback) {
+pub fn return_ok(id: u32, callback: Option<FFICallback>) {
   let mut builder = FlatBufferBuilder::new_with_capacity(1024);
   let ok_msg = Ok::create(&mut builder, &OkArgs {});
   send_server_message(builder, id, ServerMessageType::Ok, ok_msg.as_union_value(), callback);
@@ -113,7 +116,7 @@ impl From<&Endpoint> for SerializedEndpoint {
   }
 }
 
-pub fn send_event(event: ButtplugClientEvent, callback: FFICallback) {
+pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
   let mut builder = FlatBufferBuilder::new_with_capacity(1024);
   match event {
     ButtplugClientEvent::DeviceAdded(device) => {

@@ -22,12 +22,12 @@ use buttplug::{
 use std::{slice, sync::Arc};
 
 pub struct ButtplugFFIDevice {
-  callback: FFICallback,
+  callback: Option<FFICallback>,
   device: Arc<ButtplugClientDevice>,
 }
 
 impl ButtplugFFIDevice {
-  pub fn new(device: ButtplugClientDevice, callback: FFICallback) -> Self {
+  pub fn new(device: ButtplugClientDevice, callback: Option<FFICallback>) -> Self {
     Self {
       device: Arc::new(device),
       callback,

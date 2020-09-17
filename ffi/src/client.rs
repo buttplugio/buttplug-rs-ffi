@@ -29,7 +29,7 @@ use futures::StreamExt;
 
 pub struct ButtplugFFIClient {
   name: String,
-  callback: FFICallback,
+  callback: Option<FFICallback>,
   client: Arc<RwLock<Option<ButtplugClient>>>,
   devices: Arc<DashMap<u32, ButtplugClientDevice>>
 }
@@ -41,7 +41,7 @@ impl Drop for ButtplugFFIClient {
 }
 
 impl ButtplugFFIClient {
-  pub fn new(name: &str, callback: FFICallback) -> Self {
+  pub fn new(name: &str, callback: Option<FFICallback>) -> Self {
     Self {
       name: name.to_owned(),
       callback,
