@@ -1,0 +1,81 @@
+[package]
+name = "buttplug-wasm"
+version = "0.1.0"
+authors = ["Kyle Machulis <kyle@nonpolynomial.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[build]
+rustflags = "--cfg=web_sys_unstable_apis"
+
+[dependencies]
+wasm-bindgen = { version = "0.2.68" }
+buttplug = { path = "../../buttplug-rs/buttplug", default-features = false, features = ["wasm-bindgen-runtime", "client", "server", "serialize-json"] }
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however.
+#
+# Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
+wee_alloc = { version = "0.4.5", optional = true }
+
+# async-std = { version = "1.6.0", default-features=false }
+# Needed to build valico with wasm-bindgen
+uuid = { version = "0.8.1", features = ["wasm-bindgen"] }
+futures = "0.3.5"
+wasm-logger = "0.2.0"
+wasm-bindgen-futures = "0.4.18"
+async-channel = "1.4.2"
+js-sys = { version = "0.3.45"}
+tracing-subscriber = "0.2.12"
+tracing-wasm = "0.1.0"
+tracing = "0.1.19"
+async-trait = "0.1.40"
+broadcaster = "1.0.0"
+async-mutex = "1.3.0"
+dashmap = "3.11.10"
+
+[dependencies.web-sys]
+#version = "0.3.45"
+path = "../../wasm-bindgen/crates/web-sys"
+#git = "https://github.com/rustwasm/wasm-bindgen"
+features = [
+  "Navigator",
+  "Bluetooth",
+  "BluetoothDevice",
+  "BluetoothLeScanFilterInit",
+  "BluetoothRemoteGattCharacteristic",
+  "BluetoothRemoteGattServer",
+  "BluetoothRemoteGattService",
+  "BinaryType",
+  "Blob",
+  "console",
+  "ErrorEvent",
+  "Event",
+  "FileReader",
+  "MessageEvent",
+  "ProgressEvent",
+  "RequestDeviceOptions",
+  "WebSocket",
+  "Window",
+]
+
+# [dev-dependencies]
+# wasm-bindgen-test = "0.3.18"
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "z"
+lto = true
+debug = false
