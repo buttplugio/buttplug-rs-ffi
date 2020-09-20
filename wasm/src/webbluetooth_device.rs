@@ -143,7 +143,7 @@ async fn run_webbluetooth_loop(
           let event_chr: BluetoothRemoteGattCharacteristic =
             BluetoothRemoteGattCharacteristic::from(JsValue::from(e.target().unwrap()));
           let value =
-            Uint8Array::new_with_byte_offset(&JsValue::from(event_chr.value().buffer()), 0);
+            Uint8Array::new_with_byte_offset(&JsValue::from(event_chr.value().unwrap().buffer()), 0);
           let value_vec = value.to_vec();
           info!("{:?}", value_vec);
           // This block limits the lifetime of the channel sender.
