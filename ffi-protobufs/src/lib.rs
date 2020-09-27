@@ -47,6 +47,7 @@ mod client;
 mod device;
 mod export;
 mod util;
+mod pbufs;
 
 pub use export::*;
 

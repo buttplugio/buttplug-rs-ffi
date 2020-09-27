@@ -1,8 +1,11 @@
 use super::{
   FFICallback,
   device::ButtplugFFIDevice,
-  flatbuffer_client_generated::buttplug_ffi::{ClientMessage, ClientMessageType, get_root_as_client_message, DeviceCommunicationManagerTypes},
-  util::{return_client_result, return_ok, return_error, send_event}
+  util::{return_client_result, return_ok, return_error, send_event},
+  pbufs::{
+    ButtplugFfiIncomingMessage as IncomingMessage, buttplug_ffi_incoming_message::ffi_message::Msg as IncomingMessageType,
+    client_message::{ConnectLocal, ConnectWebsocket, Msg as ClientMessageType, DeviceCommunicationManagerTypes}
+  }
 };
 use std::{slice, sync::Arc};
 use async_std::sync::RwLock;
@@ -25,6 +28,7 @@ use dashmap::DashMap;
 #[cfg(target_os = "windows")]
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use futures::StreamExt;
+use prost::Message;
 
 pub struct ButtplugFFIClient {
   name: String,
@@ -60,17 +64,21 @@ impl ButtplugFFIClient {
   }
 
   pub fn parse_message(&self, buf: *const u8, buf_len: i32) {
-    let msg: &[u8];
+    let msg_ptr: &[u8];
     unsafe {
-      msg = slice::from_raw_parts(buf, buf_len as usize);
+      msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
     }
-    let client_msg = get_root_as_client_message(msg);
-    match client_msg.message_type() {
-      ClientMessageType::ConnectLocal => self.connect_local(&client_msg),
-      ClientMessageType::ConnectWebsocket => self.connect_websocket(&client_msg),
-      ClientMessageType::StartScanning => self.start_scanning(client_msg.id()),
-      ClientMessageType::StopScanning => self.stop_scanning(client_msg.id()),
-      _ => error!("Unhandled message type")
+    let ffi_msg = IncomingMessage::decode(msg_ptr).unwrap();
+    let msg_id = ffi_msg.id;
+    if let IncomingMessageType::ClientMessage(client_msg) = ffi_msg.message.unwrap().msg.unwrap() {
+      match client_msg.msg.unwrap() {
+        ClientMessageType::ConnectLocal(connect_local_msg) => self.connect_local(msg_id, &connect_local_msg),
+        ClientMessageType::ConnectWebsocket(connect_websocket_msg) => self.connect_websocket(msg_id, &connect_websocket_msg),
+        ClientMessageType::StartScanning(_) => self.start_scanning(msg_id),
+        ClientMessageType::StopScanning(_) => self.stop_scanning(msg_id),
+      }
+    } else {
+      panic!("Sent device message to client parser!");
     }
   }
 
@@ -110,67 +118,59 @@ impl ButtplugFFIClient {
     }).unwrap();
   }
 
-  fn connect_local(&self, client_msg: &ClientMessage) {
-    let connect_local = client_msg.message_as_connect_local().unwrap();
-    let server_name = connect_local.server_name().unwrap().to_owned();
-    let max_ping_time = connect_local.max_ping_time();
-    let client_msg_id = client_msg.id();
-    let connector = ButtplugInProcessClientConnector::new(&server_name, max_ping_time as u64);
-    let device_mgrs = connect_local.comm_manager_types();
-    if device_mgrs & DeviceCommunicationManagerTypes::LovenseHIDDongle as u16 > 0 {
+  fn connect_local(&self, msg_id: u32, connect_local_msg: &ConnectLocal) {
+    let connector = ButtplugInProcessClientConnector::new(&connect_local_msg.server_name, connect_local_msg.max_ping_time as u64);
+    let device_mgrs = connect_local_msg.comm_manager_types;
+    if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0 || device_mgrs == 0 {
       connector.server_ref().add_comm_manager::<LovenseHIDDongleCommunicationManager>().unwrap(); 
     }
-    if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u16 > 0 {
+    if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0 || device_mgrs == 0 {
       connector.server_ref().add_comm_manager::<LovenseSerialDongleCommunicationManager>().unwrap(); 
     }
-    if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u16 > 0 {
+    if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u32 > 0 || device_mgrs == 0 {
       connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap(); 
     }
     #[cfg(target_os="windows")]
-    if device_mgrs & DeviceCommunicationManagerTypes::XInput as u16 > 0 {
+    if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
       connector.server_ref().add_comm_manager::<XInputDeviceCommunicationManager>().unwrap(); 
     }
-    if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u16 > 0 {
+    if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
       connector.server_ref().add_comm_manager::<SerialPortCommunicationManager>().unwrap(); 
     }
-    self.connect(client_msg_id, connector);
+    self.connect(msg_id, connector);
   }
 
-  fn connect_websocket(&self, client_msg: &ClientMessage) {
-    let connect_websocket = client_msg.message_as_connect_websocket().unwrap();
-    let address = connect_websocket.address().unwrap().to_owned();
-    let bypass_cert_verify = connect_websocket.bypass_cert_verification();
-    let client_msg_id = client_msg.id();
-    let connector: ButtplugRemoteClientConnector<_, ButtplugClientJSONSerializer> = if address.contains("wss://") {
-      let transport = ButtplugWebsocketClientTransport::new_secure_connector(&address, bypass_cert_verify);
+  fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket) {
+    let connector: ButtplugRemoteClientConnector<_, ButtplugClientJSONSerializer> = if connect_websocket_msg.address.contains("wss://") {
+      let transport = ButtplugWebsocketClientTransport::new_secure_connector(&connect_websocket_msg.address, connect_websocket_msg.bypass_cert_verification);
       ButtplugRemoteClientConnector::new(transport)
     } else {
-      let transport = ButtplugWebsocketClientTransport::new_insecure_connector(&address);
+      let transport = ButtplugWebsocketClientTransport::new_insecure_connector(&connect_websocket_msg.address);
       ButtplugRemoteClientConnector::new(transport)
     };
-    self.connect(client_msg_id, connector);
+    self.connect(msg_id, connector);
   }
 
-  fn start_scanning(&self, id: u32) {
+  fn start_scanning(&self, msg_id: u32) {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(usable_client.start_scanning().await, id, callback);
+        return_client_result(usable_client.start_scanning().await, msg_id, callback);
       } else {
-        return_error(id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
+        return_error(msg_id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
       }
     }).unwrap();
   }
 
-  fn stop_scanning(&self, id: u32) {
+  fn stop_scanning(&self, msg_id: u32) {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(usable_client.stop_scanning().await, id, callback);
+        return_client_result(usable_client.stop_scanning().await, msg_id, callback);
       } else {
-        return_error(id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
+        return_error(msg_id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
       }
     }).unwrap();
   }

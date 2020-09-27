@@ -1,51 +1,50 @@
 use super::{
-  FFICallback,
-  flatbuffer_server_generated::buttplug_ffi::{ServerMessage, ServerMessageArgs, ServerMessageType, DeviceAdded, 
-    DeviceAddedArgs, Ok, OkArgs, MessageAttributes as SerializedMessageAttributes, MessageAttributeType, MessageAttributesArgs,
-    Error as FlatBufBPError, ErrorArgs, ButtplugErrorType
+  pbufs::{
+    buttplug_ffi_outgoing_message,
+    Endpoint as SerializedEndpoint,
+    buttplug_ffi_outgoing_message::ffi_message::Msg as OutgoingMessageType,
+    server_message::{ButtplugErrorType, Error as OutgoingError, Msg as ServerMessageType, Ok, MessageAttributeType, MessageAttributes, DeviceAdded},
+    ButtplugFfiOutgoingMessage as OutgoingMessage, ServerMessage,
+
   },
-  flatbuffer_enums_generated::Endpoint as SerializedEndpoint,
+  FFICallback,
 };
-use flatbuffers::{FlatBufferBuilder, WIPOffset, UnionWIPOffset};
 use buttplug::{
-  client::{ButtplugClientEvent, ButtplugClientError},
+  client::{ButtplugClientError, ButtplugClientEvent},
   core::{errors::ButtplugError, messages::ButtplugDeviceMessageType},
   device::Endpoint,
 };
+use prost::Message;
 use std::convert::{TryFrom, TryInto};
 use std::error::Error;
 
-fn send_server_message(mut builder: FlatBufferBuilder, id: u32, msg_type: ServerMessageType, union: WIPOffset<UnionWIPOffset>, callback: Option<FFICallback>) {
+fn send_server_message(message: OutgoingMessage, callback: Option<FFICallback>) {
   if callback.is_none() {
     return;
   }
-  let server_msg = ServerMessage::create(&mut builder, &ServerMessageArgs {
-    id: id,
-    message_type: msg_type,
-    message: Some(union),
-  });
-  builder.finish(server_msg, None);
-  let msg = builder.finished_data();
-  callback.unwrap()(msg.as_ptr(), msg.len() as u32);
+  let mut buf = vec![];
+  message.encode(&mut buf).unwrap();
+  callback.unwrap()(buf.as_ptr(), buf.len() as u32);
 }
 
-pub fn return_client_result(result: Result<(), ButtplugClientError>, id: u32, callback: Option<FFICallback>) {
+pub fn return_client_result(
+  result: Result<(), ButtplugClientError>,
+  id: u32,
+  callback: Option<FFICallback>,
+) {
   match result {
     Ok(_) => return_ok(id, callback),
-    Err(error) => return_error(id, error, callback)
+    Err(error) => return_error(id, error, callback),
   };
 }
 
 pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICallback>) {
-  let mut builder = FlatBufferBuilder::new_with_capacity(1024);
   let error_args = match error {
-    ButtplugClientError::ButtplugConnectorError(conn_err) => {
-      ErrorArgs {
-        error_type: ButtplugErrorType::ButtplugConnectorError,
-        message: Some(builder.create_string(&format!("{}", conn_err))),
-        backtrace: Some(builder.create_string(&format!("{:?}", conn_err.source())))
-      }
-    }
+    ButtplugClientError::ButtplugConnectorError(conn_err) => OutgoingError {
+      error_type: ButtplugErrorType::ButtplugConnectorError as i32,
+      message: format!("{}", conn_err),
+      backtrace: format!("{:?}", conn_err.source()),
+    },
     ButtplugClientError::ButtplugError(bp_err) => {
       let error_type = match &bp_err {
         ButtplugError::ButtplugDeviceError(_) => ButtplugErrorType::ButtplugDeviceError,
@@ -54,22 +53,41 @@ pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICal
         ButtplugError::ButtplugMessageError(_) => ButtplugErrorType::ButtplugMessageError,
         ButtplugError::ButtplugUnknownError(_) => ButtplugErrorType::ButtplugUnknownError,
       };
-      ErrorArgs {
-        error_type,
-        message: Some(builder.create_string(&format!("{}", bp_err))),
-        backtrace: Some(builder.create_string(&format!("{:?}", bp_err.source())))
+      OutgoingError {
+        error_type: error_type as i32,
+        message: format!("{}", bp_err),
+        backtrace: format!("{:?}", bp_err.source()),
       }
     }
   };
 
-  let error_msg = FlatBufBPError::create(&mut builder, &error_args);
-  send_server_message(builder, id, ServerMessageType::Error, error_msg.as_union_value(), callback);
+  let error_msg = OutgoingMessage {
+    id,
+    message: Some(buttplug_ffi_outgoing_message::FfiMessage {
+      msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+        msg: Some(ServerMessageType::Error(error_args)),
+      })),
+    }),
+  };
+  send_server_message(
+    error_msg,
+    callback,
+  );
 }
 
 pub fn return_ok(id: u32, callback: Option<FFICallback>) {
-  let mut builder = FlatBufferBuilder::new_with_capacity(1024);
-  let ok_msg = Ok::create(&mut builder, &OkArgs {});
-  send_server_message(builder, id, ServerMessageType::Ok, ok_msg.as_union_value(), callback);
+  let ok_msg = OutgoingMessage {
+    id,
+    message: Some(buttplug_ffi_outgoing_message::FfiMessage {
+      msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+        msg: Some(ServerMessageType::Ok(Ok::default())),
+      })),
+    }),
+  };
+  send_server_message(
+    ok_msg,
+    callback,
+  );
 }
 
 // TODO Should probably make this a macro
@@ -84,7 +102,7 @@ impl TryFrom<ButtplugDeviceMessageType> for MessageAttributeType {
       ButtplugDeviceMessageType::StopDeviceCmd => Ok(MessageAttributeType::StopDeviceCmd),
       ButtplugDeviceMessageType::RawReadCmd => Ok(MessageAttributeType::RawReadCmd),
       ButtplugDeviceMessageType::RawWriteCmd => Ok(MessageAttributeType::RawWriteCmd),
-      ButtplugDeviceMessageType::RSSILevelCmd => Ok(MessageAttributeType::RSSILevelCmd),
+      ButtplugDeviceMessageType::RSSILevelCmd => Ok(MessageAttributeType::RssiLevelCmd),
       ButtplugDeviceMessageType::BatteryLevelCmd => Ok(MessageAttributeType::BatteryLevelCmd),
       ButtplugDeviceMessageType::RawSubscribeCmd => Ok(MessageAttributeType::RawSubscribeCmd),
       ButtplugDeviceMessageType::RawUnsubscribeCmd => Ok(MessageAttributeType::RawUnsubscribeCmd),
@@ -117,69 +135,66 @@ impl From<&Endpoint> for SerializedEndpoint {
 }
 
 pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
-  let mut builder = FlatBufferBuilder::new_with_capacity(1024);
   match event {
     ButtplugClientEvent::DeviceAdded(device) => {
-
       // TODO This should probably be its own fn but I didn't wanna screw with builder lifetime.
-      let mut attrs_vec = vec!();
+      let mut attrs_vec = vec![];
       info!("{:?}", device.allowed_messages);
       for (message_type, message_attrs) in &device.allowed_messages {
         // If we can't convert, this means we don't support the message type in
         // the FFI layer. Good way to deprecate messages.
-        let attr_type = if let Ok(attr) = message_type.clone().try_into() {
+        let attr_type: ButtplugDeviceMessageType = if let Ok(attr) = message_type.clone().try_into() {
           attr
         } else {
           continue;
         };
         let step_count = if message_attrs.step_count.is_some() {
-            Some(builder.create_vector(&message_attrs.step_count.clone().unwrap()))
-          } else {
-            None
-          };
-        let serialized_endpoints: Vec<SerializedEndpoint> = if message_attrs.endpoints.is_some() {
-          message_attrs.endpoints.clone().unwrap().iter().map(|x| x.into()).collect()
+          message_attrs.step_count.clone().unwrap()
         } else {
           vec![]
         };
-        let endpoints = builder.create_vector(&serialized_endpoints);
-        let attrs = SerializedMessageAttributes::create(&mut builder, &MessageAttributesArgs {
-          message_type: attr_type,
-          feature_count: message_attrs.feature_count.unwrap_or(0),
-          step_count: step_count,
-          endpoints: Some(endpoints),
-          max_duration: None,
-        });
+        let serialized_endpoints: Vec<i32> = if message_attrs.endpoints.is_some() {
+          message_attrs
+            .endpoints
+            .clone()
+            .unwrap()
+            .iter()
+            .map(|x| *x as i32)
+            .collect()
+        } else {
+          vec![]
+        };
+        let attrs = MessageAttributes {
+            message_type: attr_type as i32,
+            feature_count: message_attrs.feature_count.unwrap_or(0),
+            step_count: step_count,
+            endpoints: serialized_endpoints,
+            max_duration: vec![],
+        };
         attrs_vec.push(attrs);
       }
-      let device_attributes = builder.create_vector(&attrs_vec);
-
-      let device_name = builder.create_string(&device.name);
-      // let device_attributes = builder.create_vector(&serialize_message_attributes(&builder, &device.allowed_messages));
-      let device_added_msg = DeviceAdded::create(&mut builder, &DeviceAddedArgs {
-        name: Some(device_name),
-        index: device.index(),
-        attributes: Some(device_attributes)
-      });
-      send_server_message(builder, 0, ServerMessageType::DeviceAdded, device_added_msg.as_union_value(), callback);
-    },
-    ButtplugClientEvent::DeviceRemoved(device) => {
-
-    },
-    ButtplugClientEvent::Error(error) => {
-
-    },
-    ButtplugClientEvent::Log(log_level, log_msg) => {
-
-    },
-    ButtplugClientEvent::ScanningFinished => {
-
-    },
-    ButtplugClientEvent::ServerDisconnect => {
-
-    },
-    ButtplugClientEvent::PingTimeout => {
-
+      let device_added_msg = OutgoingMessage {
+        id: 0,
+        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
+          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+            msg: Some(ServerMessageType::DeviceAdded(DeviceAdded {
+              name: device.name.clone(),
+              index: device.index(),
+              message_attributes: attrs_vec
+            }))
+          }))
+        })
+      };
+      send_server_message(
+        device_added_msg,
+        callback,
+      );
     }
+    ButtplugClientEvent::DeviceRemoved(device) => {}
+    ButtplugClientEvent::Error(error) => {}
+    ButtplugClientEvent::Log(log_level, log_msg) => {}
+    ButtplugClientEvent::ScanningFinished => {}
+    ButtplugClientEvent::ServerDisconnect => {}
+    ButtplugClientEvent::PingTimeout => {}
   }
 }

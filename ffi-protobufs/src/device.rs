@@ -1,16 +1,14 @@
 use super::{
-  flatbuffer_device_generated::buttplug_ffi::{
-    get_root_as_device_message,
-    DeviceMessage,
-    DeviceMessageType,
-    LinearCmd,
-    RawReadCmd,
-    RawWriteCmd,
-    RawSubscribeCmd,
-    RawUnsubscribeCmd,
-    RotateCmd,
-    StopDeviceCmd,
-    VibrateCmd,
+  pbufs::{
+    buttplug_ffi_incoming_message::ffi_message::Msg as IncomingMessageType,
+    buttplug_ffi_outgoing_message,
+    buttplug_ffi_outgoing_message::ffi_message::Msg as OutgoingMessageType,
+    device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, Msg as DeviceMessageType},
+    server_message::{
+      ButtplugErrorType, Error as OutgoingError, MessageAttributeType, Msg as ServerMessageType, Ok,
+    },
+    ButtplugFfiIncomingMessage as IncomingMessage, ButtplugFfiOutgoingMessage as OutgoingMessage,
+    DeviceMessage, Endpoint as SerializedEndpoint, ServerMessage,
   },
   util::return_client_result,
   FFICallback,
@@ -19,7 +17,8 @@ use buttplug::{
   client::device::{ButtplugClientDevice, LinearCommand, RotateCommand, VibrateCommand},
   util::async_manager,
 };
-use std::{slice, sync::Arc};
+use prost::Message;
+use std::{slice, sync::Arc, collections::HashMap, iter::FromIterator};
 
 pub struct ButtplugFFIDevice {
   callback: Option<FFICallback>,
@@ -35,123 +34,110 @@ impl ButtplugFFIDevice {
   }
 
   pub fn parse_message(&self, buf: *const u8, buf_len: i32) {
-    let msg: &[u8];
+    let msg_ptr: &[u8];
     unsafe {
-      msg = slice::from_raw_parts(buf, buf_len as usize);
+      msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
     }
-    let device_msg = get_root_as_device_message(msg);
-    match device_msg.message_type() {
-      DeviceMessageType::VibrateCmd => self.send_vibrate_cmd(device_msg),
-      DeviceMessageType::RotateCmd => self.send_rotate_cmd(device_msg),
-      DeviceMessageType::LinearCmd => self.send_linear_cmd(device_msg),
-      DeviceMessageType::StopDeviceCmd => self.send_stop_device_cmd(device_msg),
-      DeviceMessageType::RawReadCmd => self.send_raw_read_cmd(device_msg),
-      DeviceMessageType::RawWriteCmd => self.send_raw_write_cmd(device_msg),
-      DeviceMessageType::RawSubscribeCmd => self.send_raw_subscribe_cmd(device_msg),
-      DeviceMessageType::RawUnsubscribeCmd => self.send_raw_unsubscribe_cmd(device_msg),
-      DeviceMessageType::BatteryLevelCmd => self.send_battery_level_cmd(device_msg),
-      DeviceMessageType::RSSILevelCmd => self.send_rssi_level_cmd(device_msg),
-      DeviceMessageType::NONE => error!("Unhandled device message"),
-    };
+    let ffi_msg = IncomingMessage::decode(msg_ptr).unwrap();
+    let msg_id = ffi_msg.id;
+    if let IncomingMessageType::DeviceMessage(device_msg) = ffi_msg.message.unwrap().msg.unwrap() {
+      match device_msg.msg.unwrap() {
+        DeviceMessageType::VibrateCmd(vibrate_msg) => self.send_vibrate_cmd(msg_id, vibrate_msg),
+        DeviceMessageType::RotateCmd(rotate_msg) => self.send_rotate_cmd(msg_id, rotate_msg),
+        DeviceMessageType::LinearCmd(linear_msg) => self.send_linear_cmd(msg_id, linear_msg),
+        DeviceMessageType::StopDeviceCmd(stop_msg) => self.send_stop_device_cmd(msg_id, stop_msg),
+        DeviceMessageType::RawReadCmd(raw_read_msg) => self.send_raw_read_cmd(msg_id, raw_read_msg),
+        DeviceMessageType::RawWriteCmd(raw_write_msg) => self.send_raw_write_cmd(msg_id, raw_write_msg),
+        DeviceMessageType::RawSubscribeCmd(raw_sub_msg) => self.send_raw_subscribe_cmd(msg_id, raw_sub_msg),
+        DeviceMessageType::RawUnsubscribeCmd(raw_unsub_msg) => self.send_raw_unsubscribe_cmd(msg_id, raw_unsub_msg),
+        DeviceMessageType::BatteryLevelCmd(battery_msg) => self.send_battery_level_cmd(msg_id, battery_msg),
+        DeviceMessageType::RssiLevelCmd(rssi_msg) => self.send_rssi_level_cmd(msg_id, rssi_msg),
+      };
+    } else {
+      panic!("Send client message to device parser!");
+    }
   }
 
-  pub fn send_vibrate_cmd(&self, msg: DeviceMessage) {
-    let vibrate_msg = msg.message_as_vibrate_cmd().unwrap();
+  pub fn send_vibrate_cmd(&self, id: u32, msg: VibrateCmd) {
     let callback = self.callback.clone();
     let params = VibrateCommand::SpeedMap(
-      vibrate_msg
-        .speeds()
-        .unwrap()
+      msg
+        .speeds
         .into_iter()
-        .map(|x| (x.index(), x.speed()))
+        .map(|x| (x.index, x.speed))
         .collect(),
     );
     let device = self.device.clone();
-    let id = msg.id();
     async_manager::spawn(async move {
       return_client_result(device.vibrate(params).await, id, callback);
     })
     .unwrap();
   }
 
-  pub fn send_rotate_cmd(&self, msg: DeviceMessage) {
-    let rotate_msg = msg.message_as_rotate_cmd().unwrap();
+  pub fn send_rotate_cmd(&self, id: u32, rotate_msg: RotateCmd) {
     let callback = self.callback.clone();
     let params = RotateCommand::RotateMap(
-      rotate_msg
-        .rotations()
-        .unwrap()
+      HashMap::from_iter(rotate_msg
+        .rotations
         .into_iter()
-        .map(|x| (x.index(), (x.speed(), x.clockwise())))
-        .collect(),
+        .map(|x| (x.index, (x.speed, x.clockwise))))
     );
     let device = self.device.clone();
-    let id = msg.id();
     async_manager::spawn(async move {
       return_client_result(device.rotate(params).await, id, callback);
     })
     .unwrap();
   }
 
-  pub fn send_linear_cmd(&self, msg: DeviceMessage) {
-    let linear_msg = msg.message_as_linear_cmd().unwrap();
+  pub fn send_linear_cmd(&self, id: u32, linear_msg: LinearCmd) {
     let callback = self.callback.clone();
     let params = LinearCommand::LinearMap(
+      HashMap::from_iter(
       linear_msg
-        .movements()
-        .unwrap()
+        .movements
         .into_iter()
-        .map(|x| (x.index(), (x.duration(), x.position())))
-        .collect(),
+        .map(|x| (x.index, (x.duration, x.position))))
     );
     let device = self.device.clone();
-    let id = msg.id();
     async_manager::spawn(async move {
       return_client_result(device.linear(params).await, id, callback);
     })
     .unwrap();
   }
 
-  pub fn send_stop_device_cmd(&self, msg: DeviceMessage) {
+  pub fn send_stop_device_cmd(&self, id: u32, msg: StopDeviceCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
-    let id = msg.id();
     async_manager::spawn(async move {
       return_client_result(device.stop().await, id, callback);
     })
     .unwrap();
   }
 
-  pub fn send_raw_read_cmd(&self, msg: DeviceMessage) {
-    let raw_read_msg = msg.message_as_raw_read_cmd().unwrap();
+  pub fn send_raw_read_cmd(&self, id: u32, msg: RawReadCmd) {
   }
 
-  pub fn send_raw_write_cmd(&self, msg: DeviceMessage) {
-    let raw_write_msg = msg.message_as_raw_write_cmd().unwrap();
+  pub fn send_raw_write_cmd(&self, id: u32, msg: RawWriteCmd) {
   }
 
-  pub fn send_raw_subscribe_cmd(&self, msg: DeviceMessage) {
-    let raw_read_msg = msg.message_as_raw_subscribe_cmd().unwrap();
+  pub fn send_raw_subscribe_cmd(&self, id: u32, msg: RawSubscribeCmd) {
   }
 
-  pub fn send_raw_unsubscribe_cmd(&self, msg: DeviceMessage) {
-    let raw_write_msg = msg.message_as_raw_unsubscribe_cmd().unwrap();
+  pub fn send_raw_unsubscribe_cmd(&self, id: u32, msg: RawUnsubscribeCmd) {
   }
 
-  pub fn send_battery_level_cmd(&self, msg: DeviceMessage) {
+  pub fn send_battery_level_cmd(&self, id: u32, msg: BatteryLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
-    let id = msg.id();
     async_manager::spawn(async move {
       return_client_result(Ok(()), id, callback);
     })
     .unwrap();
   }
 
-  pub fn send_rssi_level_cmd(&self, msg: DeviceMessage) {
+  pub fn send_rssi_level_cmd(&self, id: u32, msg: RssiLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
-    let id = msg.id();
     async_manager::spawn(async move {
       return_client_result(Ok(()), id, callback);
     })
