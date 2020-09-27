@@ -37,8 +37,18 @@ async fn event_emitter_loop(
           "deviceadded",
           &JsValue::from(ButtplugClientDevice::new(device))
         );
-      }
-      _ => {}
+      },
+      ButtplugClientEvent::DeviceRemoved(device) => {
+
+      },
+      ButtplugClientEvent::Error(err) => {
+        event_manager.emit("buttplugerror", &JsValue::from_str(&format!("{:?}", err)));
+      },
+      ButtplugClientEvent::Log(_, _) => {
+      },
+      ButtplugClientEvent::PingTimeout => event_manager.emit("pingtimeout", &JsValue::undefined()),
+      ButtplugClientEvent::ScanningFinished => event_manager.emit("scanningfinished", &JsValue::undefined()),
+      ButtplugClientEvent::ServerDisconnect => event_manager.emit("serverdisconnect", &JsValue::undefined()),
     }
   }
 }
