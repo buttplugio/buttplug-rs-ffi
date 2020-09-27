@@ -1,10 +1,10 @@
 use super::{
   pbufs::{
-    buttplug_ffi_outgoing_message,
+    buttplug_ffi_server_message,
     Endpoint as SerializedEndpoint,
-    buttplug_ffi_outgoing_message::ffi_message::Msg as OutgoingMessageType,
+    buttplug_ffi_server_message::ffi_message::Msg as FFIServerMessageType,
     server_message::{ButtplugErrorType, Error as OutgoingError, Msg as ServerMessageType, Ok, MessageAttributeType, MessageAttributes, DeviceAdded, DeviceRemoved, ScanningFinished, Disconnect},
-    ButtplugFfiOutgoingMessage as OutgoingMessage, ServerMessage,
+    ButtplugFfiServerMessage as FFIServerMessage, ServerMessage,
 
   },
   FFICallback,
@@ -18,7 +18,7 @@ use prost::Message;
 use std::convert::{TryFrom, TryInto};
 use std::error::Error;
 
-fn send_server_message(message: OutgoingMessage, callback: Option<FFICallback>) {
+fn send_server_message(message: FFIServerMessage, callback: Option<FFICallback>) {
   if callback.is_none() {
     return;
   }
@@ -61,10 +61,10 @@ pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICal
     }
   };
 
-  let error_msg = OutgoingMessage {
+  let error_msg = FFIServerMessage {
     id,
-    message: Some(buttplug_ffi_outgoing_message::FfiMessage {
-      msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+    message: Some(buttplug_ffi_server_message::FfiMessage {
+      msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
         msg: Some(ServerMessageType::Error(error_args)),
       })),
     }),
@@ -76,10 +76,10 @@ pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICal
 }
 
 pub fn return_ok(id: u32, callback: Option<FFICallback>) {
-  let ok_msg = OutgoingMessage {
+  let ok_msg = FFIServerMessage {
     id,
-    message: Some(buttplug_ffi_outgoing_message::FfiMessage {
-      msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+    message: Some(buttplug_ffi_server_message::FfiMessage {
+      msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
         msg: Some(ServerMessageType::Ok(Ok::default())),
       })),
     }),
@@ -173,10 +173,10 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         };
         attrs_vec.push(attrs);
       }
-      let device_added_msg = OutgoingMessage {
+      let device_added_msg = FFIServerMessage {
         id: 0,
-        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
-          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+        message: Some(buttplug_ffi_server_message::FfiMessage {
+          msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
             msg: Some(ServerMessageType::DeviceAdded(DeviceAdded {
               name: device.name.clone(),
               index: device.index(),
@@ -191,10 +191,10 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       );
     }
     ButtplugClientEvent::DeviceRemoved(device) => {
-      let device_removed_msg = OutgoingMessage {
+      let device_removed_msg = FFIServerMessage {
         id: 0,
-        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
-          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+        message: Some(buttplug_ffi_server_message::FfiMessage {
+          msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
             msg: Some(ServerMessageType::DeviceRemoved(DeviceRemoved {
               index: device.device_index,
             }))
@@ -209,10 +209,10 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
     ButtplugClientEvent::Error(error) => {}
     ButtplugClientEvent::Log(log_level, log_msg) => {}
     ButtplugClientEvent::ScanningFinished => {
-      let scanning_finished_msg = OutgoingMessage {
+      let scanning_finished_msg = FFIServerMessage {
         id: 0,
-        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
-          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+        message: Some(buttplug_ffi_server_message::FfiMessage {
+          msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
             msg: Some(ServerMessageType::ScanningFinished(ScanningFinished {
             }))
           }))
@@ -224,10 +224,10 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       );
     }
     ButtplugClientEvent::ServerDisconnect => {
-      let disconnect_msg = OutgoingMessage {
+      let disconnect_msg = FFIServerMessage {
         id: 0,
-        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
-          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+        message: Some(buttplug_ffi_server_message::FfiMessage {
+          msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
             msg: Some(ServerMessageType::Disconnect(Disconnect {
             }))
           }))

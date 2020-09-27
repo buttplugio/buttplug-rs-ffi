@@ -224,7 +224,7 @@ message DeviceEvent {
   };  
 }
 
-message ButtplugFFIIncomingMessage {
+message ButtplugFFIClientMessage {
   message FFIMessage {
     oneof msg {
       ClientMessage client_message = 1;
@@ -236,7 +236,7 @@ message ButtplugFFIIncomingMessage {
   FFIMessage message = 2;
 }
 
-message ButtplugFFIOutgoingMessage {
+message ButtplugFFIServerMessage {
   message FFIMessage {
     oneof msg {
       ServerMessage server_message = 1;

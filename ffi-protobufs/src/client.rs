@@ -3,7 +3,7 @@ use super::{
   device::ButtplugFFIDevice,
   util::{return_client_result, return_ok, return_error, send_event},
   pbufs::{
-    ButtplugFfiIncomingMessage as IncomingMessage, buttplug_ffi_incoming_message::ffi_message::Msg as IncomingMessageType,
+    ButtplugFfiClientMessage as FFIClientMessage, buttplug_ffi_client_message::ffi_message::Msg as FFIClientMessageType,
     client_message::{ConnectLocal, ConnectWebsocket, Msg as ClientMessageType, DeviceCommunicationManagerTypes}
   }
 };
@@ -68,9 +68,9 @@ impl ButtplugFFIClient {
     unsafe {
       msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
     }
-    let ffi_msg = IncomingMessage::decode(msg_ptr).unwrap();
+    let ffi_msg = FFIClientMessage::decode(msg_ptr).unwrap();
     let msg_id = ffi_msg.id;
-    if let IncomingMessageType::ClientMessage(client_msg) = ffi_msg.message.unwrap().msg.unwrap() {
+    if let FFIClientMessageType::ClientMessage(client_msg) = ffi_msg.message.unwrap().msg.unwrap() {
       match client_msg.msg.unwrap() {
         ClientMessageType::ConnectLocal(connect_local_msg) => self.connect_local(msg_id, &connect_local_msg),
         ClientMessageType::ConnectWebsocket(connect_websocket_msg) => self.connect_websocket(msg_id, &connect_websocket_msg),

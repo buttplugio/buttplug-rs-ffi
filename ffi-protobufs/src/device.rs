@@ -1,13 +1,13 @@
 use super::{
   pbufs::{
-    buttplug_ffi_incoming_message::ffi_message::Msg as IncomingMessageType,
-    buttplug_ffi_outgoing_message,
-    buttplug_ffi_outgoing_message::ffi_message::Msg as OutgoingMessageType,
+    buttplug_ffi_client_message::ffi_message::Msg as FFIClientMessageType,
+    buttplug_ffi_server_message,
+    buttplug_ffi_server_message::ffi_message::Msg as FFIServerMessageType,
     device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, Msg as DeviceMessageType},
     server_message::{
       ButtplugErrorType, Error as OutgoingError, MessageAttributeType, Msg as ServerMessageType, Ok,
     },
-    ButtplugFfiIncomingMessage as IncomingMessage, ButtplugFfiOutgoingMessage as OutgoingMessage,
+    ButtplugFfiClientMessage as FFIClientMessage, ButtplugFfiServerMessage as FFIServerMessage,
     DeviceMessage, Endpoint as SerializedEndpoint, ServerMessage,
   },
   util::return_client_result,
@@ -38,9 +38,9 @@ impl ButtplugFFIDevice {
     unsafe {
       msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
     }
-    let ffi_msg = IncomingMessage::decode(msg_ptr).unwrap();
+    let ffi_msg = FFIClientMessage::decode(msg_ptr).unwrap();
     let msg_id = ffi_msg.id;
-    if let IncomingMessageType::DeviceMessage(device_msg) = ffi_msg.message.unwrap().msg.unwrap() {
+    if let FFIClientMessageType::DeviceMessage(device_msg) = ffi_msg.message.unwrap().msg.unwrap() {
       match device_msg.msg.unwrap() {
         DeviceMessageType::VibrateCmd(vibrate_msg) => self.send_vibrate_cmd(msg_id, vibrate_msg),
         DeviceMessageType::RotateCmd(rotate_msg) => self.send_rotate_cmd(msg_id, rotate_msg),
