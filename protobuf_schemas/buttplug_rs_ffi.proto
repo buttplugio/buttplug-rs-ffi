@@ -188,6 +188,9 @@ message ServerMessage {
   message DeviceRemoved {
     uint32 index = 1;
   }
+
+  message Disconnect {
+  }
   
   oneof msg {
     Ok ok = 1;
@@ -195,6 +198,7 @@ message ServerMessage {
     ScanningFinished scanning_finished = 3;
     DeviceAdded device_added = 4;
     DeviceRemoved device_removed = 5;
+    Disconnect disconnect = 6;
   };
 }
 

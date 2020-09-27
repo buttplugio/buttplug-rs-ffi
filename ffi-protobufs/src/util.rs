@@ -3,7 +3,7 @@ use super::{
     buttplug_ffi_outgoing_message,
     Endpoint as SerializedEndpoint,
     buttplug_ffi_outgoing_message::ffi_message::Msg as OutgoingMessageType,
-    server_message::{ButtplugErrorType, Error as OutgoingError, Msg as ServerMessageType, Ok, MessageAttributeType, MessageAttributes, DeviceAdded},
+    server_message::{ButtplugErrorType, Error as OutgoingError, Msg as ServerMessageType, Ok, MessageAttributeType, MessageAttributes, DeviceAdded, DeviceRemoved, ScanningFinished, Disconnect},
     ButtplugFfiOutgoingMessage as OutgoingMessage, ServerMessage,
 
   },
@@ -190,11 +190,54 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         callback,
       );
     }
-    ButtplugClientEvent::DeviceRemoved(device) => {}
+    ButtplugClientEvent::DeviceRemoved(device) => {
+      let device_removed_msg = OutgoingMessage {
+        id: 0,
+        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
+          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+            msg: Some(ServerMessageType::DeviceRemoved(DeviceRemoved {
+              index: device.device_index,
+            }))
+          }))
+        })
+      };
+      send_server_message(
+        device_removed_msg,
+        callback,
+      );
+    }
     ButtplugClientEvent::Error(error) => {}
     ButtplugClientEvent::Log(log_level, log_msg) => {}
-    ButtplugClientEvent::ScanningFinished => {}
-    ButtplugClientEvent::ServerDisconnect => {}
+    ButtplugClientEvent::ScanningFinished => {
+      let scanning_finished_msg = OutgoingMessage {
+        id: 0,
+        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
+          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+            msg: Some(ServerMessageType::ScanningFinished(ScanningFinished {
+            }))
+          }))
+        })
+      };
+      send_server_message(
+        scanning_finished_msg,
+        callback,
+      );
+    }
+    ButtplugClientEvent::ServerDisconnect => {
+      let disconnect_msg = OutgoingMessage {
+        id: 0,
+        message: Some(buttplug_ffi_outgoing_message::FfiMessage {
+          msg: Some(OutgoingMessageType::ServerMessage(ServerMessage {
+            msg: Some(ServerMessageType::Disconnect(Disconnect {
+            }))
+          }))
+        })
+      };
+      send_server_message(
+        disconnect_msg,
+        callback,
+      );
+    }
     ButtplugClientEvent::PingTimeout => {}
   }
 }
