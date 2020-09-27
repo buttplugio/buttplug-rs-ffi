@@ -1,5 +1,5 @@
 syntax = "proto3";
-package ButtplugFFIProtocols;
+package ButtplugFFI;
 
 enum Endpoint {
   Tx = 0;
@@ -17,13 +17,14 @@ enum Endpoint {
 }
 
 message ClientMessage {
+  // This is a bitfield, not a normal enum
   enum DeviceCommunicationManagerTypes {
     All = 0;
     Btleplug = 1;
     XInput = 2;
-    SerialPort = 3;
-    LovenseHIDDongle = 4;
-    LovenseSerialDongle = 5;
+    SerialPort = 4;
+    LovenseHIDDongle = 8;
+    LovenseSerialDongle = 16;
   }
 
   message ConnectLocal {
@@ -43,22 +44,18 @@ message ClientMessage {
   message StopScanning {
   }
 
-  message RequestDeviceList {
-  }
-
   oneof msg {
     ConnectLocal connect_local = 1;
     ConnectWebsocket connect_websocket = 2;
     StartScanning start_scanning = 3;
     StopScanning stop_scanning = 4;
-    RequestDeviceList request_device_list = 5;
   }
 }
 
 message DeviceMessage {
   message VibrateComponent {
     uint32 index = 1;
-    double float = 2;
+    double speed = 2;
   }
 
   message VibrateCmd {
@@ -122,23 +119,18 @@ message DeviceMessage {
     uint32 index = 1;
   }
 
-  message Message {
-    oneof msg {
-      VibrateCmd vibrate_cmd = 1;
-      RotateCmd rotate_cmd = 2;
-      LinearCmd linear_cmd = 3;
-      StopDeviceCmd stop_device_cmd = 4;
-      RawReadCmd raw_read_cmd =5;
-      RawWriteCmd raw_write_cmd = 6;
-      RawSubscribeCmd raw_subscribe_cmd = 7;
-      RawUnsubscribeCmd raw_unsubscribe_cmd = 8;
-      BatteryLevelCmd battery_level_cmd = 9;
-      RSSILevelCmd rssi_level_cmd = 10;
-    };
-  }
-
-  uint32 id = 1;
-  Message msg = 2;
+  oneof msg {
+    VibrateCmd vibrate_cmd = 1;
+    RotateCmd rotate_cmd = 2;
+    LinearCmd linear_cmd = 3;
+    StopDeviceCmd stop_device_cmd = 4;
+    RawReadCmd raw_read_cmd =5;
+    RawWriteCmd raw_write_cmd = 6;
+    RawSubscribeCmd raw_subscribe_cmd = 7;
+    RawUnsubscribeCmd raw_unsubscribe_cmd = 8;
+    BatteryLevelCmd battery_level_cmd = 9;
+    RSSILevelCmd rssi_level_cmd = 10;
+  };
 }
 
 message ServerMessage {
@@ -197,18 +189,13 @@ message ServerMessage {
     uint32 index = 1;
   }
   
-  message Message {
-    oneof msg {
-      Ok ok = 1;
-      Error error = 2;
-      ScanningFinished scanning_finished = 3;
-      DeviceAdded device_added = 4;
-      DeviceRemoved device_removed = 5;
-    };
-  }
-
-  uint32 id = 1;
-  Message msg = 2;
+  oneof msg {
+    Ok ok = 1;
+    Error error = 2;
+    ScanningFinished scanning_finished = 3;
+    DeviceAdded device_added = 4;
+    DeviceRemoved device_removed = 5;
+  };
 }
 
 message DeviceEvent {
@@ -225,15 +212,34 @@ message DeviceEvent {
     uint32 index = 1;
     double reading = 2;
   }
-  
-  message Message {
+ 
+  oneof msg {
+    Disconnect disconnect = 1;
+    BatteryLevelReading battery_level_reading = 2;
+    RSSILevelReading rssi_level_reading = 3;
+  };  
+}
+
+message ButtplugFFIIncomingMessage {
+  message FFIMessage {
     oneof msg {
-      Disconnect disconnect = 1;
-      BatteryLevelReading battery_level_reading = 2;
-      RSSILevelReading rssi_level_reading = 3;
-    };  
+      ClientMessage client_message = 1;
+      DeviceMessage device_message = 2;
+    }
   }
 
   uint32 id = 1;
-  Message msg = 2;
+  FFIMessage message = 2;
+}
+
+message ButtplugFFIOutgoingMessage {
+  message FFIMessage {
+    oneof msg {
+      ServerMessage server_message = 1;
+      DeviceEvent device_event = 2;
+    }
+  }
+
+  uint32 id = 1;
+  FFIMessage message = 2;
 }
