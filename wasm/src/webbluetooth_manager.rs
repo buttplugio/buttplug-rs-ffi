@@ -10,7 +10,7 @@ use buttplug::{
   },
 };
 use futures::future;
-use js_sys::{Array, Promise};
+use js_sys::Array;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::BluetoothDevice;
 
@@ -35,11 +35,11 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
     spawn_local(async move {
       let config_manager = DeviceConfigurationManager::default();
       let mut options = web_sys::RequestDeviceOptions::new();
-      let mut filters = Array::new();
-      let mut optional_services = Array::new();
-      for (protocol_name, configs) in config_manager.config.protocols {
-        if let Some(btle) = configs.btle {
-          for name in btle.names {
+      let filters = Array::new();
+      let optional_services = Array::new();
+      for (_, configs) in config_manager.protocol_configurations() {
+        if let Some(btle) = &configs.btle {
+          for name in &btle.names {
             let mut filter = web_sys::BluetoothLeScanFilterInit::new();
             if name.contains("*") {
               let mut name_clone = name.clone();
@@ -50,7 +50,7 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
             }
             filters.push(&filter.into());
           }
-          for (service, _) in btle.services {
+          for (service, _) in &btle.services {
             optional_services.push(&service.to_string().into());
           }
         }
