@@ -89,6 +89,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime, ushort aDeviceCommManagerTypes)
         {
             var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
             msg.Message.ConnectLocal = new ClientMessage.Types.ConnectLocal
             {
                 ServerName = aServerName,
@@ -101,6 +102,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendConnectWebsocket(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aAddress, bool aIgnoreCert)
         {
             var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
             msg.Message.ConnectWebsocket = new ClientMessage.Types.ConnectWebsocket
             {
                 Address = aAddress,
@@ -112,6 +114,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendStartScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
         {
             var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
             msg.Message.StartScanning = new ClientMessage.Types.StartScanning
             {
             };
@@ -121,6 +124,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendStopScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
         {
             var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
             msg.Message.StopScanning = new ClientMessage.Types.StopScanning
             {
             };
@@ -143,6 +147,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendVibrateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, double> aSpeeds) 
         {
             var msg = new DeviceMessage();
+            msg.Message = new DeviceMessage.Types.FFIMessage();
             var command_list = new List<DeviceMessage.Types.VibrateComponent>();
             foreach (var pair in aSpeeds)
             {
@@ -161,6 +166,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendRotateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, (double, bool)> aRotations)
         {
             var msg = new DeviceMessage();
+            msg.Message = new DeviceMessage.Types.FFIMessage();
             var command_list = new List<DeviceMessage.Types.RotateComponent>();
             foreach (var pair in aRotations)
             {
@@ -181,6 +187,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendLinearCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, (uint, double)> aLinears)
         {
             var msg = new DeviceMessage();
+            msg.Message = new DeviceMessage.Types.FFIMessage();
             var command_list = new List<DeviceMessage.Types.LinearComponent>();
             foreach (var pair in aLinears)
             {
@@ -201,6 +208,7 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendStopDeviceCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex)
         {
             var msg = new DeviceMessage();
+            msg.Message = new DeviceMessage.Types.FFIMessage();
             msg.Index = aDeviceIndex;
             var cmd = new DeviceMessage.Types.StopDeviceCmd();
             msg.Message.StopDeviceCmd = cmd;
