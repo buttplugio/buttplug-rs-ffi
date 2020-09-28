@@ -34,11 +34,14 @@ aren't that many entry points into the library itself, which luckily makes
 building FFI easy.
 
 For simple type conversion purposes, the FFI layer uses
-[flatbuffers](https://google.github.io/flatbuffers/). Flatbuffers provide a
+[protobufs](https://developers.google.com/protocol-buffers). Protobufs provide a
 simple, fast way to deal with type differences between many languages, and due
 to the low frequency of message updates in buttplug (we might send 100s of
 messages per second in a system with multiple devices, but usually its 10s), the
-overhead of the conversion process isn't too expensive for us.
+overhead of the conversion process isn't too expensive for us. Flatbuffers were
+originally considered and implemented for C#, but ended up causing developer
+friction on bringup. We don't really need the ability to pick out fields to
+parse, as we'll always be using the full message in arguments.
 
 For more information on FFI and Rust using intermediate serialization layers,
 check out the following articles:
@@ -57,10 +60,11 @@ from different threads.
 The library currently implements FFI from Rust to the following languages:
 
 - C#
+- JS/Typescript for web via WASM
 
 Our current plans are to expand to the following list of languages:
 
-- JS/Typescript (both Node and Web/WASM)
+- JS/Typescript for Node
 - Python
 - C/C++
 - Swift
