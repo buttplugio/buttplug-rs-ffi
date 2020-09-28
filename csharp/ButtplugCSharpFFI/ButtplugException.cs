@@ -17,29 +17,25 @@ namespace ButtplugCSharpFFI
         {
         }
 
-        public static ButtplugException FromError(ServerMessage aMsg)
+        public static ButtplugException FromError(ServerMessage.Types.Error aMsg)
         {
-            var error_msg = aMsg.Message<Error>();
-            if (error_msg is null)
+            var err_str = aMsg.Message;
+            switch (aMsg.ErrorType)
             {
-                throw new ArgumentException("Must be an error message");
+                case ServerMessage.Types.ButtplugErrorType.ButtplugConnectorError:
+                    return new ButtplugConnectorException(err_str);
+                case ServerMessage.Types.ButtplugErrorType.ButtplugPingError:
+                    return new ButtplugPingException(err_str);
+                case ServerMessage.Types.ButtplugErrorType.ButtplugMessageError:
+                    return new ButtplugMessageException(err_str);
+                case ServerMessage.Types.ButtplugErrorType.ButtplugUnknownError:
+                    return new ButtplugUnknownException(err_str);
+                case ServerMessage.Types.ButtplugErrorType.ButtplugHandshakeError:
+                    return new ButtplugHandshakeException(err_str);
+                case ServerMessage.Types.ButtplugErrorType.ButtplugDeviceError:
+                    return new ButtplugDeviceException(err_str);
             }
-            switch (error_msg.Value.ErrorType)
-            {
-                case ButtplugErrorType.ButtplugConnectorError:
-                    return new ButtplugConnectorException(error_msg.Value.Message);
-                case ButtplugErrorType.ButtplugPingError:
-                    return new ButtplugPingException(error_msg.Value.Message);
-                case ButtplugErrorType.ButtplugMessageError:
-                    return new ButtplugMessageException(error_msg.Value.Message);
-                case ButtplugErrorType.ButtplugUnknownError:
-                    return new ButtplugUnknownException(error_msg.Value.Message);
-                case ButtplugErrorType.ButtplugHandshakeError:
-                    return new ButtplugHandshakeException(error_msg.Value.Message);
-                case ButtplugErrorType.ButtplugDeviceError:
-                    return new ButtplugDeviceException(error_msg.Value.Message);
-            }
-            return new ButtplugUnknownException($"Unknown error type: {error_msg.Value.ErrorType} | Message: {error_msg.Value.Message}");
+            return new ButtplugUnknownException($"Unknown error type: {aMsg.ErrorType} | Message: {aMsg.Message}");
         }
     }
 }

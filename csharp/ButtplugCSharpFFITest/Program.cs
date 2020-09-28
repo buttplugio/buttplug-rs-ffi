@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ButtplugCSharpFFI;
+using ButtplugFFI;
 
 namespace ButtplugCSharpFFITest
 {
@@ -22,7 +23,7 @@ namespace ButtplugCSharpFFITest
             client.DeviceAdded += async (obj, args) =>
             {
                 var device = args.Device;
-                if (device.AllowedMessages.ContainsKey(ButtplugFFI.MessageAttributeType.VibrateCmd))
+                if (device.AllowedMessages.ContainsKey(ServerMessage.Types.MessageAttributeType.VibrateCmd))
                 {
                     await device.SendVibrateCmd(0.5);
                 }

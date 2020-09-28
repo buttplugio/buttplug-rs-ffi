@@ -1,10 +1,7 @@
 ﻿using ButtplugFFI;
-using FlatBuffers;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ButtplugCSharpFFI
@@ -68,12 +65,7 @@ namespace ButtplugCSharpFFI
         }
 
         public async Task ConnectLocal(
-            ushort aDeviceCommManagerTypes =
-            (ushort)(DeviceCommunicationManagerTypes.Btleplug |
-            DeviceCommunicationManagerTypes.LovenseHIDDongle |
-            DeviceCommunicationManagerTypes.LovenseSerialDongle |
-            DeviceCommunicationManagerTypes.SerialPort |
-            DeviceCommunicationManagerTypes.XInput),
+            ushort aDeviceCommManagerTypes = (ushort)ClientMessage.Types.DeviceCommunicationManagerTypes.All,
             string aServerName = "Buttplug C# FFI In-Process Server", uint aMaxPingTime = 0)
         {
             Console.WriteLine("Trying to connect");
@@ -93,27 +85,27 @@ namespace ButtplugCSharpFFI
             {
                 byteArray = new Span<byte>(buf.ToPointer(), buf_length);
             }
-            ByteBuffer byteBuf = new ByteBuffer(byteArray.ToArray());
-            var server_message = ServerMessage.GetRootAsServerMessage(byteBuf);
+            var server_message = ButtplugFFIServerMessage.Parser.ParseFrom(byteArray.ToArray());
             if (server_message.Id > 0)
             {
                 _messageSorter.CheckMessage(server_message);
             }
             else
             {
-                if (server_message.MessageType == ServerMessageType.DeviceAdded)
+                if (server_message.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.ServerMessage &&
+                    server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceAdded)
                 {
-                    var device_added_message = server_message.Message<DeviceAdded>();
-                    var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Value.Index);
-                    var attribute_dict = new Dictionary<MessageAttributeType, ButtplugMessageAttributes>();
-                    for (var i = 0; i < device_added_message.Value.AttributesLength; ++i)
+                    var device_added_message = server_message.Message.ServerMessage.DeviceAdded;
+                    var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
+                    var attribute_dict = new Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes>();
+                    for (var i = 0; i < device_added_message.MessageAttributes.Count; ++i)
                     {
-                        var attributes = device_added_message.Value.Attributes(i).Value;
-                        var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.GetStepCountArray(),
-                            attributes.GetEndpointsArray(), attributes.GetMaxDurationArray(), null, null);
+                        var attributes = device_added_message.MessageAttributes[i];
+                        var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.StepCount.ToArray(),
+                            attributes.Endpoints.ToArray(), attributes.MaxDuration.ToArray(), null, null);
                         attribute_dict.Add(attributes.MessageType, device_message_attributes);
                     }
-                    var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Value.Index, device_added_message.Value.Name, attribute_dict);
+                    var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict);
                     DeviceAdded.Invoke(this, new DeviceAddedEventArgs(device));
                 }
             }

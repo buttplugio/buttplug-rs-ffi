@@ -13,11 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.4" />
+    <None Include="..\..\protobuf_schemas\buttplug_rs_ffi.proto" Link="buttplug_rs_ffi.proto" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FlatBuffersNetStandard\FlatBuffersNetStandard.csproj" />
+    <PackageReference Include="Google.Protobuf" Version="3.13.0" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
 
 </Project>

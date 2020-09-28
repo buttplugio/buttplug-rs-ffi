@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ButtplugCSharpFFI", "Buttpl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ButtplugCSharpFFITest", "ButtplugCSharpFFITest\ButtplugCSharpFFITest.csproj", "{941506B5-91B7-45BC-AFB2-C373770BE30A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatBuffersNetStandard", "FlatBuffersNetStandard\FlatBuffersNetStandard.csproj", "{FC584049-53E1-4DE8-AB32-44065A960493}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{941506B5-91B7-45BC-AFB2-C373770BE30A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{941506B5-91B7-45BC-AFB2-C373770BE30A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{941506B5-91B7-45BC-AFB2-C373770BE30A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FC584049-53E1-4DE8-AB32-44065A960493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC584049-53E1-4DE8-AB32-44065A960493}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC584049-53E1-4DE8-AB32-44065A960493}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC584049-53E1-4DE8-AB32-44065A960493}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 using ButtplugFFI;
 
@@ -27,7 +25,7 @@ namespace ButtplugCSharpFFI
         /// <summary>
         /// The Buttplug Protocol messages supported by this device, with additional attributes.
         /// </summary>
-        public Dictionary<MessageAttributeType, ButtplugMessageAttributes> AllowedMessages { get; }
+        public Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes> AllowedMessages { get; }
 
         private ButtplugFFIMessageSorter Sorter;
 
@@ -44,7 +42,7 @@ namespace ButtplugCSharpFFI
             ButtplugFFIDeviceHandle aHandle,
             uint aIndex,
             string aName,
-            Dictionary<MessageAttributeType, ButtplugMessageAttributes> aAllowedMessages)
+            Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes> aAllowedMessages)
         {
             Sorter = aSorter;
             Handle = aHandle;

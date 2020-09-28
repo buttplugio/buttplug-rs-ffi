@@ -9,7 +9,6 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using ButtplugFFI;
-using FlatBuffers;
 
 namespace ButtplugCSharpFFI
 {
@@ -28,8 +27,8 @@ namespace ButtplugCSharpFFI
         /// <summary>
         /// Stores messages waiting for reply from the server.
         /// </summary>
-        private readonly ConcurrentDictionary<uint, TaskCompletionSource<ServerMessage>> _waitingMsgs =
-            new ConcurrentDictionary<uint, TaskCompletionSource<ServerMessage>>();
+        private readonly ConcurrentDictionary<uint, TaskCompletionSource<ButtplugFFIServerMessage>> _waitingMsgs =
+            new ConcurrentDictionary<uint, TaskCompletionSource<ButtplugFFIServerMessage>>();
 
         ~ButtplugFFIMessageSorter()
         {
@@ -45,31 +44,19 @@ namespace ButtplugCSharpFFI
             }
         }
 
-        public Task<ServerMessage> PrepareClientMessage(FlatBufferBuilder aBuilder)
+        public Task<ButtplugFFIServerMessage> PrepareMessage(ButtplugFFIClientMessage aMsg)
         {
             var id = NextMsgId;
             // The client always increments the IDs on outgoing messages
-            ClientMessage.AddId(aBuilder, id);
+            aMsg.Id = id;
 
-            var promise = new TaskCompletionSource<ServerMessage>();
+            var promise = new TaskCompletionSource<ButtplugFFIServerMessage>();
             _waitingMsgs.TryAdd(id, promise);
             Console.WriteLine($"Sending a client message with Id {id}");
             return promise.Task;
         }
 
-        public Task<ServerMessage> PrepareDeviceMessage(FlatBufferBuilder aBuilder)
-        {
-            var id = NextMsgId;
-            // The client always increments the IDs on outgoing messages
-            DeviceMessage.AddId(aBuilder, id);
-
-            var promise = new TaskCompletionSource<ServerMessage>();
-            _waitingMsgs.TryAdd(id, promise);
-            Console.WriteLine($"Sending a device message with Id {id}");
-            return promise.Task;
-        }
-
-        public void CheckMessage(ServerMessage aMsg)
+        public void CheckMessage(ButtplugFFIServerMessage aMsg)
         {
             Console.WriteLine($"Got a message back with Id {aMsg.Id}");
             // We'll never match a system message, those are server -> client only.
@@ -85,14 +72,15 @@ namespace ButtplugCSharpFFI
                 throw new ButtplugMessageException("Message with non-matching ID received.");
             }
 
-            if (aMsg.MessageType is ServerMessageType.Error)
+            if (aMsg.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.ServerMessage &&
+                aMsg.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Error)
             {
-
-                queued.SetException(ButtplugException.FromError(aMsg));
-                return;
+                queued.SetException(ButtplugException.FromError(aMsg.Message.ServerMessage.Error));
             }
-
-            queued.SetResult(aMsg);
+            else
+            {
+                queued.SetResult(aMsg);
+            }
         }
     }
 }
