@@ -24,115 +24,112 @@ namespace ButtplugFFI {
     static ButtplugRsFfiReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChVidXR0cGx1Z19yc19mZmkucHJvdG8SC0J1dHRwbHVnRkZJIu4ECg1DbGll",
-            "bnRNZXNzYWdlEkAKDWNvbm5lY3RfbG9jYWwYASABKAsyJy5CdXR0cGx1Z0ZG",
-            "SS5DbGllbnRNZXNzYWdlLkNvbm5lY3RMb2NhbEgAEkgKEWNvbm5lY3Rfd2Vi",
-            "c29ja2V0GAIgASgLMisuQnV0dHBsdWdGRkkuQ2xpZW50TWVzc2FnZS5Db25u",
-            "ZWN0V2Vic29ja2V0SAASQgoOc3RhcnRfc2Nhbm5pbmcYAyABKAsyKC5CdXR0",
-            "cGx1Z0ZGSS5DbGllbnRNZXNzYWdlLlN0YXJ0U2Nhbm5pbmdIABJACg1zdG9w",
-            "X3NjYW5uaW5nGAQgASgLMicuQnV0dHBsdWdGRkkuQ2xpZW50TWVzc2FnZS5T",
-            "dG9wU2Nhbm5pbmdIABpWCgxDb25uZWN0TG9jYWwSEwoLc2VydmVyX25hbWUY",
-            "ASABKAkSFQoNbWF4X3BpbmdfdGltZRgCIAEoDRIaChJjb21tX21hbmFnZXJf",
-            "dHlwZXMYAyABKA0aRQoQQ29ubmVjdFdlYnNvY2tldBIPCgdhZGRyZXNzGAEg",
-            "ASgJEiAKGGJ5cGFzc19jZXJ0X3ZlcmlmaWNhdGlvbhgCIAEoCBoPCg1TdGFy",
-            "dFNjYW5uaW5nGg4KDFN0b3BTY2FubmluZyKDAQofRGV2aWNlQ29tbXVuaWNh",
+            "ChVidXR0cGx1Z19yc19mZmkucHJvdG8SC0J1dHRwbHVnRkZJIsEFCg1DbGll",
+            "bnRNZXNzYWdlEgoKAmlkGAEgASgNEjYKB21lc3NhZ2UYAiABKAsyJS5CdXR0",
+            "cGx1Z0ZGSS5DbGllbnRNZXNzYWdlLkZGSU1lc3NhZ2UaVgoMQ29ubmVjdExv",
+            "Y2FsEhMKC3NlcnZlcl9uYW1lGAEgASgJEhUKDW1heF9waW5nX3RpbWUYAiAB",
+            "KA0SGgoSY29tbV9tYW5hZ2VyX3R5cGVzGAMgASgNGkUKEENvbm5lY3RXZWJz",
+            "b2NrZXQSDwoHYWRkcmVzcxgBIAEoCRIgChhieXBhc3NfY2VydF92ZXJpZmlj",
+            "YXRpb24YAiABKAgaDwoNU3RhcnRTY2FubmluZxoOCgxTdG9wU2Nhbm5pbmca",
+            "pQIKCkZGSU1lc3NhZ2USQAoNY29ubmVjdF9sb2NhbBgBIAEoCzInLkJ1dHRw",
+            "bHVnRkZJLkNsaWVudE1lc3NhZ2UuQ29ubmVjdExvY2FsSAASSAoRY29ubmVj",
+            "dF93ZWJzb2NrZXQYAiABKAsyKy5CdXR0cGx1Z0ZGSS5DbGllbnRNZXNzYWdl",
+            "LkNvbm5lY3RXZWJzb2NrZXRIABJCCg5zdGFydF9zY2FubmluZxgDIAEoCzIo",
+            "LkJ1dHRwbHVnRkZJLkNsaWVudE1lc3NhZ2UuU3RhcnRTY2FubmluZ0gAEkAK",
+            "DXN0b3Bfc2Nhbm5pbmcYBCABKAsyJy5CdXR0cGx1Z0ZGSS5DbGllbnRNZXNz",
+            "YWdlLlN0b3BTY2FubmluZ0gAQgUKA21zZyKDAQofRGV2aWNlQ29tbXVuaWNh",
             "dGlvbk1hbmFnZXJUeXBlcxIHCgNBbGwQABIMCghCdGxlcGx1ZxABEgoKBlhJ",
             "bnB1dBACEg4KClNlcmlhbFBvcnQQBBIUChBMb3ZlbnNlSElERG9uZ2xlEAgS",
-            "FwoTTG92ZW5zZVNlcmlhbERvbmdsZRAQQgUKA21zZyK0DAoNRGV2aWNlTWVz",
-            "c2FnZRINCgVpbmRleBgBIAEoDRI8CgdtZXNzYWdlGAIgASgLMisuQnV0dHBs",
-            "dWdGRkkuRGV2aWNlTWVzc2FnZS5GRklEZXZpY2VNZXNzYWdlGjAKEFZpYnJh",
-            "dGVDb21wb25lbnQSDQoFaW5kZXgYASABKA0SDQoFc3BlZWQYAiABKAEaSQoK",
-            "VmlicmF0ZUNtZBI7CgZzcGVlZHMYASADKAsyKy5CdXR0cGx1Z0ZGSS5EZXZp",
-            "Y2VNZXNzYWdlLlZpYnJhdGVDb21wb25lbnQaQgoPUm90YXRlQ29tcG9uZW50",
-            "Eg0KBWluZGV4GAEgASgNEg0KBXNwZWVkGAIgASgBEhEKCWNsb2Nrd2lzZRgD",
-            "IAEoCBpKCglSb3RhdGVDbWQSPQoJcm90YXRpb25zGAEgAygLMiouQnV0dHBs",
-            "dWdGRkkuRGV2aWNlTWVzc2FnZS5Sb3RhdGVDb21wb25lbnQaRAoPTGluZWFy",
-            "Q29tcG9uZW50Eg0KBWluZGV4GAEgASgNEhAKCGR1cmF0aW9uGAIgASgNEhAK",
-            "CHBvc2l0aW9uGAMgASgBGkoKCUxpbmVhckNtZBI9Cgltb3ZlbWVudHMYASAD",
-            "KAsyKi5CdXR0cGx1Z0ZGSS5EZXZpY2VNZXNzYWdlLkxpbmVhckNvbXBvbmVu",
-            "dBoPCg1TdG9wRGV2aWNlQ21kGm0KClJhd1JlYWRDbWQSJwoIZW5kcG9pbnQY",
-            "ASABKA4yFS5CdXR0cGx1Z0ZGSS5FbmRwb2ludBIMCgRkYXRhGAIgASgMEhcK",
-            "D2V4cGVjdGVkX2xlbmd0aBgDIAEoDRIPCgd0aW1lb3V0GAQgASgNGmEKC1Jh",
-            "d1dyaXRlQ21kEicKCGVuZHBvaW50GAEgASgOMhUuQnV0dHBsdWdGRkkuRW5k",
-            "cG9pbnQSDAoEZGF0YRgCIAEoDBIbChN3cml0ZV93aXRoX3Jlc3BvbnNlGAMg",
-            "ASgIGjoKD1Jhd1N1YnNjcmliZUNtZBInCghlbmRwb2ludBgBIAEoDjIVLkJ1",
-            "dHRwbHVnRkZJLkVuZHBvaW50GjwKEVJhd1Vuc3Vic2NyaWJlQ21kEicKCGVu",
-            "ZHBvaW50GAEgASgOMhUuQnV0dHBsdWdGRkkuRW5kcG9pbnQaEQoPQmF0dGVy",
-            "eUxldmVsQ21kGg4KDFJTU0lMZXZlbENtZBq2BQoQRkZJRGV2aWNlTWVzc2Fn",
-            "ZRI8Cgt2aWJyYXRlX2NtZBgBIAEoCzIlLkJ1dHRwbHVnRkZJLkRldmljZU1l",
-            "c3NhZ2UuVmlicmF0ZUNtZEgAEjoKCnJvdGF0ZV9jbWQYAiABKAsyJC5CdXR0",
-            "cGx1Z0ZGSS5EZXZpY2VNZXNzYWdlLlJvdGF0ZUNtZEgAEjoKCmxpbmVhcl9j",
-            "bWQYAyABKAsyJC5CdXR0cGx1Z0ZGSS5EZXZpY2VNZXNzYWdlLkxpbmVhckNt",
-            "ZEgAEkMKD3N0b3BfZGV2aWNlX2NtZBgEIAEoCzIoLkJ1dHRwbHVnRkZJLkRl",
-            "dmljZU1lc3NhZ2UuU3RvcERldmljZUNtZEgAEj0KDHJhd19yZWFkX2NtZBgF",
-            "IAEoCzIlLkJ1dHRwbHVnRkZJLkRldmljZU1lc3NhZ2UuUmF3UmVhZENtZEgA",
-            "Ej8KDXJhd193cml0ZV9jbWQYBiABKAsyJi5CdXR0cGx1Z0ZGSS5EZXZpY2VN",
-            "ZXNzYWdlLlJhd1dyaXRlQ21kSAASRwoRcmF3X3N1YnNjcmliZV9jbWQYByAB",
-            "KAsyKi5CdXR0cGx1Z0ZGSS5EZXZpY2VNZXNzYWdlLlJhd1N1YnNjcmliZUNt",
-            "ZEgAEksKE3Jhd191bnN1YnNjcmliZV9jbWQYCCABKAsyLC5CdXR0cGx1Z0ZG",
-            "SS5EZXZpY2VNZXNzYWdlLlJhd1Vuc3Vic2NyaWJlQ21kSAASRwoRYmF0dGVy",
-            "eV9sZXZlbF9jbWQYCSABKAsyKi5CdXR0cGx1Z0ZGSS5EZXZpY2VNZXNzYWdl",
-            "LkJhdHRlcnlMZXZlbENtZEgAEkEKDnJzc2lfbGV2ZWxfY21kGAogASgLMicu",
-            "QnV0dHBsdWdGRkkuRGV2aWNlTWVzc2FnZS5SU1NJTGV2ZWxDbWRIAEIFCgNt",
-            "c2ci9gkKDVNlcnZlck1lc3NhZ2USKwoCb2sYASABKAsyHS5CdXR0cGx1Z0ZG",
-            "SS5TZXJ2ZXJNZXNzYWdlLk9rSAASMQoFZXJyb3IYAiABKAsyIC5CdXR0cGx1",
-            "Z0ZGSS5TZXJ2ZXJNZXNzYWdlLkVycm9ySAASSAoRc2Nhbm5pbmdfZmluaXNo",
-            "ZWQYAyABKAsyKy5CdXR0cGx1Z0ZGSS5TZXJ2ZXJNZXNzYWdlLlNjYW5uaW5n",
-            "RmluaXNoZWRIABI+CgxkZXZpY2VfYWRkZWQYBCABKAsyJi5CdXR0cGx1Z0ZG",
-            "SS5TZXJ2ZXJNZXNzYWdlLkRldmljZUFkZGVkSAASQgoOZGV2aWNlX3JlbW92",
-            "ZWQYBSABKAsyKC5CdXR0cGx1Z0ZGSS5TZXJ2ZXJNZXNzYWdlLkRldmljZVJl",
-            "bW92ZWRIABI7CgpkaXNjb25uZWN0GAYgASgLMiUuQnV0dHBsdWdGRkkuU2Vy",
-            "dmVyTWVzc2FnZS5EaXNjb25uZWN0SAAaxQEKEU1lc3NhZ2VBdHRyaWJ1dGVz",
-            "EkUKDG1lc3NhZ2VfdHlwZRgBIAEoDjIvLkJ1dHRwbHVnRkZJLlNlcnZlck1l",
-            "c3NhZ2UuTWVzc2FnZUF0dHJpYnV0ZVR5cGUSFQoNZmVhdHVyZV9jb3VudBgC",
-            "IAEoDRISCgpzdGVwX2NvdW50GAMgAygNEigKCWVuZHBvaW50cxgEIAMoDjIV",
-            "LkJ1dHRwbHVnRkZJLkVuZHBvaW50EhQKDG1heF9kdXJhdGlvbhgFIAMoDRoE",
-            "CgJPaxptCgVFcnJvchJACgplcnJvcl90eXBlGAEgASgOMiwuQnV0dHBsdWdG",
-            "RkkuU2VydmVyTWVzc2FnZS5CdXR0cGx1Z0Vycm9yVHlwZRIPCgdtZXNzYWdl",
-            "GAIgASgJEhEKCWJhY2t0cmFjZRgDIAEoCRoSChBTY2FubmluZ0ZpbmlzaGVk",
-            "GnQKC0RldmljZUFkZGVkEgwKBG5hbWUYASABKAkSDQoFaW5kZXgYAiABKA0S",
-            "SAoSbWVzc2FnZV9hdHRyaWJ1dGVzGAMgAygLMiwuQnV0dHBsdWdGRkkuU2Vy",
-            "dmVyTWVzc2FnZS5NZXNzYWdlQXR0cmlidXRlcxoeCg1EZXZpY2VSZW1vdmVk",
-            "Eg0KBWluZGV4GAEgASgNGgwKCkRpc2Nvbm5lY3QirwEKEUJ1dHRwbHVnRXJy",
-            "b3JUeXBlEhoKFkJ1dHRwbHVnQ29ubmVjdG9yRXJyb3IQABIaChZCdXR0cGx1",
-            "Z0hhbmRzaGFrZUVycm9yEAESFwoTQnV0dHBsdWdEZXZpY2VFcnJvchACEhUK",
-            "EUJ1dHRwbHVnUGluZ0Vycm9yEAMSGAoUQnV0dHBsdWdNZXNzYWdlRXJyb3IQ",
-            "BBIYChRCdXR0cGx1Z1Vua25vd25FcnJvchAFIssBChRNZXNzYWdlQXR0cmli",
-            "dXRlVHlwZRIOCgpWaWJyYXRlQ21kEAASDQoJUm90YXRlQ21kEAESDQoJTGlu",
-            "ZWFyQ21kEAISEQoNU3RvcERldmljZUNtZBADEg4KClJhd1JlYWRDbWQQBBIP",
-            "CgtSYXdXcml0ZUNtZBAFEhMKD1Jhd1N1YnNjcmliZUNtZBAGEhUKEVJhd1Vu",
-            "c3Vic2NyaWJlQ21kEAcSEwoPQmF0dGVyeUxldmVsQ21kEAgSEAoMUlNTSUxl",
-            "dmVsQ21kEAlCBQoDbXNnIu8CCgtEZXZpY2VFdmVudBI5CgpkaXNjb25uZWN0",
-            "GAEgASgLMiMuQnV0dHBsdWdGRkkuRGV2aWNlRXZlbnQuRGlzY29ubmVjdEgA",
-            "Ek0KFWJhdHRlcnlfbGV2ZWxfcmVhZGluZxgCIAEoCzIsLkJ1dHRwbHVnRkZJ",
-            "LkRldmljZUV2ZW50LkJhdHRlcnlMZXZlbFJlYWRpbmdIABJHChJyc3NpX2xl",
-            "dmVsX3JlYWRpbmcYAyABKAsyKS5CdXR0cGx1Z0ZGSS5EZXZpY2VFdmVudC5S",
-            "U1NJTGV2ZWxSZWFkaW5nSAAaGwoKRGlzY29ubmVjdBINCgVpbmRleBgBIAEo",
-            "DRo1ChNCYXR0ZXJ5TGV2ZWxSZWFkaW5nEg0KBWluZGV4GAEgASgNEg8KB3Jl",
-            "YWRpbmcYAiABKAEaMgoQUlNTSUxldmVsUmVhZGluZxINCgVpbmRleBgBIAEo",
-            "DRIPCgdyZWFkaW5nGAIgASgBQgUKA21zZyLqAQoYQnV0dHBsdWdGRklDbGll",
-            "bnRNZXNzYWdlEgoKAmlkGAEgASgNEkEKB21lc3NhZ2UYAiABKAsyMC5CdXR0",
-            "cGx1Z0ZGSS5CdXR0cGx1Z0ZGSUNsaWVudE1lc3NhZ2UuRkZJTWVzc2FnZRp/",
-            "CgpGRklNZXNzYWdlEjQKDmNsaWVudF9tZXNzYWdlGAEgASgLMhouQnV0dHBs",
-            "dWdGRkkuQ2xpZW50TWVzc2FnZUgAEjQKDmRldmljZV9tZXNzYWdlGAIgASgL",
-            "MhouQnV0dHBsdWdGRkkuRGV2aWNlTWVzc2FnZUgAQgUKA21zZyLmAQoYQnV0",
-            "dHBsdWdGRklTZXJ2ZXJNZXNzYWdlEgoKAmlkGAEgASgNEkEKB21lc3NhZ2UY",
-            "AiABKAsyMC5CdXR0cGx1Z0ZGSS5CdXR0cGx1Z0ZGSVNlcnZlck1lc3NhZ2Uu",
-            "RkZJTWVzc2FnZRp7CgpGRklNZXNzYWdlEjQKDnNlcnZlcl9tZXNzYWdlGAEg",
-            "ASgLMhouQnV0dHBsdWdGRkkuU2VydmVyTWVzc2FnZUgAEjAKDGRldmljZV9l",
-            "dmVudBgCIAEoCzIYLkJ1dHRwbHVnRkZJLkRldmljZUV2ZW50SABCBQoDbXNn",
-            "KqsBCghFbmRwb2ludBIGCgJUeBAAEgYKAlJ4EAESDgoKUnhQcmVzc3VyZRAC",
-            "EgsKB1J4VG91Y2gQAxILCgdSeEFjY2VsEAQSCwoHQ29tbWFuZBAFEgwKCEZp",
-            "cm13YXJlEAYSCgoGVHhNb2RlEAcSDQoJVHhWaWJyYXRlEAgSCwoHVHhTaG9j",
-            "axAJEhMKD1R4VmVuZG9yQ29udHJvbBAKEg0KCVdoaXRlbGlzdBALYgZwcm90",
-            "bzM="));
+            "FwoTTG92ZW5zZVNlcmlhbERvbmdsZRAQIqgMCg1EZXZpY2VNZXNzYWdlEg0K",
+            "BWluZGV4GAEgASgNEjYKB21lc3NhZ2UYAiABKAsyJS5CdXR0cGx1Z0ZGSS5E",
+            "ZXZpY2VNZXNzYWdlLkZGSU1lc3NhZ2UaMAoQVmlicmF0ZUNvbXBvbmVudBIN",
+            "CgVpbmRleBgBIAEoDRINCgVzcGVlZBgCIAEoARpJCgpWaWJyYXRlQ21kEjsK",
+            "BnNwZWVkcxgBIAMoCzIrLkJ1dHRwbHVnRkZJLkRldmljZU1lc3NhZ2UuVmli",
+            "cmF0ZUNvbXBvbmVudBpCCg9Sb3RhdGVDb21wb25lbnQSDQoFaW5kZXgYASAB",
+            "KA0SDQoFc3BlZWQYAiABKAESEQoJY2xvY2t3aXNlGAMgASgIGkoKCVJvdGF0",
+            "ZUNtZBI9Cglyb3RhdGlvbnMYASADKAsyKi5CdXR0cGx1Z0ZGSS5EZXZpY2VN",
+            "ZXNzYWdlLlJvdGF0ZUNvbXBvbmVudBpECg9MaW5lYXJDb21wb25lbnQSDQoF",
+            "aW5kZXgYASABKA0SEAoIZHVyYXRpb24YAiABKA0SEAoIcG9zaXRpb24YAyAB",
+            "KAEaSgoJTGluZWFyQ21kEj0KCW1vdmVtZW50cxgBIAMoCzIqLkJ1dHRwbHVn",
+            "RkZJLkRldmljZU1lc3NhZ2UuTGluZWFyQ29tcG9uZW50Gg8KDVN0b3BEZXZp",
+            "Y2VDbWQabQoKUmF3UmVhZENtZBInCghlbmRwb2ludBgBIAEoDjIVLkJ1dHRw",
+            "bHVnRkZJLkVuZHBvaW50EgwKBGRhdGEYAiABKAwSFwoPZXhwZWN0ZWRfbGVu",
+            "Z3RoGAMgASgNEg8KB3RpbWVvdXQYBCABKA0aYQoLUmF3V3JpdGVDbWQSJwoI",
+            "ZW5kcG9pbnQYASABKA4yFS5CdXR0cGx1Z0ZGSS5FbmRwb2ludBIMCgRkYXRh",
+            "GAIgASgMEhsKE3dyaXRlX3dpdGhfcmVzcG9uc2UYAyABKAgaOgoPUmF3U3Vi",
+            "c2NyaWJlQ21kEicKCGVuZHBvaW50GAEgASgOMhUuQnV0dHBsdWdGRkkuRW5k",
+            "cG9pbnQaPAoRUmF3VW5zdWJzY3JpYmVDbWQSJwoIZW5kcG9pbnQYASABKA4y",
+            "FS5CdXR0cGx1Z0ZGSS5FbmRwb2ludBoRCg9CYXR0ZXJ5TGV2ZWxDbWQaDgoM",
+            "UlNTSUxldmVsQ21kGrAFCgpGRklNZXNzYWdlEjwKC3ZpYnJhdGVfY21kGAEg",
+            "ASgLMiUuQnV0dHBsdWdGRkkuRGV2aWNlTWVzc2FnZS5WaWJyYXRlQ21kSAAS",
+            "OgoKcm90YXRlX2NtZBgCIAEoCzIkLkJ1dHRwbHVnRkZJLkRldmljZU1lc3Nh",
+            "Z2UuUm90YXRlQ21kSAASOgoKbGluZWFyX2NtZBgDIAEoCzIkLkJ1dHRwbHVn",
+            "RkZJLkRldmljZU1lc3NhZ2UuTGluZWFyQ21kSAASQwoPc3RvcF9kZXZpY2Vf",
+            "Y21kGAQgASgLMiguQnV0dHBsdWdGRkkuRGV2aWNlTWVzc2FnZS5TdG9wRGV2",
+            "aWNlQ21kSAASPQoMcmF3X3JlYWRfY21kGAUgASgLMiUuQnV0dHBsdWdGRkku",
+            "RGV2aWNlTWVzc2FnZS5SYXdSZWFkQ21kSAASPwoNcmF3X3dyaXRlX2NtZBgG",
+            "IAEoCzImLkJ1dHRwbHVnRkZJLkRldmljZU1lc3NhZ2UuUmF3V3JpdGVDbWRI",
+            "ABJHChFyYXdfc3Vic2NyaWJlX2NtZBgHIAEoCzIqLkJ1dHRwbHVnRkZJLkRl",
+            "dmljZU1lc3NhZ2UuUmF3U3Vic2NyaWJlQ21kSAASSwoTcmF3X3Vuc3Vic2Ny",
+            "aWJlX2NtZBgIIAEoCzIsLkJ1dHRwbHVnRkZJLkRldmljZU1lc3NhZ2UuUmF3",
+            "VW5zdWJzY3JpYmVDbWRIABJHChFiYXR0ZXJ5X2xldmVsX2NtZBgJIAEoCzIq",
+            "LkJ1dHRwbHVnRkZJLkRldmljZU1lc3NhZ2UuQmF0dGVyeUxldmVsQ21kSAAS",
+            "QQoOcnNzaV9sZXZlbF9jbWQYCiABKAsyJy5CdXR0cGx1Z0ZGSS5EZXZpY2VN",
+            "ZXNzYWdlLlJTU0lMZXZlbENtZEgAQgUKA21zZyL2CQoNU2VydmVyTWVzc2Fn",
+            "ZRIrCgJvaxgBIAEoCzIdLkJ1dHRwbHVnRkZJLlNlcnZlck1lc3NhZ2UuT2tI",
+            "ABIxCgVlcnJvchgCIAEoCzIgLkJ1dHRwbHVnRkZJLlNlcnZlck1lc3NhZ2Uu",
+            "RXJyb3JIABJIChFzY2FubmluZ19maW5pc2hlZBgDIAEoCzIrLkJ1dHRwbHVn",
+            "RkZJLlNlcnZlck1lc3NhZ2UuU2Nhbm5pbmdGaW5pc2hlZEgAEj4KDGRldmlj",
+            "ZV9hZGRlZBgEIAEoCzImLkJ1dHRwbHVnRkZJLlNlcnZlck1lc3NhZ2UuRGV2",
+            "aWNlQWRkZWRIABJCCg5kZXZpY2VfcmVtb3ZlZBgFIAEoCzIoLkJ1dHRwbHVn",
+            "RkZJLlNlcnZlck1lc3NhZ2UuRGV2aWNlUmVtb3ZlZEgAEjsKCmRpc2Nvbm5l",
+            "Y3QYBiABKAsyJS5CdXR0cGx1Z0ZGSS5TZXJ2ZXJNZXNzYWdlLkRpc2Nvbm5l",
+            "Y3RIABrFAQoRTWVzc2FnZUF0dHJpYnV0ZXMSRQoMbWVzc2FnZV90eXBlGAEg",
+            "ASgOMi8uQnV0dHBsdWdGRkkuU2VydmVyTWVzc2FnZS5NZXNzYWdlQXR0cmli",
+            "dXRlVHlwZRIVCg1mZWF0dXJlX2NvdW50GAIgASgNEhIKCnN0ZXBfY291bnQY",
+            "AyADKA0SKAoJZW5kcG9pbnRzGAQgAygOMhUuQnV0dHBsdWdGRkkuRW5kcG9p",
+            "bnQSFAoMbWF4X2R1cmF0aW9uGAUgAygNGgQKAk9rGm0KBUVycm9yEkAKCmVy",
+            "cm9yX3R5cGUYASABKA4yLC5CdXR0cGx1Z0ZGSS5TZXJ2ZXJNZXNzYWdlLkJ1",
+            "dHRwbHVnRXJyb3JUeXBlEg8KB21lc3NhZ2UYAiABKAkSEQoJYmFja3RyYWNl",
+            "GAMgASgJGhIKEFNjYW5uaW5nRmluaXNoZWQadAoLRGV2aWNlQWRkZWQSDAoE",
+            "bmFtZRgBIAEoCRINCgVpbmRleBgCIAEoDRJIChJtZXNzYWdlX2F0dHJpYnV0",
+            "ZXMYAyADKAsyLC5CdXR0cGx1Z0ZGSS5TZXJ2ZXJNZXNzYWdlLk1lc3NhZ2VB",
+            "dHRyaWJ1dGVzGh4KDURldmljZVJlbW92ZWQSDQoFaW5kZXgYASABKA0aDAoK",
+            "RGlzY29ubmVjdCKvAQoRQnV0dHBsdWdFcnJvclR5cGUSGgoWQnV0dHBsdWdD",
+            "b25uZWN0b3JFcnJvchAAEhoKFkJ1dHRwbHVnSGFuZHNoYWtlRXJyb3IQARIX",
+            "ChNCdXR0cGx1Z0RldmljZUVycm9yEAISFQoRQnV0dHBsdWdQaW5nRXJyb3IQ",
+            "AxIYChRCdXR0cGx1Z01lc3NhZ2VFcnJvchAEEhgKFEJ1dHRwbHVnVW5rbm93",
+            "bkVycm9yEAUiywEKFE1lc3NhZ2VBdHRyaWJ1dGVUeXBlEg4KClZpYnJhdGVD",
+            "bWQQABINCglSb3RhdGVDbWQQARINCglMaW5lYXJDbWQQAhIRCg1TdG9wRGV2",
+            "aWNlQ21kEAMSDgoKUmF3UmVhZENtZBAEEg8KC1Jhd1dyaXRlQ21kEAUSEwoP",
+            "UmF3U3Vic2NyaWJlQ21kEAYSFQoRUmF3VW5zdWJzY3JpYmVDbWQQBxITCg9C",
+            "YXR0ZXJ5TGV2ZWxDbWQQCBIQCgxSU1NJTGV2ZWxDbWQQCUIFCgNtc2ci7wIK",
+            "C0RldmljZUV2ZW50EjkKCmRpc2Nvbm5lY3QYASABKAsyIy5CdXR0cGx1Z0ZG",
+            "SS5EZXZpY2VFdmVudC5EaXNjb25uZWN0SAASTQoVYmF0dGVyeV9sZXZlbF9y",
+            "ZWFkaW5nGAIgASgLMiwuQnV0dHBsdWdGRkkuRGV2aWNlRXZlbnQuQmF0dGVy",
+            "eUxldmVsUmVhZGluZ0gAEkcKEnJzc2lfbGV2ZWxfcmVhZGluZxgDIAEoCzIp",
+            "LkJ1dHRwbHVnRkZJLkRldmljZUV2ZW50LlJTU0lMZXZlbFJlYWRpbmdIABob",
+            "CgpEaXNjb25uZWN0Eg0KBWluZGV4GAEgASgNGjUKE0JhdHRlcnlMZXZlbFJl",
+            "YWRpbmcSDQoFaW5kZXgYASABKA0SDwoHcmVhZGluZxgCIAEoARoyChBSU1NJ",
+            "TGV2ZWxSZWFkaW5nEg0KBWluZGV4GAEgASgNEg8KB3JlYWRpbmcYAiABKAFC",
+            "BQoDbXNnIuYBChhCdXR0cGx1Z0ZGSVNlcnZlck1lc3NhZ2USCgoCaWQYASAB",
+            "KA0SQQoHbWVzc2FnZRgCIAEoCzIwLkJ1dHRwbHVnRkZJLkJ1dHRwbHVnRkZJ",
+            "U2VydmVyTWVzc2FnZS5GRklNZXNzYWdlGnsKCkZGSU1lc3NhZ2USNAoOc2Vy",
+            "dmVyX21lc3NhZ2UYASABKAsyGi5CdXR0cGx1Z0ZGSS5TZXJ2ZXJNZXNzYWdl",
+            "SAASMAoMZGV2aWNlX2V2ZW50GAIgASgLMhguQnV0dHBsdWdGRkkuRGV2aWNl",
+            "RXZlbnRIAEIFCgNtc2cqqwEKCEVuZHBvaW50EgYKAlR4EAASBgoCUngQARIO",
+            "CgpSeFByZXNzdXJlEAISCwoHUnhUb3VjaBADEgsKB1J4QWNjZWwQBBILCgdD",
+            "b21tYW5kEAUSDAoIRmlybXdhcmUQBhIKCgZUeE1vZGUQBxINCglUeFZpYnJh",
+            "dGUQCBILCgdUeFNob2NrEAkSEwoPVHhWZW5kb3JDb250cm9sEAoSDQoJV2hp",
+            "dGVsaXN0EAtiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::ButtplugFFI.Endpoint), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage), global::ButtplugFFI.ClientMessage.Parser, new[]{ "ConnectLocal", "ConnectWebsocket", "StartScanning", "StopScanning" }, new[]{ "Msg" }, new[]{ typeof(global::ButtplugFFI.ClientMessage.Types.DeviceCommunicationManagerTypes) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.ConnectLocal), global::ButtplugFFI.ClientMessage.Types.ConnectLocal.Parser, new[]{ "ServerName", "MaxPingTime", "CommManagerTypes" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage), global::ButtplugFFI.ClientMessage.Parser, new[]{ "Id", "Message" }, null, new[]{ typeof(global::ButtplugFFI.ClientMessage.Types.DeviceCommunicationManagerTypes) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.ConnectLocal), global::ButtplugFFI.ClientMessage.Types.ConnectLocal.Parser, new[]{ "ServerName", "MaxPingTime", "CommManagerTypes" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket), global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket.Parser, new[]{ "Address", "BypassCertVerification" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.StartScanning), global::ButtplugFFI.ClientMessage.Types.StartScanning.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.StopScanning), global::ButtplugFFI.ClientMessage.Types.StopScanning.Parser, null, null, null, null, null)}),
+            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.StopScanning), global::ButtplugFFI.ClientMessage.Types.StopScanning.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ClientMessage.Types.FFIMessage), global::ButtplugFFI.ClientMessage.Types.FFIMessage.Parser, new[]{ "ConnectLocal", "ConnectWebsocket", "StartScanning", "StopScanning" }, new[]{ "Msg" }, null, null, null)}),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage), global::ButtplugFFI.DeviceMessage.Parser, new[]{ "Index", "Message" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.VibrateComponent), global::ButtplugFFI.DeviceMessage.Types.VibrateComponent.Parser, new[]{ "Index", "Speed" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.VibrateCmd), global::ButtplugFFI.DeviceMessage.Types.VibrateCmd.Parser, new[]{ "Speeds" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.RotateComponent), global::ButtplugFFI.DeviceMessage.Types.RotateComponent.Parser, new[]{ "Index", "Speed", "Clockwise" }, null, null, null, null),
@@ -146,7 +143,7 @@ namespace ButtplugFFI {
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.RawUnsubscribeCmd), global::ButtplugFFI.DeviceMessage.Types.RawUnsubscribeCmd.Parser, new[]{ "Endpoint" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.BatteryLevelCmd), global::ButtplugFFI.DeviceMessage.Types.BatteryLevelCmd.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.RSSILevelCmd), global::ButtplugFFI.DeviceMessage.Types.RSSILevelCmd.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.FFIDeviceMessage), global::ButtplugFFI.DeviceMessage.Types.FFIDeviceMessage.Parser, new[]{ "VibrateCmd", "RotateCmd", "LinearCmd", "StopDeviceCmd", "RawReadCmd", "RawWriteCmd", "RawSubscribeCmd", "RawUnsubscribeCmd", "BatteryLevelCmd", "RssiLevelCmd" }, new[]{ "Msg" }, null, null, null)}),
+            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceMessage.Types.FFIMessage), global::ButtplugFFI.DeviceMessage.Types.FFIMessage.Parser, new[]{ "VibrateCmd", "RotateCmd", "LinearCmd", "StopDeviceCmd", "RawReadCmd", "RawWriteCmd", "RawSubscribeCmd", "RawUnsubscribeCmd", "BatteryLevelCmd", "RssiLevelCmd" }, new[]{ "Msg" }, null, null, null)}),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage), global::ButtplugFFI.ServerMessage.Parser, new[]{ "Ok", "Error", "ScanningFinished", "DeviceAdded", "DeviceRemoved", "Disconnect" }, new[]{ "Msg" }, new[]{ typeof(global::ButtplugFFI.ServerMessage.Types.ButtplugErrorType), typeof(global::ButtplugFFI.ServerMessage.Types.MessageAttributeType) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage.Types.MessageAttributes), global::ButtplugFFI.ServerMessage.Types.MessageAttributes.Parser, new[]{ "MessageType", "FeatureCount", "StepCount", "Endpoints", "MaxDuration" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage.Types.Ok), global::ButtplugFFI.ServerMessage.Types.Ok.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage.Types.Error), global::ButtplugFFI.ServerMessage.Types.Error.Parser, new[]{ "ErrorType", "Message", "Backtrace" }, null, null, null, null),
@@ -157,7 +154,6 @@ namespace ButtplugFFI {
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent), global::ButtplugFFI.DeviceEvent.Parser, new[]{ "Disconnect", "BatteryLevelReading", "RssiLevelReading" }, new[]{ "Msg" }, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.Disconnect), global::ButtplugFFI.DeviceEvent.Types.Disconnect.Parser, new[]{ "Index" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.BatteryLevelReading), global::ButtplugFFI.DeviceEvent.Types.BatteryLevelReading.Parser, new[]{ "Index", "Reading" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.RSSILevelReading), global::ButtplugFFI.DeviceEvent.Types.RSSILevelReading.Parser, new[]{ "Index", "Reading" }, null, null, null, null)}),
-            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ButtplugFFIClientMessage), global::ButtplugFFI.ButtplugFFIClientMessage.Parser, new[]{ "Id", "Message" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ButtplugFFIClientMessage.Types.FFIMessage), global::ButtplugFFI.ButtplugFFIClientMessage.Types.FFIMessage.Parser, new[]{ "ClientMessage", "DeviceMessage" }, new[]{ "Msg" }, null, null, null)}),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ButtplugFFIServerMessage), global::ButtplugFFI.ButtplugFFIServerMessage.Parser, new[]{ "Id", "Message" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ButtplugFFIServerMessage.Types.FFIMessage), global::ButtplugFFI.ButtplugFFIServerMessage.Types.FFIMessage.Parser, new[]{ "ServerMessage", "DeviceEvent" }, new[]{ "Msg" }, null, null, null)})
           }));
     }
@@ -208,21 +204,8 @@ namespace ButtplugFFI {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public ClientMessage(ClientMessage other) : this() {
-      switch (other.MsgCase) {
-        case MsgOneofCase.ConnectLocal:
-          ConnectLocal = other.ConnectLocal.Clone();
-          break;
-        case MsgOneofCase.ConnectWebsocket:
-          ConnectWebsocket = other.ConnectWebsocket.Clone();
-          break;
-        case MsgOneofCase.StartScanning:
-          StartScanning = other.StartScanning.Clone();
-          break;
-        case MsgOneofCase.StopScanning:
-          StopScanning = other.StopScanning.Clone();
-          break;
-      }
-
+      id_ = other.id_;
+      message_ = other.message_ != null ? other.message_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -231,69 +214,26 @@ namespace ButtplugFFI {
       return new ClientMessage(this);
     }
 
-    /// <summary>Field number for the "connect_local" field.</summary>
-    public const int ConnectLocalFieldNumber = 1;
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private uint id_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::ButtplugFFI.ClientMessage.Types.ConnectLocal ConnectLocal {
-      get { return msgCase_ == MsgOneofCase.ConnectLocal ? (global::ButtplugFFI.ClientMessage.Types.ConnectLocal) msg_ : null; }
+    public uint Id {
+      get { return id_; }
       set {
-        msg_ = value;
-        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.ConnectLocal;
+        id_ = value;
       }
     }
 
-    /// <summary>Field number for the "connect_websocket" field.</summary>
-    public const int ConnectWebsocketFieldNumber = 2;
+    /// <summary>Field number for the "message" field.</summary>
+    public const int MessageFieldNumber = 2;
+    private global::ButtplugFFI.ClientMessage.Types.FFIMessage message_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket ConnectWebsocket {
-      get { return msgCase_ == MsgOneofCase.ConnectWebsocket ? (global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket) msg_ : null; }
+    public global::ButtplugFFI.ClientMessage.Types.FFIMessage Message {
+      get { return message_; }
       set {
-        msg_ = value;
-        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.ConnectWebsocket;
+        message_ = value;
       }
-    }
-
-    /// <summary>Field number for the "start_scanning" field.</summary>
-    public const int StartScanningFieldNumber = 3;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::ButtplugFFI.ClientMessage.Types.StartScanning StartScanning {
-      get { return msgCase_ == MsgOneofCase.StartScanning ? (global::ButtplugFFI.ClientMessage.Types.StartScanning) msg_ : null; }
-      set {
-        msg_ = value;
-        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.StartScanning;
-      }
-    }
-
-    /// <summary>Field number for the "stop_scanning" field.</summary>
-    public const int StopScanningFieldNumber = 4;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::ButtplugFFI.ClientMessage.Types.StopScanning StopScanning {
-      get { return msgCase_ == MsgOneofCase.StopScanning ? (global::ButtplugFFI.ClientMessage.Types.StopScanning) msg_ : null; }
-      set {
-        msg_ = value;
-        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.StopScanning;
-      }
-    }
-
-    private object msg_;
-    /// <summary>Enum of possible cases for the "msg" oneof.</summary>
-    public enum MsgOneofCase {
-      None = 0,
-      ConnectLocal = 1,
-      ConnectWebsocket = 2,
-      StartScanning = 3,
-      StopScanning = 4,
-    }
-    private MsgOneofCase msgCase_ = MsgOneofCase.None;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public MsgOneofCase MsgCase {
-      get { return msgCase_; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void ClearMsg() {
-      msgCase_ = MsgOneofCase.None;
-      msg_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -309,22 +249,16 @@ namespace ButtplugFFI {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (!object.Equals(ConnectLocal, other.ConnectLocal)) return false;
-      if (!object.Equals(ConnectWebsocket, other.ConnectWebsocket)) return false;
-      if (!object.Equals(StartScanning, other.StartScanning)) return false;
-      if (!object.Equals(StopScanning, other.StopScanning)) return false;
-      if (MsgCase != other.MsgCase) return false;
+      if (Id != other.Id) return false;
+      if (!object.Equals(Message, other.Message)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (msgCase_ == MsgOneofCase.ConnectLocal) hash ^= ConnectLocal.GetHashCode();
-      if (msgCase_ == MsgOneofCase.ConnectWebsocket) hash ^= ConnectWebsocket.GetHashCode();
-      if (msgCase_ == MsgOneofCase.StartScanning) hash ^= StartScanning.GetHashCode();
-      if (msgCase_ == MsgOneofCase.StopScanning) hash ^= StopScanning.GetHashCode();
-      hash ^= (int) msgCase_;
+      if (Id != 0) hash ^= Id.GetHashCode();
+      if (message_ != null) hash ^= Message.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -338,21 +272,13 @@ namespace ButtplugFFI {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (msgCase_ == MsgOneofCase.ConnectLocal) {
-        output.WriteRawTag(10);
-        output.WriteMessage(ConnectLocal);
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(Id);
       }
-      if (msgCase_ == MsgOneofCase.ConnectWebsocket) {
+      if (message_ != null) {
         output.WriteRawTag(18);
-        output.WriteMessage(ConnectWebsocket);
-      }
-      if (msgCase_ == MsgOneofCase.StartScanning) {
-        output.WriteRawTag(26);
-        output.WriteMessage(StartScanning);
-      }
-      if (msgCase_ == MsgOneofCase.StopScanning) {
-        output.WriteRawTag(34);
-        output.WriteMessage(StopScanning);
+        output.WriteMessage(Message);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -362,17 +288,11 @@ namespace ButtplugFFI {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (msgCase_ == MsgOneofCase.ConnectLocal) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ConnectLocal);
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Id);
       }
-      if (msgCase_ == MsgOneofCase.ConnectWebsocket) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ConnectWebsocket);
-      }
-      if (msgCase_ == MsgOneofCase.StartScanning) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(StartScanning);
-      }
-      if (msgCase_ == MsgOneofCase.StopScanning) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(StopScanning);
+      if (message_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Message);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -385,33 +305,15 @@ namespace ButtplugFFI {
       if (other == null) {
         return;
       }
-      switch (other.MsgCase) {
-        case MsgOneofCase.ConnectLocal:
-          if (ConnectLocal == null) {
-            ConnectLocal = new global::ButtplugFFI.ClientMessage.Types.ConnectLocal();
-          }
-          ConnectLocal.MergeFrom(other.ConnectLocal);
-          break;
-        case MsgOneofCase.ConnectWebsocket:
-          if (ConnectWebsocket == null) {
-            ConnectWebsocket = new global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket();
-          }
-          ConnectWebsocket.MergeFrom(other.ConnectWebsocket);
-          break;
-        case MsgOneofCase.StartScanning:
-          if (StartScanning == null) {
-            StartScanning = new global::ButtplugFFI.ClientMessage.Types.StartScanning();
-          }
-          StartScanning.MergeFrom(other.StartScanning);
-          break;
-        case MsgOneofCase.StopScanning:
-          if (StopScanning == null) {
-            StopScanning = new global::ButtplugFFI.ClientMessage.Types.StopScanning();
-          }
-          StopScanning.MergeFrom(other.StopScanning);
-          break;
+      if (other.Id != 0) {
+        Id = other.Id;
       }
-
+      if (other.message_ != null) {
+        if (message_ == null) {
+          Message = new global::ButtplugFFI.ClientMessage.Types.FFIMessage();
+        }
+        Message.MergeFrom(other.Message);
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -423,40 +325,15 @@ namespace ButtplugFFI {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            global::ButtplugFFI.ClientMessage.Types.ConnectLocal subBuilder = new global::ButtplugFFI.ClientMessage.Types.ConnectLocal();
-            if (msgCase_ == MsgOneofCase.ConnectLocal) {
-              subBuilder.MergeFrom(ConnectLocal);
-            }
-            input.ReadMessage(subBuilder);
-            ConnectLocal = subBuilder;
+          case 8: {
+            Id = input.ReadUInt32();
             break;
           }
           case 18: {
-            global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket subBuilder = new global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket();
-            if (msgCase_ == MsgOneofCase.ConnectWebsocket) {
-              subBuilder.MergeFrom(ConnectWebsocket);
+            if (message_ == null) {
+              Message = new global::ButtplugFFI.ClientMessage.Types.FFIMessage();
             }
-            input.ReadMessage(subBuilder);
-            ConnectWebsocket = subBuilder;
-            break;
-          }
-          case 26: {
-            global::ButtplugFFI.ClientMessage.Types.StartScanning subBuilder = new global::ButtplugFFI.ClientMessage.Types.StartScanning();
-            if (msgCase_ == MsgOneofCase.StartScanning) {
-              subBuilder.MergeFrom(StartScanning);
-            }
-            input.ReadMessage(subBuilder);
-            StartScanning = subBuilder;
-            break;
-          }
-          case 34: {
-            global::ButtplugFFI.ClientMessage.Types.StopScanning subBuilder = new global::ButtplugFFI.ClientMessage.Types.StopScanning();
-            if (msgCase_ == MsgOneofCase.StopScanning) {
-              subBuilder.MergeFrom(StopScanning);
-            }
-            input.ReadMessage(subBuilder);
-            StopScanning = subBuilder;
+            input.ReadMessage(Message);
             break;
           }
         }
@@ -1023,6 +900,288 @@ namespace ButtplugFFI {
 
       }
 
+      public sealed partial class FFIMessage : pb::IMessage<FFIMessage> {
+        private static readonly pb::MessageParser<FFIMessage> _parser = new pb::MessageParser<FFIMessage>(() => new FFIMessage());
+        private pb::UnknownFieldSet _unknownFields;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public static pb::MessageParser<FFIMessage> Parser { get { return _parser; } }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public static pbr::MessageDescriptor Descriptor {
+          get { return global::ButtplugFFI.ClientMessage.Descriptor.NestedTypes[4]; }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        pbr::MessageDescriptor pb::IMessage.Descriptor {
+          get { return Descriptor; }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public FFIMessage() {
+          OnConstruction();
+        }
+
+        partial void OnConstruction();
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public FFIMessage(FFIMessage other) : this() {
+          switch (other.MsgCase) {
+            case MsgOneofCase.ConnectLocal:
+              ConnectLocal = other.ConnectLocal.Clone();
+              break;
+            case MsgOneofCase.ConnectWebsocket:
+              ConnectWebsocket = other.ConnectWebsocket.Clone();
+              break;
+            case MsgOneofCase.StartScanning:
+              StartScanning = other.StartScanning.Clone();
+              break;
+            case MsgOneofCase.StopScanning:
+              StopScanning = other.StopScanning.Clone();
+              break;
+          }
+
+          _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public FFIMessage Clone() {
+          return new FFIMessage(this);
+        }
+
+        /// <summary>Field number for the "connect_local" field.</summary>
+        public const int ConnectLocalFieldNumber = 1;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public global::ButtplugFFI.ClientMessage.Types.ConnectLocal ConnectLocal {
+          get { return msgCase_ == MsgOneofCase.ConnectLocal ? (global::ButtplugFFI.ClientMessage.Types.ConnectLocal) msg_ : null; }
+          set {
+            msg_ = value;
+            msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.ConnectLocal;
+          }
+        }
+
+        /// <summary>Field number for the "connect_websocket" field.</summary>
+        public const int ConnectWebsocketFieldNumber = 2;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket ConnectWebsocket {
+          get { return msgCase_ == MsgOneofCase.ConnectWebsocket ? (global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket) msg_ : null; }
+          set {
+            msg_ = value;
+            msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.ConnectWebsocket;
+          }
+        }
+
+        /// <summary>Field number for the "start_scanning" field.</summary>
+        public const int StartScanningFieldNumber = 3;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public global::ButtplugFFI.ClientMessage.Types.StartScanning StartScanning {
+          get { return msgCase_ == MsgOneofCase.StartScanning ? (global::ButtplugFFI.ClientMessage.Types.StartScanning) msg_ : null; }
+          set {
+            msg_ = value;
+            msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.StartScanning;
+          }
+        }
+
+        /// <summary>Field number for the "stop_scanning" field.</summary>
+        public const int StopScanningFieldNumber = 4;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public global::ButtplugFFI.ClientMessage.Types.StopScanning StopScanning {
+          get { return msgCase_ == MsgOneofCase.StopScanning ? (global::ButtplugFFI.ClientMessage.Types.StopScanning) msg_ : null; }
+          set {
+            msg_ = value;
+            msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.StopScanning;
+          }
+        }
+
+        private object msg_;
+        /// <summary>Enum of possible cases for the "msg" oneof.</summary>
+        public enum MsgOneofCase {
+          None = 0,
+          ConnectLocal = 1,
+          ConnectWebsocket = 2,
+          StartScanning = 3,
+          StopScanning = 4,
+        }
+        private MsgOneofCase msgCase_ = MsgOneofCase.None;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public MsgOneofCase MsgCase {
+          get { return msgCase_; }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void ClearMsg() {
+          msgCase_ = MsgOneofCase.None;
+          msg_ = null;
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public override bool Equals(object other) {
+          return Equals(other as FFIMessage);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public bool Equals(FFIMessage other) {
+          if (ReferenceEquals(other, null)) {
+            return false;
+          }
+          if (ReferenceEquals(other, this)) {
+            return true;
+          }
+          if (!object.Equals(ConnectLocal, other.ConnectLocal)) return false;
+          if (!object.Equals(ConnectWebsocket, other.ConnectWebsocket)) return false;
+          if (!object.Equals(StartScanning, other.StartScanning)) return false;
+          if (!object.Equals(StopScanning, other.StopScanning)) return false;
+          if (MsgCase != other.MsgCase) return false;
+          return Equals(_unknownFields, other._unknownFields);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public override int GetHashCode() {
+          int hash = 1;
+          if (msgCase_ == MsgOneofCase.ConnectLocal) hash ^= ConnectLocal.GetHashCode();
+          if (msgCase_ == MsgOneofCase.ConnectWebsocket) hash ^= ConnectWebsocket.GetHashCode();
+          if (msgCase_ == MsgOneofCase.StartScanning) hash ^= StartScanning.GetHashCode();
+          if (msgCase_ == MsgOneofCase.StopScanning) hash ^= StopScanning.GetHashCode();
+          hash ^= (int) msgCase_;
+          if (_unknownFields != null) {
+            hash ^= _unknownFields.GetHashCode();
+          }
+          return hash;
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public override string ToString() {
+          return pb::JsonFormatter.ToDiagnosticString(this);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void WriteTo(pb::CodedOutputStream output) {
+          if (msgCase_ == MsgOneofCase.ConnectLocal) {
+            output.WriteRawTag(10);
+            output.WriteMessage(ConnectLocal);
+          }
+          if (msgCase_ == MsgOneofCase.ConnectWebsocket) {
+            output.WriteRawTag(18);
+            output.WriteMessage(ConnectWebsocket);
+          }
+          if (msgCase_ == MsgOneofCase.StartScanning) {
+            output.WriteRawTag(26);
+            output.WriteMessage(StartScanning);
+          }
+          if (msgCase_ == MsgOneofCase.StopScanning) {
+            output.WriteRawTag(34);
+            output.WriteMessage(StopScanning);
+          }
+          if (_unknownFields != null) {
+            _unknownFields.WriteTo(output);
+          }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public int CalculateSize() {
+          int size = 0;
+          if (msgCase_ == MsgOneofCase.ConnectLocal) {
+            size += 1 + pb::CodedOutputStream.ComputeMessageSize(ConnectLocal);
+          }
+          if (msgCase_ == MsgOneofCase.ConnectWebsocket) {
+            size += 1 + pb::CodedOutputStream.ComputeMessageSize(ConnectWebsocket);
+          }
+          if (msgCase_ == MsgOneofCase.StartScanning) {
+            size += 1 + pb::CodedOutputStream.ComputeMessageSize(StartScanning);
+          }
+          if (msgCase_ == MsgOneofCase.StopScanning) {
+            size += 1 + pb::CodedOutputStream.ComputeMessageSize(StopScanning);
+          }
+          if (_unknownFields != null) {
+            size += _unknownFields.CalculateSize();
+          }
+          return size;
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void MergeFrom(FFIMessage other) {
+          if (other == null) {
+            return;
+          }
+          switch (other.MsgCase) {
+            case MsgOneofCase.ConnectLocal:
+              if (ConnectLocal == null) {
+                ConnectLocal = new global::ButtplugFFI.ClientMessage.Types.ConnectLocal();
+              }
+              ConnectLocal.MergeFrom(other.ConnectLocal);
+              break;
+            case MsgOneofCase.ConnectWebsocket:
+              if (ConnectWebsocket == null) {
+                ConnectWebsocket = new global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket();
+              }
+              ConnectWebsocket.MergeFrom(other.ConnectWebsocket);
+              break;
+            case MsgOneofCase.StartScanning:
+              if (StartScanning == null) {
+                StartScanning = new global::ButtplugFFI.ClientMessage.Types.StartScanning();
+              }
+              StartScanning.MergeFrom(other.StartScanning);
+              break;
+            case MsgOneofCase.StopScanning:
+              if (StopScanning == null) {
+                StopScanning = new global::ButtplugFFI.ClientMessage.Types.StopScanning();
+              }
+              StopScanning.MergeFrom(other.StopScanning);
+              break;
+          }
+
+          _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void MergeFrom(pb::CodedInputStream input) {
+          uint tag;
+          while ((tag = input.ReadTag()) != 0) {
+            switch(tag) {
+              default:
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+                break;
+              case 10: {
+                global::ButtplugFFI.ClientMessage.Types.ConnectLocal subBuilder = new global::ButtplugFFI.ClientMessage.Types.ConnectLocal();
+                if (msgCase_ == MsgOneofCase.ConnectLocal) {
+                  subBuilder.MergeFrom(ConnectLocal);
+                }
+                input.ReadMessage(subBuilder);
+                ConnectLocal = subBuilder;
+                break;
+              }
+              case 18: {
+                global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket subBuilder = new global::ButtplugFFI.ClientMessage.Types.ConnectWebsocket();
+                if (msgCase_ == MsgOneofCase.ConnectWebsocket) {
+                  subBuilder.MergeFrom(ConnectWebsocket);
+                }
+                input.ReadMessage(subBuilder);
+                ConnectWebsocket = subBuilder;
+                break;
+              }
+              case 26: {
+                global::ButtplugFFI.ClientMessage.Types.StartScanning subBuilder = new global::ButtplugFFI.ClientMessage.Types.StartScanning();
+                if (msgCase_ == MsgOneofCase.StartScanning) {
+                  subBuilder.MergeFrom(StartScanning);
+                }
+                input.ReadMessage(subBuilder);
+                StartScanning = subBuilder;
+                break;
+              }
+              case 34: {
+                global::ButtplugFFI.ClientMessage.Types.StopScanning subBuilder = new global::ButtplugFFI.ClientMessage.Types.StopScanning();
+                if (msgCase_ == MsgOneofCase.StopScanning) {
+                  subBuilder.MergeFrom(StopScanning);
+                }
+                input.ReadMessage(subBuilder);
+                StopScanning = subBuilder;
+                break;
+              }
+            }
+          }
+        }
+
+      }
+
     }
     #endregion
 
@@ -1076,9 +1235,9 @@ namespace ButtplugFFI {
 
     /// <summary>Field number for the "message" field.</summary>
     public const int MessageFieldNumber = 2;
-    private global::ButtplugFFI.DeviceMessage.Types.FFIDeviceMessage message_;
+    private global::ButtplugFFI.DeviceMessage.Types.FFIMessage message_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::ButtplugFFI.DeviceMessage.Types.FFIDeviceMessage Message {
+    public global::ButtplugFFI.DeviceMessage.Types.FFIMessage Message {
       get { return message_; }
       set {
         message_ = value;
@@ -1159,7 +1318,7 @@ namespace ButtplugFFI {
       }
       if (other.message_ != null) {
         if (message_ == null) {
-          Message = new global::ButtplugFFI.DeviceMessage.Types.FFIDeviceMessage();
+          Message = new global::ButtplugFFI.DeviceMessage.Types.FFIMessage();
         }
         Message.MergeFrom(other.Message);
       }
@@ -1180,7 +1339,7 @@ namespace ButtplugFFI {
           }
           case 18: {
             if (message_ == null) {
-              Message = new global::ButtplugFFI.DeviceMessage.Types.FFIDeviceMessage();
+              Message = new global::ButtplugFFI.DeviceMessage.Types.FFIMessage();
             }
             input.ReadMessage(Message);
             break;
@@ -3042,11 +3201,11 @@ namespace ButtplugFFI {
 
       }
 
-      public sealed partial class FFIDeviceMessage : pb::IMessage<FFIDeviceMessage> {
-        private static readonly pb::MessageParser<FFIDeviceMessage> _parser = new pb::MessageParser<FFIDeviceMessage>(() => new FFIDeviceMessage());
+      public sealed partial class FFIMessage : pb::IMessage<FFIMessage> {
+        private static readonly pb::MessageParser<FFIMessage> _parser = new pb::MessageParser<FFIMessage>(() => new FFIMessage());
         private pb::UnknownFieldSet _unknownFields;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public static pb::MessageParser<FFIDeviceMessage> Parser { get { return _parser; } }
+        public static pb::MessageParser<FFIMessage> Parser { get { return _parser; } }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pbr::MessageDescriptor Descriptor {
@@ -3059,14 +3218,14 @@ namespace ButtplugFFI {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public FFIDeviceMessage() {
+        public FFIMessage() {
           OnConstruction();
         }
 
         partial void OnConstruction();
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public FFIDeviceMessage(FFIDeviceMessage other) : this() {
+        public FFIMessage(FFIMessage other) : this() {
           switch (other.MsgCase) {
             case MsgOneofCase.VibrateCmd:
               VibrateCmd = other.VibrateCmd.Clone();
@@ -3104,8 +3263,8 @@ namespace ButtplugFFI {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public FFIDeviceMessage Clone() {
-          return new FFIDeviceMessage(this);
+        public FFIMessage Clone() {
+          return new FFIMessage(this);
         }
 
         /// <summary>Field number for the "vibrate_cmd" field.</summary>
@@ -3247,11 +3406,11 @@ namespace ButtplugFFI {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public override bool Equals(object other) {
-          return Equals(other as FFIDeviceMessage);
+          return Equals(other as FFIMessage);
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public bool Equals(FFIDeviceMessage other) {
+        public bool Equals(FFIMessage other) {
           if (ReferenceEquals(other, null)) {
             return false;
           }
@@ -3384,7 +3543,7 @@ namespace ButtplugFFI {
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public void MergeFrom(FFIDeviceMessage other) {
+        public void MergeFrom(FFIMessage other) {
           if (other == null) {
             return;
           }
@@ -5663,380 +5822,6 @@ namespace ButtplugFFI {
 
   }
 
-  public sealed partial class ButtplugFFIClientMessage : pb::IMessage<ButtplugFFIClientMessage> {
-    private static readonly pb::MessageParser<ButtplugFFIClientMessage> _parser = new pb::MessageParser<ButtplugFFIClientMessage>(() => new ButtplugFFIClientMessage());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<ButtplugFFIClientMessage> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::ButtplugFFI.ButtplugRsFfiReflection.Descriptor.MessageTypes[4]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ButtplugFFIClientMessage() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ButtplugFFIClientMessage(ButtplugFFIClientMessage other) : this() {
-      id_ = other.id_;
-      message_ = other.message_ != null ? other.message_.Clone() : null;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ButtplugFFIClientMessage Clone() {
-      return new ButtplugFFIClientMessage(this);
-    }
-
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 1;
-    private uint id_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public uint Id {
-      get { return id_; }
-      set {
-        id_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "message" field.</summary>
-    public const int MessageFieldNumber = 2;
-    private global::ButtplugFFI.ButtplugFFIClientMessage.Types.FFIMessage message_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::ButtplugFFI.ButtplugFFIClientMessage.Types.FFIMessage Message {
-      get { return message_; }
-      set {
-        message_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as ButtplugFFIClientMessage);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(ButtplugFFIClientMessage other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Id != other.Id) return false;
-      if (!object.Equals(Message, other.Message)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Id != 0) hash ^= Id.GetHashCode();
-      if (message_ != null) hash ^= Message.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Id != 0) {
-        output.WriteRawTag(8);
-        output.WriteUInt32(Id);
-      }
-      if (message_ != null) {
-        output.WriteRawTag(18);
-        output.WriteMessage(Message);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (Id != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Id);
-      }
-      if (message_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Message);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(ButtplugFFIClientMessage other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Id != 0) {
-        Id = other.Id;
-      }
-      if (other.message_ != null) {
-        if (message_ == null) {
-          Message = new global::ButtplugFFI.ButtplugFFIClientMessage.Types.FFIMessage();
-        }
-        Message.MergeFrom(other.Message);
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 8: {
-            Id = input.ReadUInt32();
-            break;
-          }
-          case 18: {
-            if (message_ == null) {
-              Message = new global::ButtplugFFI.ButtplugFFIClientMessage.Types.FFIMessage();
-            }
-            input.ReadMessage(Message);
-            break;
-          }
-        }
-      }
-    }
-
-    #region Nested types
-    /// <summary>Container for nested types declared in the ButtplugFFIClientMessage message type.</summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static partial class Types {
-      public sealed partial class FFIMessage : pb::IMessage<FFIMessage> {
-        private static readonly pb::MessageParser<FFIMessage> _parser = new pb::MessageParser<FFIMessage>(() => new FFIMessage());
-        private pb::UnknownFieldSet _unknownFields;
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public static pb::MessageParser<FFIMessage> Parser { get { return _parser; } }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public static pbr::MessageDescriptor Descriptor {
-          get { return global::ButtplugFFI.ButtplugFFIClientMessage.Descriptor.NestedTypes[0]; }
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        pbr::MessageDescriptor pb::IMessage.Descriptor {
-          get { return Descriptor; }
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public FFIMessage() {
-          OnConstruction();
-        }
-
-        partial void OnConstruction();
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public FFIMessage(FFIMessage other) : this() {
-          switch (other.MsgCase) {
-            case MsgOneofCase.ClientMessage:
-              ClientMessage = other.ClientMessage.Clone();
-              break;
-            case MsgOneofCase.DeviceMessage:
-              DeviceMessage = other.DeviceMessage.Clone();
-              break;
-          }
-
-          _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public FFIMessage Clone() {
-          return new FFIMessage(this);
-        }
-
-        /// <summary>Field number for the "client_message" field.</summary>
-        public const int ClientMessageFieldNumber = 1;
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public global::ButtplugFFI.ClientMessage ClientMessage {
-          get { return msgCase_ == MsgOneofCase.ClientMessage ? (global::ButtplugFFI.ClientMessage) msg_ : null; }
-          set {
-            msg_ = value;
-            msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.ClientMessage;
-          }
-        }
-
-        /// <summary>Field number for the "device_message" field.</summary>
-        public const int DeviceMessageFieldNumber = 2;
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public global::ButtplugFFI.DeviceMessage DeviceMessage {
-          get { return msgCase_ == MsgOneofCase.DeviceMessage ? (global::ButtplugFFI.DeviceMessage) msg_ : null; }
-          set {
-            msg_ = value;
-            msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.DeviceMessage;
-          }
-        }
-
-        private object msg_;
-        /// <summary>Enum of possible cases for the "msg" oneof.</summary>
-        public enum MsgOneofCase {
-          None = 0,
-          ClientMessage = 1,
-          DeviceMessage = 2,
-        }
-        private MsgOneofCase msgCase_ = MsgOneofCase.None;
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public MsgOneofCase MsgCase {
-          get { return msgCase_; }
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public void ClearMsg() {
-          msgCase_ = MsgOneofCase.None;
-          msg_ = null;
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public override bool Equals(object other) {
-          return Equals(other as FFIMessage);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public bool Equals(FFIMessage other) {
-          if (ReferenceEquals(other, null)) {
-            return false;
-          }
-          if (ReferenceEquals(other, this)) {
-            return true;
-          }
-          if (!object.Equals(ClientMessage, other.ClientMessage)) return false;
-          if (!object.Equals(DeviceMessage, other.DeviceMessage)) return false;
-          if (MsgCase != other.MsgCase) return false;
-          return Equals(_unknownFields, other._unknownFields);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public override int GetHashCode() {
-          int hash = 1;
-          if (msgCase_ == MsgOneofCase.ClientMessage) hash ^= ClientMessage.GetHashCode();
-          if (msgCase_ == MsgOneofCase.DeviceMessage) hash ^= DeviceMessage.GetHashCode();
-          hash ^= (int) msgCase_;
-          if (_unknownFields != null) {
-            hash ^= _unknownFields.GetHashCode();
-          }
-          return hash;
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public override string ToString() {
-          return pb::JsonFormatter.ToDiagnosticString(this);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public void WriteTo(pb::CodedOutputStream output) {
-          if (msgCase_ == MsgOneofCase.ClientMessage) {
-            output.WriteRawTag(10);
-            output.WriteMessage(ClientMessage);
-          }
-          if (msgCase_ == MsgOneofCase.DeviceMessage) {
-            output.WriteRawTag(18);
-            output.WriteMessage(DeviceMessage);
-          }
-          if (_unknownFields != null) {
-            _unknownFields.WriteTo(output);
-          }
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public int CalculateSize() {
-          int size = 0;
-          if (msgCase_ == MsgOneofCase.ClientMessage) {
-            size += 1 + pb::CodedOutputStream.ComputeMessageSize(ClientMessage);
-          }
-          if (msgCase_ == MsgOneofCase.DeviceMessage) {
-            size += 1 + pb::CodedOutputStream.ComputeMessageSize(DeviceMessage);
-          }
-          if (_unknownFields != null) {
-            size += _unknownFields.CalculateSize();
-          }
-          return size;
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public void MergeFrom(FFIMessage other) {
-          if (other == null) {
-            return;
-          }
-          switch (other.MsgCase) {
-            case MsgOneofCase.ClientMessage:
-              if (ClientMessage == null) {
-                ClientMessage = new global::ButtplugFFI.ClientMessage();
-              }
-              ClientMessage.MergeFrom(other.ClientMessage);
-              break;
-            case MsgOneofCase.DeviceMessage:
-              if (DeviceMessage == null) {
-                DeviceMessage = new global::ButtplugFFI.DeviceMessage();
-              }
-              DeviceMessage.MergeFrom(other.DeviceMessage);
-              break;
-          }
-
-          _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-        }
-
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public void MergeFrom(pb::CodedInputStream input) {
-          uint tag;
-          while ((tag = input.ReadTag()) != 0) {
-            switch(tag) {
-              default:
-                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-                break;
-              case 10: {
-                global::ButtplugFFI.ClientMessage subBuilder = new global::ButtplugFFI.ClientMessage();
-                if (msgCase_ == MsgOneofCase.ClientMessage) {
-                  subBuilder.MergeFrom(ClientMessage);
-                }
-                input.ReadMessage(subBuilder);
-                ClientMessage = subBuilder;
-                break;
-              }
-              case 18: {
-                global::ButtplugFFI.DeviceMessage subBuilder = new global::ButtplugFFI.DeviceMessage();
-                if (msgCase_ == MsgOneofCase.DeviceMessage) {
-                  subBuilder.MergeFrom(DeviceMessage);
-                }
-                input.ReadMessage(subBuilder);
-                DeviceMessage = subBuilder;
-                break;
-              }
-            }
-          }
-        }
-
-      }
-
-    }
-    #endregion
-
-  }
-
   public sealed partial class ButtplugFFIServerMessage : pb::IMessage<ButtplugFFIServerMessage> {
     private static readonly pb::MessageParser<ButtplugFFIServerMessage> _parser = new pb::MessageParser<ButtplugFFIServerMessage>(() => new ButtplugFFIServerMessage());
     private pb::UnknownFieldSet _unknownFields;
@@ -6045,7 +5830,7 @@ namespace ButtplugFFI {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::ButtplugFFI.ButtplugRsFfiReflection.Descriptor.MessageTypes[5]; }
+      get { return global::ButtplugFFI.ButtplugRsFfiReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

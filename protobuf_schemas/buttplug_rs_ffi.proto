@@ -44,12 +44,17 @@ message ClientMessage {
   message StopScanning {
   }
 
-  oneof msg {
-    ConnectLocal connect_local = 1;
-    ConnectWebsocket connect_websocket = 2;
-    StartScanning start_scanning = 3;
-    StopScanning stop_scanning = 4;
+  message FFIMessage {
+    oneof msg {
+      ConnectLocal connect_local = 1;
+      ConnectWebsocket connect_websocket = 2;
+      StartScanning start_scanning = 3;
+      StopScanning stop_scanning = 4;
+    }
   }
+
+  uint32 id = 1;
+  FFIMessage message = 2;
 }
 
 message DeviceMessage {
@@ -112,7 +117,7 @@ message DeviceMessage {
   message RSSILevelCmd {
   }
 
-  message FFIDeviceMessage {
+  message FFIMessage {
     oneof msg {
       VibrateCmd vibrate_cmd = 1;
       RotateCmd rotate_cmd = 2;
@@ -127,8 +132,9 @@ message DeviceMessage {
     }
   }
   
-  uint32 index = 1;
-  FFIDeviceMessage message = 2;
+  uint32 id = 1;
+  uint32 index = 2;
+  FFIMessage message = 3;
 }
 
 message ServerMessage {
@@ -220,18 +226,6 @@ message DeviceEvent {
     BatteryLevelReading battery_level_reading = 2;
     RSSILevelReading rssi_level_reading = 3;
   };  
-}
-
-message ButtplugFFIClientMessage {
-  message FFIMessage {
-    oneof msg {
-      ClientMessage client_message = 1;
-      DeviceMessage device_message = 2;
-    }
-  }
-
-  uint32 id = 1;
-  FFIMessage message = 2;
 }
 
 message ButtplugFFIServerMessage {

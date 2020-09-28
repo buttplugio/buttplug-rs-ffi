@@ -1,13 +1,12 @@
 use super::{
   pbufs::{
-    buttplug_ffi_client_message::ffi_message::Msg as FFIClientMessageType,
     buttplug_ffi_server_message,
     buttplug_ffi_server_message::ffi_message::Msg as FFIServerMessageType,
-    device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, ffi_device_message::Msg as DeviceMessageType},
+    device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, ffi_message::Msg as DeviceMessageType},
     server_message::{
       ButtplugErrorType, Error as OutgoingError, MessageAttributeType, Msg as ServerMessageType, Ok,
     },
-    ButtplugFfiClientMessage as FFIClientMessage, ButtplugFfiServerMessage as FFIServerMessage,
+    ButtplugFfiServerMessage as FFIServerMessage,
     DeviceMessage, Endpoint as SerializedEndpoint, ServerMessage,
   },
   util::return_client_result,
@@ -38,24 +37,20 @@ impl ButtplugFFIDevice {
     unsafe {
       msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
     }
-    let ffi_msg = FFIClientMessage::decode(msg_ptr).unwrap();
-    let msg_id = ffi_msg.id;
-    if let FFIClientMessageType::DeviceMessage(device_msg) = ffi_msg.message.unwrap().msg.unwrap() {
-      match device_msg.message.unwrap().msg.unwrap() {
-        DeviceMessageType::VibrateCmd(vibrate_msg) => self.send_vibrate_cmd(msg_id, vibrate_msg),
-        DeviceMessageType::RotateCmd(rotate_msg) => self.send_rotate_cmd(msg_id, rotate_msg),
-        DeviceMessageType::LinearCmd(linear_msg) => self.send_linear_cmd(msg_id, linear_msg),
-        DeviceMessageType::StopDeviceCmd(stop_msg) => self.send_stop_device_cmd(msg_id, stop_msg),
-        DeviceMessageType::RawReadCmd(raw_read_msg) => self.send_raw_read_cmd(msg_id, raw_read_msg),
-        DeviceMessageType::RawWriteCmd(raw_write_msg) => self.send_raw_write_cmd(msg_id, raw_write_msg),
-        DeviceMessageType::RawSubscribeCmd(raw_sub_msg) => self.send_raw_subscribe_cmd(msg_id, raw_sub_msg),
-        DeviceMessageType::RawUnsubscribeCmd(raw_unsub_msg) => self.send_raw_unsubscribe_cmd(msg_id, raw_unsub_msg),
-        DeviceMessageType::BatteryLevelCmd(battery_msg) => self.send_battery_level_cmd(msg_id, battery_msg),
-        DeviceMessageType::RssiLevelCmd(rssi_msg) => self.send_rssi_level_cmd(msg_id, rssi_msg),
-      };
-    } else {
-      panic!("Send client message to device parser!");
-    }
+    let device_msg = DeviceMessage::decode(msg_ptr).unwrap();
+    let msg_id = device_msg.id;
+    match device_msg.message.unwrap().msg.unwrap() {
+      DeviceMessageType::VibrateCmd(vibrate_msg) => self.send_vibrate_cmd(msg_id, vibrate_msg),
+      DeviceMessageType::RotateCmd(rotate_msg) => self.send_rotate_cmd(msg_id, rotate_msg),
+      DeviceMessageType::LinearCmd(linear_msg) => self.send_linear_cmd(msg_id, linear_msg),
+      DeviceMessageType::StopDeviceCmd(stop_msg) => self.send_stop_device_cmd(msg_id, stop_msg),
+      DeviceMessageType::RawReadCmd(raw_read_msg) => self.send_raw_read_cmd(msg_id, raw_read_msg),
+      DeviceMessageType::RawWriteCmd(raw_write_msg) => self.send_raw_write_cmd(msg_id, raw_write_msg),
+      DeviceMessageType::RawSubscribeCmd(raw_sub_msg) => self.send_raw_subscribe_cmd(msg_id, raw_sub_msg),
+      DeviceMessageType::RawUnsubscribeCmd(raw_unsub_msg) => self.send_raw_unsubscribe_cmd(msg_id, raw_unsub_msg),
+      DeviceMessageType::BatteryLevelCmd(battery_msg) => self.send_battery_level_cmd(msg_id, battery_msg),
+      DeviceMessageType::RssiLevelCmd(rssi_msg) => self.send_rssi_level_cmd(msg_id, rssi_msg),
+    };
   }
 
   pub fn send_vibrate_cmd(&self, id: u32, msg: VibrateCmd) {
