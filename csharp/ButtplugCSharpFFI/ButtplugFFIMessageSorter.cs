@@ -44,7 +44,19 @@ namespace ButtplugCSharpFFI
             }
         }
 
-        public Task<ButtplugFFIServerMessage> PrepareMessage(ButtplugFFIClientMessage aMsg)
+        public Task<ButtplugFFIServerMessage> PrepareClientMessage(ClientMessage aMsg)
+        {
+            var id = NextMsgId;
+            // The client always increments the IDs on outgoing messages
+            aMsg.Id = id;
+
+            var promise = new TaskCompletionSource<ButtplugFFIServerMessage>();
+            _waitingMsgs.TryAdd(id, promise);
+            Console.WriteLine($"Sending a client message with Id {id}");
+            return promise.Task;
+        }
+
+        public Task<ButtplugFFIServerMessage> PrepareDeviceMessage(DeviceMessage aMsg)
         {
             var id = NextMsgId;
             // The client always increments the IDs on outgoing messages

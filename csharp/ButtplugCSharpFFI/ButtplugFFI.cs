@@ -78,9 +78,9 @@ namespace ButtplugCSharpFFI
             return ButtplugFFICalls.buttplug_create_client(aCallback, aClientName);
         }
 
-        internal static Task<ButtplugFFIServerMessage> SendClientMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugFFIClientMessage aMsg)
+        internal static Task<ButtplugFFIServerMessage> SendClientMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ClientMessage aMsg)
         {
-            var task = aSorter.PrepareMessage(aMsg);
+            var task = aSorter.PrepareClientMessage(aMsg);
             var buf = aMsg.ToByteArray();
             ButtplugFFICalls.buttplug_parse_client_message(aHandle, buf, buf.Length);
             return task;
@@ -89,50 +89,42 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime, ushort aDeviceCommManagerTypes)
         {
             var msg = new ClientMessage();
-            msg.ConnectLocal = new ClientMessage.Types.ConnectLocal
+            msg.Message.ConnectLocal = new ClientMessage.Types.ConnectLocal
             {
                 ServerName = aServerName,
                 MaxPingTime = aMaxPingTime,
                 CommManagerTypes = aDeviceCommManagerTypes
             };
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.ClientMessage = msg;
-            return SendClientMessage(aSorter, aHandle, ffi_client_msg);
+            return SendClientMessage(aSorter, aHandle, msg);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendConnectWebsocket(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aAddress, bool aIgnoreCert)
         {
             var msg = new ClientMessage();
-            msg.ConnectWebsocket = new ClientMessage.Types.ConnectWebsocket
+            msg.Message.ConnectWebsocket = new ClientMessage.Types.ConnectWebsocket
             {
                 Address = aAddress,
                 BypassCertVerification = aIgnoreCert,
             };
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.ClientMessage = msg;
-            return SendClientMessage(aSorter, aHandle, ffi_client_msg);
+            return SendClientMessage(aSorter, aHandle, msg);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStartScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
         {
             var msg = new ClientMessage();
-            msg.StartScanning = new ClientMessage.Types.StartScanning
+            msg.Message.StartScanning = new ClientMessage.Types.StartScanning
             {
             };
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.ClientMessage = msg;
-            return SendClientMessage(aSorter, aHandle, ffi_client_msg);
+            return SendClientMessage(aSorter, aHandle, msg);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStopScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
         {
             var msg = new ClientMessage();
-            msg.StopScanning = new ClientMessage.Types.StopScanning
+            msg.Message.StopScanning = new ClientMessage.Types.StopScanning
             {
             };
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.ClientMessage = msg;
-            return SendClientMessage(aSorter, aHandle, ffi_client_msg);
+            return SendClientMessage(aSorter, aHandle, msg);
         }
 
         internal static ButtplugFFIDeviceHandle SendCreateDevice(ButtplugFFIClientHandle aHandle, uint aDeviceIndex)
@@ -140,9 +132,9 @@ namespace ButtplugCSharpFFI
             return ButtplugFFICalls.buttplug_create_device(aHandle, aDeviceIndex);
         }
 
-        internal static Task<ButtplugFFIServerMessage> SendDeviceMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, ButtplugFFIClientMessage aMsg)
+        internal static Task<ButtplugFFIServerMessage> SendDeviceMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, DeviceMessage aMsg)
         {
-            var task = aSorter.PrepareMessage(aMsg);
+            var task = aSorter.PrepareDeviceMessage(aMsg);
             var buf = aMsg.ToByteArray();
             ButtplugFFICalls.buttplug_parse_device_message(aHandle, buf, buf.Length);
             return task;
@@ -163,9 +155,7 @@ namespace ButtplugCSharpFFI
             var vibrate_cmd = new DeviceMessage.Types.VibrateCmd();
             vibrate_cmd.Speeds.Add(command_list);
             msg.Message.VibrateCmd = vibrate_cmd;
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.DeviceMessage = msg;
-            return SendDeviceMessage(aSorter, aHandle, ffi_client_msg);
+            return SendDeviceMessage(aSorter, aHandle, msg);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendRotateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, (double, bool)> aRotations)
@@ -185,9 +175,7 @@ namespace ButtplugCSharpFFI
             var cmd = new DeviceMessage.Types.RotateCmd();
             cmd.Rotations.Add(command_list);
             msg.Message.RotateCmd = cmd;
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.DeviceMessage = msg;
-            return SendDeviceMessage(aSorter, aHandle, ffi_client_msg);
+            return SendDeviceMessage(aSorter, aHandle, msg);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendLinearCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, (uint, double)> aLinears)
@@ -207,9 +195,7 @@ namespace ButtplugCSharpFFI
             var cmd = new DeviceMessage.Types.LinearCmd();
             cmd.Movements.Add(command_list);
             msg.Message.LinearCmd = cmd;
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.DeviceMessage = msg;
-            return SendDeviceMessage(aSorter, aHandle, ffi_client_msg);
+            return SendDeviceMessage(aSorter, aHandle, msg);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStopDeviceCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex)
@@ -218,9 +204,7 @@ namespace ButtplugCSharpFFI
             msg.Index = aDeviceIndex;
             var cmd = new DeviceMessage.Types.StopDeviceCmd();
             msg.Message.StopDeviceCmd = cmd;
-            var ffi_client_msg = new ButtplugFFIClientMessage();
-            ffi_client_msg.Message.DeviceMessage = msg;
-            return SendDeviceMessage(aSorter, aHandle, ffi_client_msg);
+            return SendDeviceMessage(aSorter, aHandle, msg);
         }
     }
 }
