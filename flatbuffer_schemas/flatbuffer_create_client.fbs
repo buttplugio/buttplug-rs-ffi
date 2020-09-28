@@ -1,7 +1,0 @@
-namespace ButtplugFFI;
-
-table CreateClient {
-  name:string;
-}
-
-root_type CreateClient;
