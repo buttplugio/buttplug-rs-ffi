@@ -83,54 +83,52 @@ message DeviceMessage {
   }
 
   message StopDeviceCmd {
-    uint32 index = 1;
   }
 
   message RawReadCmd {
-    uint32 index = 1;
-    Endpoint endpoint = 2;
-    bytes data = 3;
-    uint32 expected_length = 4;
-    uint32 timeout = 5;    
+    Endpoint endpoint = 1;
+    bytes data = 2;
+    uint32 expected_length = 3;
+    uint32 timeout = 4;
   }
 
   message RawWriteCmd {
-    uint32 index = 1;
-    Endpoint endpoint = 2;
-    bytes data = 3;
-    bool write_with_response = 4;
+    Endpoint endpoint = 1;
+    bytes data = 2;
+    bool write_with_response = 3;
   }
 
   message RawSubscribeCmd {
-    uint32 index = 1;
-    Endpoint endpoint = 2;
+    Endpoint endpoint = 1;
   }
 
   message RawUnsubscribeCmd {
-    uint32 index = 1;
-    Endpoint endpoint = 2;
+    Endpoint endpoint = 1;
   }
 
   message BatteryLevelCmd {
-    uint32 index = 1;
   }
 
   message RSSILevelCmd {
-    uint32 index = 1;
   }
 
-  oneof msg {
-    VibrateCmd vibrate_cmd = 1;
-    RotateCmd rotate_cmd = 2;
-    LinearCmd linear_cmd = 3;
-    StopDeviceCmd stop_device_cmd = 4;
-    RawReadCmd raw_read_cmd =5;
-    RawWriteCmd raw_write_cmd = 6;
-    RawSubscribeCmd raw_subscribe_cmd = 7;
-    RawUnsubscribeCmd raw_unsubscribe_cmd = 8;
-    BatteryLevelCmd battery_level_cmd = 9;
-    RSSILevelCmd rssi_level_cmd = 10;
-  };
+  message FFIDeviceMessage {
+    oneof msg {
+      VibrateCmd vibrate_cmd = 1;
+      RotateCmd rotate_cmd = 2;
+      LinearCmd linear_cmd = 3;
+      StopDeviceCmd stop_device_cmd = 4;
+      RawReadCmd raw_read_cmd =5;
+      RawWriteCmd raw_write_cmd = 6;
+      RawSubscribeCmd raw_subscribe_cmd = 7;
+      RawUnsubscribeCmd raw_unsubscribe_cmd = 8;
+      BatteryLevelCmd battery_level_cmd = 9;
+      RSSILevelCmd rssi_level_cmd = 10;
+    }
+  }
+  
+  uint32 index = 1;
+  FFIDeviceMessage message = 2;
 }
 
 message ServerMessage {

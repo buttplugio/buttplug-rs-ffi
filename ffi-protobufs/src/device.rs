@@ -3,7 +3,7 @@ use super::{
     buttplug_ffi_client_message::ffi_message::Msg as FFIClientMessageType,
     buttplug_ffi_server_message,
     buttplug_ffi_server_message::ffi_message::Msg as FFIServerMessageType,
-    device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, Msg as DeviceMessageType},
+    device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, ffi_device_message::Msg as DeviceMessageType},
     server_message::{
       ButtplugErrorType, Error as OutgoingError, MessageAttributeType, Msg as ServerMessageType, Ok,
     },
@@ -41,7 +41,7 @@ impl ButtplugFFIDevice {
     let ffi_msg = FFIClientMessage::decode(msg_ptr).unwrap();
     let msg_id = ffi_msg.id;
     if let FFIClientMessageType::DeviceMessage(device_msg) = ffi_msg.message.unwrap().msg.unwrap() {
-      match device_msg.msg.unwrap() {
+      match device_msg.message.unwrap().msg.unwrap() {
         DeviceMessageType::VibrateCmd(vibrate_msg) => self.send_vibrate_cmd(msg_id, vibrate_msg),
         DeviceMessageType::RotateCmd(rotate_msg) => self.send_rotate_cmd(msg_id, rotate_msg),
         DeviceMessageType::LinearCmd(linear_msg) => self.send_linear_cmd(msg_id, linear_msg),
