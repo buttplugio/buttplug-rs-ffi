@@ -357,7 +357,6 @@ dependencies = [
  "async-std",
  "buttplug",
  "dashmap 3.11.10",
- "flatbuffers",
  "futures",
  "libc",
  "prost",
@@ -648,15 +647,6 @@ name = "fixedbitset"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37ab347416e802de484e4d03c7316c48f1ecb56574dfd4a46a80f173ce1de04d"
-
-[[package]]
-name = "flatbuffers"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a788f068dd10687940565bf4b5480ee943176cbd114b12e811074bcf7c04e4b9"
-dependencies = [
- "smallvec",
-]
 
 [[package]]
 name = "fnv"
