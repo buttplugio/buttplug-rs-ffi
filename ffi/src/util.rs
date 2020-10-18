@@ -130,6 +130,39 @@ impl From<&Endpoint> for SerializedEndpoint {
       Endpoint::Whitelist => SerializedEndpoint::Whitelist,
       Endpoint::Command => SerializedEndpoint::Command,
       Endpoint::Firmware => SerializedEndpoint::Firmware,
+      Endpoint::RxBLEBattery => SerializedEndpoint::RxBleBattery,
+      Endpoint::Generic0 => SerializedEndpoint::Generic0,
+      Endpoint::Generic1 => SerializedEndpoint::Generic1,
+      Endpoint::Generic2 => SerializedEndpoint::Generic2,
+      Endpoint::Generic3 => SerializedEndpoint::Generic3,
+      Endpoint::Generic4 => SerializedEndpoint::Generic4,
+      Endpoint::Generic5 => SerializedEndpoint::Generic5,
+      Endpoint::Generic6 => SerializedEndpoint::Generic6,
+      Endpoint::Generic7 => SerializedEndpoint::Generic7,
+      Endpoint::Generic8 => SerializedEndpoint::Generic8,
+      Endpoint::Generic9 => SerializedEndpoint::Generic9,
+      Endpoint::Generic10 => SerializedEndpoint::Generic10,
+      Endpoint::Generic11 => SerializedEndpoint::Generic11,
+      Endpoint::Generic12 => SerializedEndpoint::Generic12,
+      Endpoint::Generic13 => SerializedEndpoint::Generic13,
+      Endpoint::Generic14 => SerializedEndpoint::Generic14,
+      Endpoint::Generic15 => SerializedEndpoint::Generic15,
+      Endpoint::Generic16 => SerializedEndpoint::Generic16,
+      Endpoint::Generic17 => SerializedEndpoint::Generic17,
+      Endpoint::Generic18 => SerializedEndpoint::Generic18,
+      Endpoint::Generic19 => SerializedEndpoint::Generic19,
+      Endpoint::Generic20 => SerializedEndpoint::Generic20,
+      Endpoint::Generic21 => SerializedEndpoint::Generic21,
+      Endpoint::Generic22 => SerializedEndpoint::Generic22,
+      Endpoint::Generic23 => SerializedEndpoint::Generic23,
+      Endpoint::Generic24 => SerializedEndpoint::Generic24,
+      Endpoint::Generic25 => SerializedEndpoint::Generic25,
+      Endpoint::Generic26 => SerializedEndpoint::Generic26,
+      Endpoint::Generic27 => SerializedEndpoint::Generic27,
+      Endpoint::Generic28 => SerializedEndpoint::Generic28,
+      Endpoint::Generic29 => SerializedEndpoint::Generic29,
+      Endpoint::Generic30 => SerializedEndpoint::Generic30,
+      Endpoint::Generic31 => SerializedEndpoint::Generic31,
     }
   }
 }
@@ -207,7 +240,6 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       );
     }
     ButtplugClientEvent::Error(error) => {}
-    ButtplugClientEvent::Log(log_level, log_msg) => {}
     ButtplugClientEvent::ScanningFinished => {
       let scanning_finished_msg = FFIServerMessage {
         id: 0,

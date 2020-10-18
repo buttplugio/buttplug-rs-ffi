@@ -21,6 +21,7 @@ use buttplug::{
       },
       serialport::SerialPortCommunicationManager,
     },
+    ButtplugServerOptions,
   },
   util::async_manager
 };
@@ -115,7 +116,13 @@ impl ButtplugFFIClient {
   }
 
   fn connect_local(&self, msg_id: u32, connect_local_msg: &ConnectLocal) {
-    let connector = ButtplugInProcessClientConnector::new(&connect_local_msg.server_name, connect_local_msg.max_ping_time as u64);
+    let mut options = ButtplugServerOptions::default();
+    options.name = connect_local_msg.server_name.clone();
+    options.max_ping_time = connect_local_msg.max_ping_time.into();
+    options.allow_raw_messages = connect_local_msg.allow_raw_messages;
+    options.device_configuration_json = if connect_local_msg.device_configuration_json.is_empty() { None } else { Some(connect_local_msg.device_configuration_json.clone()) };
+    options.user_device_configuration_json = if connect_local_msg.user_device_configuration_json.is_empty() { None } else { Some(connect_local_msg.user_device_configuration_json.clone()) };
+    let connector = ButtplugInProcessClientConnector::new_with_options(&options).unwrap();
     let device_mgrs = connect_local_msg.comm_manager_types;
     if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0 || device_mgrs == 0 {
       connector.server_ref().add_comm_manager::<LovenseHIDDongleCommunicationManager>().unwrap(); 

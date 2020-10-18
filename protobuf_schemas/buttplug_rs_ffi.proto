@@ -2,18 +2,51 @@ syntax = "proto3";
 package ButtplugFFI;
 
 enum Endpoint {
-  Tx = 0;
-  Rx = 1;
-  RxPressure = 2;
-  RxTouch = 3;
-  RxAccel = 4;
-  Command = 5;
-  Firmware = 6;
-  TxMode = 7;
-  TxVibrate = 8;
+  Command = 0;
+  Firmware = 1;
+  Rx = 2;
+  RxAccel = 3;
+  RxBLEBattery = 4;
+  RxPressure = 5;
+  RxTouch = 6;
+  Tx = 7;
+  TxMode = 8;
   TxShock = 9;
-  TxVendorControl = 10;
-  Whitelist = 11;
+  TxVibrate = 10;
+  TxVendorControl = 11;
+  Whitelist = 12;
+  Generic0 = 13;
+  Generic1 = 14;
+  Generic2 = 15;
+  Generic3 = 16;
+  Generic4 = 17;
+  Generic5 = 18;
+  Generic6 = 19;
+  Generic7 = 20;
+  Generic8 = 21;
+  Generic9 = 22;
+  Generic10 = 23;
+  Generic11 = 24;
+  Generic12 = 25;
+  Generic13 = 26;
+  Generic14 = 27;
+  Generic15 = 28;
+  Generic16 = 29;
+  Generic17 = 30;
+  Generic18 = 31;
+  Generic19 = 32;
+  Generic20 = 33;
+  Generic21 = 34;
+  Generic22 = 35;
+  Generic23 = 36;
+  Generic24 = 37;
+  Generic25 = 38;
+  Generic26 = 39;
+  Generic27 = 40;
+  Generic28 = 41;
+  Generic29 = 42;
+  Generic30 = 43;
+  Generic31 = 44;
 }
 
 message ClientMessage {
@@ -30,7 +63,10 @@ message ClientMessage {
   message ConnectLocal {
     string server_name = 1;
     uint32 max_ping_time = 2;
-    uint32 comm_manager_types = 3;
+    bool allow_raw_messages = 3;
+    string device_configuration_json = 4;
+    string user_device_configuration_json = 5;
+    uint32 comm_manager_types = 6;
   }
 
   message ConnectWebsocket {
