@@ -86,7 +86,15 @@ namespace ButtplugCSharpFFI
             return task;
         }
 
-        internal static Task<ButtplugFFIServerMessage> SendConnectLocal(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aServerName, uint aMaxPingTime, ushort aDeviceCommManagerTypes)
+        internal static Task<ButtplugFFIServerMessage> SendConnectLocal(
+            ButtplugFFIMessageSorter aSorter, 
+            ButtplugFFIClientHandle aHandle, 
+            string aServerName, 
+            uint aMaxPingTime, 
+            bool aAllowRawMessages,
+            string aDeviceConfigJSON,
+            string aUserDeviceConfigJSON,
+            ushort aDeviceCommManagerTypes)
         {
             var msg = new ClientMessage();
             msg.Message = new ClientMessage.Types.FFIMessage();
@@ -94,6 +102,9 @@ namespace ButtplugCSharpFFI
             {
                 ServerName = aServerName,
                 MaxPingTime = aMaxPingTime,
+                AllowRawMessages = aAllowRawMessages,
+                DeviceConfigurationJson = aDeviceConfigJSON,
+                UserDeviceConfigurationJson = aUserDeviceConfigJSON,
                 CommManagerTypes = aDeviceCommManagerTypes
             };
             return SendClientMessage(aSorter, aHandle, msg);

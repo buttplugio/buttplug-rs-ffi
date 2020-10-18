@@ -49,12 +49,6 @@ namespace ButtplugCSharpFFI
         /// </summary>
         public event EventHandler ServerDisconnect;
 
-        /// <summary>
-        /// Event fired when the client receives a Log message. Should only fire if the client has
-        /// requested that log messages be sent.
-        /// </summary>
-        //[CanBeNull]
-        //public event EventHandler<LogEventArgs> Log;
         private ButtplugCallback SorterCallbackDelegate;
 
         public ButtplugClient(string aClientName)
@@ -65,11 +59,23 @@ namespace ButtplugCSharpFFI
         }
 
         public async Task ConnectLocal(
-            ushort aDeviceCommManagerTypes = (ushort)ClientMessage.Types.DeviceCommunicationManagerTypes.All,
-            string aServerName = "Buttplug C# FFI In-Process Server", uint aMaxPingTime = 0)
+            ButtplugServerOptions aOptions = null,
+            ushort aDeviceCommManagerTypes = (ushort)ClientMessage.Types.DeviceCommunicationManagerTypes.All)
         {
+            if (aOptions == null)
+            {
+                aOptions = new ButtplugServerOptions();
+            }
             Console.WriteLine("Trying to connect");
-            await ButtplugFFI.SendConnectLocal(_messageSorter, _clientHandle, aServerName, aMaxPingTime, aDeviceCommManagerTypes);
+            await ButtplugFFI.SendConnectLocal(
+                _messageSorter,
+                _clientHandle,
+                aOptions.ServerName,
+                aOptions.MaxPingTime,
+                aOptions.AllowRawMessages,
+                aOptions.DeviceConfigurationJson,
+                aOptions.UserDeviceConfigurationJson,
+                aDeviceCommManagerTypes);
             Console.WriteLine("Connected");
         }
 
