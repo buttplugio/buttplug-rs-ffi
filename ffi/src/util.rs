@@ -18,7 +18,7 @@ use prost::Message;
 use std::convert::{TryFrom, TryInto};
 use std::error::Error;
 
-fn send_server_message(message: FFIServerMessage, callback: Option<FFICallback>) {
+fn send_server_message(message: &FFIServerMessage, callback: &Option<FFICallback>) {
   if callback.is_none() {
     return;
   }
@@ -28,9 +28,9 @@ fn send_server_message(message: FFIServerMessage, callback: Option<FFICallback>)
 }
 
 pub fn return_client_result(
-  result: Result<(), ButtplugClientError>,
   id: u32,
-  callback: Option<FFICallback>,
+  result: &Result<(), ButtplugClientError>,
+  callback: &Option<FFICallback>,
 ) {
   match result {
     Ok(_) => return_ok(id, callback),
@@ -38,7 +38,11 @@ pub fn return_client_result(
   };
 }
 
-pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICallback>) {
+pub fn return_error(
+  id: u32, 
+  error: &ButtplugClientError, 
+  callback: &Option<FFICallback>
+) {
   let error_args = match error {
     ButtplugClientError::ButtplugConnectorError(conn_err) => OutgoingError {
       error_type: ButtplugErrorType::ButtplugConnectorError as i32,
@@ -70,12 +74,12 @@ pub fn return_error(id: u32, error: ButtplugClientError, callback: Option<FFICal
     }),
   };
   send_server_message(
-    error_msg,
+    &error_msg,
     callback,
   );
 }
 
-pub fn return_ok(id: u32, callback: Option<FFICallback>) {
+pub fn return_ok(id: u32, callback: &Option<FFICallback>) {
   let ok_msg = FFIServerMessage {
     id,
     message: Some(buttplug_ffi_server_message::FfiMessage {
@@ -85,7 +89,7 @@ pub fn return_ok(id: u32, callback: Option<FFICallback>) {
     }),
   };
   send_server_message(
-    ok_msg,
+    &ok_msg,
     callback,
   );
 }

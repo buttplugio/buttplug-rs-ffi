@@ -9,7 +9,7 @@ use super::{
     ButtplugFfiServerMessage as FFIServerMessage,
     DeviceMessage, Endpoint as SerializedEndpoint, ServerMessage,
   },
-  util::return_client_result,
+  util::{return_client_result, return_ok},
   FFICallback,
 };
 use buttplug::{
@@ -64,7 +64,7 @@ impl ButtplugFFIDevice {
     );
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_client_result(device.vibrate(params).await, id, callback);
+      return_client_result(id, &device.vibrate(params).await, &callback);
     })
     .unwrap();
   }
@@ -79,7 +79,7 @@ impl ButtplugFFIDevice {
     );
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_client_result(device.rotate(params).await, id, callback);
+      return_client_result(id, &device.rotate(params).await, &callback);
     })
     .unwrap();
   }
@@ -95,7 +95,7 @@ impl ButtplugFFIDevice {
     );
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_client_result(device.linear(params).await, id, callback);
+      return_client_result(id, &device.linear(params).await, &callback);
     })
     .unwrap();
   }
@@ -104,7 +104,7 @@ impl ButtplugFFIDevice {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_client_result(device.stop().await, id, callback);
+      return_client_result(id, &device.stop().await, &callback);
     })
     .unwrap();
   }
@@ -125,7 +125,7 @@ impl ButtplugFFIDevice {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_client_result(Ok(()), id, callback);
+      return_ok(id, &callback);
     })
     .unwrap();
   }
@@ -134,7 +134,7 @@ impl ButtplugFFIDevice {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_client_result(Ok(()), id, callback);
+      return_ok(id, &callback);
     })
     .unwrap();
   }

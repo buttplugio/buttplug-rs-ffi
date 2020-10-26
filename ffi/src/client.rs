@@ -101,15 +101,18 @@ impl ButtplugFFIClient {
                 ButtplugClientEvent::DeviceRemoved(device) => {
                   device_map.remove(&device.device_index);
                 }
+                // Events will be forwarded to the client in send_event, so we
+                // can ignore them here unless they specifically need to modify
+                // the FFI client somehow.
                 _ => {}
               };
               send_event(e, event_callback);
             }
           }).unwrap();
-          return_ok(client_msg_id, callback);    
+          return_ok(client_msg_id, &callback);    
         },
         Err(e) => {
-          return_error(client_msg_id, e, callback);
+          return_error(client_msg_id, &e, &callback);
         }
       }
     }).unwrap();
@@ -159,9 +162,9 @@ impl ButtplugFFIClient {
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(usable_client.start_scanning().await, msg_id, callback);
+        return_client_result(msg_id, &usable_client.start_scanning().await, &callback);
       } else {
-        return_error(msg_id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
+        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
       }
     }).unwrap();
   }
@@ -171,9 +174,9 @@ impl ButtplugFFIClient {
     let callback = self.callback.clone();
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(usable_client.stop_scanning().await, msg_id, callback);
+        return_client_result(msg_id, &usable_client.stop_scanning().await, &callback);
       } else {
-        return_error(msg_id, ButtplugConnectorError::ConnectorNotConnected.into(), callback)
+        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
       }
     }).unwrap();
   }
