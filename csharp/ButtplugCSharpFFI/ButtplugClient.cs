@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
 namespace ButtplugCSharpFFI
@@ -32,7 +33,7 @@ namespace ButtplugCSharpFFI
         /// such as a device exception, message parsing error, etc... Server may possibly disconnect
         /// after this event fires.
         /// </summary>
-        //public event EventHandler<ButtplugExceptionEventArgs> ErrorReceived;
+        public event EventHandler<ButtplugExceptionEventArgs> ErrorReceived;
 
         /// <summary>
         /// Event fired when the server has finished scanning for devices.
@@ -48,6 +49,14 @@ namespace ButtplugCSharpFFI
         /// Event fired when a server disconnect has occured.
         /// </summary>
         public event EventHandler ServerDisconnect;
+
+        /// <summary>
+        /// Stores information about devices currently connected to the server.
+        /// </summary>
+        private readonly Dictionary<uint, ButtplugClientDevice> _devices =
+            new Dictionary<uint, ButtplugClientDevice>();
+
+        public ButtplugClientDevice[] Devices => _devices.Values.ToArray();
 
         private ButtplugCallback SorterCallbackDelegate;
 
@@ -96,10 +105,9 @@ namespace ButtplugCSharpFFI
             {
                 _messageSorter.CheckMessage(server_message);
             }
-            else
+            else if (server_message.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.ServerMessage)
             {
-                if (server_message.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.ServerMessage &&
-                    server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceAdded)
+                if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceAdded)
                 {
                     var device_added_message = server_message.Message.ServerMessage.DeviceAdded;
                     var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
@@ -112,8 +120,42 @@ namespace ButtplugCSharpFFI
                         attribute_dict.Add(attributes.MessageType, device_message_attributes);
                     }
                     var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict);
+                    _devices.Add(device_added_message.Index, device);
                     DeviceAdded.Invoke(this, new DeviceAddedEventArgs(device));
                 }
+                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceRemoved)
+                {
+                    var device_removed_message = server_message.Message.ServerMessage.DeviceRemoved;
+                    var device = _devices[device_removed_message.Index];
+                    _devices.Remove(device_removed_message.Index);
+                    DeviceRemoved.Invoke(this, new DeviceRemovedEventArgs(device));
+                }
+                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
+                {
+                    ServerDisconnect?.Invoke(this, null);
+                }
+                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Error)
+                {
+                    var errorMsg = server_message.Message.ServerMessage.Error;
+                    var error = ButtplugException.FromError(errorMsg);
+                    if (error is ButtplugPingException)
+                    {
+                        PingTimeout?.Invoke(this, null);
+                    }
+                    ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(error));
+                }
+                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.ScanningFinished)
+                {
+                    ScanningFinished?.Invoke(this, null);
+                } 
+                else
+                {
+                    // We should probably do something here with unhandled events, but I'm not particularly sure what. I miss pattern matching. :(
+                }
+            } 
+            else
+            {
+                // We should probably do something here with unhandled events, but I'm not particularly sure what. I miss pattern matching. :(
             }
         }
 
