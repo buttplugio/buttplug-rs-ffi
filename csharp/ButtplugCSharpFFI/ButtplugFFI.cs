@@ -51,7 +51,7 @@ namespace ButtplugCSharpFFI
     }
 
     internal class ButtplugFFICalls
-   {
+    {
         [DllImport("buttplug_ffi")]
         internal static extern ButtplugFFIClientHandle buttplug_create_client(ButtplugCallback callback, string client_name);
 
@@ -88,7 +88,7 @@ namespace ButtplugCSharpFFI
 
         internal static Task<ButtplugFFIServerMessage> SendConnectLocal(
             ButtplugFFIMessageSorter aSorter, 
-            ButtplugFFIClientHandle aHandle, 
+            ButtplugFFIClientHandle aHandle,
             string aServerName, 
             uint aMaxPingTime, 
             bool aAllowRawMessages,
@@ -103,8 +103,8 @@ namespace ButtplugCSharpFFI
                 ServerName = aServerName,
                 MaxPingTime = aMaxPingTime,
                 AllowRawMessages = aAllowRawMessages,
-                DeviceConfigurationJson = aDeviceConfigJSON,
-                UserDeviceConfigurationJson = aUserDeviceConfigJSON,
+                DeviceConfigurationJson = aDeviceConfigJSON ?? "",
+                UserDeviceConfigurationJson = aUserDeviceConfigJSON ?? "",
                 CommManagerTypes = aDeviceCommManagerTypes
             };
             return SendClientMessage(aSorter, aHandle, msg);
