@@ -223,8 +223,8 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         })
       };
       send_server_message(
-        device_added_msg,
-        callback,
+        &device_added_msg,
+        &callback,
       );
     }
     ButtplugClientEvent::DeviceRemoved(device) => {
@@ -239,11 +239,13 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         })
       };
       send_server_message(
-        device_removed_msg,
-        callback,
+        &device_removed_msg,
+        &callback,
       );
     }
-    ButtplugClientEvent::Error(error) => {}
+    ButtplugClientEvent::Error(error) => {
+      return_error(0, &ButtplugClientError::ButtplugError(error), &callback)
+    }
     ButtplugClientEvent::ScanningFinished => {
       let scanning_finished_msg = FFIServerMessage {
         id: 0,
@@ -255,8 +257,8 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         })
       };
       send_server_message(
-        scanning_finished_msg,
-        callback,
+        &scanning_finished_msg,
+        &callback,
       );
     }
     ButtplugClientEvent::ServerDisconnect => {
@@ -270,10 +272,12 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         })
       };
       send_server_message(
-        disconnect_msg,
-        callback,
+        &disconnect_msg,
+        &callback,
       );
     }
-    ButtplugClientEvent::PingTimeout => {}
+    ButtplugClientEvent::PingTimeout => {
+      return_error(0, &ButtplugClientError::ButtplugError(ButtplugError::ButtplugPingError(buttplug::core::errors::ButtplugPingError::PingedOut)), &callback)
+    }
   }
 }
