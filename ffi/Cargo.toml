@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 # buttplug = { path = "../../buttplug-rs/buttplug", features = ["async-std-runtime", "client", "server", "serialize-json", "btleplug-manager", "websockets", "xinput-manager", "serial-manager", "lovense-dongle-manager"] }
-buttplug = { version = "0.10.0", features = ["async-std-runtime", "client", "server", "serialize-json", "btleplug-manager", "websockets", "xinput-manager", "serial-manager", "lovense-dongle-manager"] }
+buttplug = { version = "0.10.1", features = ["async-std-runtime", "client", "server", "serialize-json", "btleplug-manager", "websockets", "xinput-manager", "serial-manager", "lovense-dongle-manager"] }
 async-std = "1.6.3"
 tracing-subscriber = "0.2.12"
 futures = "0.3.5"
@@ -16,6 +16,8 @@ tracing = "0.1.19"
 dashmap = "3.11.10"
 libc = "0.2.77"
 prost = "0.6.1"
+async-channel = "1.5.1"
+lazy_static = "1.4.0"
 
 [build-dependencies]
 prost-build = "0.6.1"
