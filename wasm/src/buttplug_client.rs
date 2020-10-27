@@ -105,14 +105,16 @@ async fn event_emitter_loop(
   while let Some(event) = event_stream.next().await {
     match event {
       ButtplugClientEvent::DeviceAdded(device) => {
-        info!("Emitting device added!");
         event_manager.emit(
           "deviceadded",
           &JsValue::from(ButtplugClientDevice::new(device))
         );
       },
       ButtplugClientEvent::DeviceRemoved(device) => {
-
+        event_manager.emit(
+          "deviceremoved",
+          &JsValue::from(ButtplugClientDevice::new(device))
+        );
       },
       ButtplugClientEvent::Error(err) => {
         event_manager.emit("buttplugerror", &JsValue::from_str(&format!("{:?}", err)));
@@ -165,7 +167,7 @@ impl ButtplugClient {
   pub fn connectWebsocket(js_address: &JsValue) -> Promise {
     let address = js_address.as_string().unwrap();
     future_to_promise(async move {
-      let mut connector = ButtplugRemoteClientConnector::<
+      let connector = ButtplugRemoteClientConnector::<
         ButtplugBrowserWebsocketClientTransport,
         ButtplugClientJSONSerializer,
       >::new(
@@ -173,7 +175,7 @@ impl ButtplugClient {
           &address,
         ),
       );
-      let (client, mut event_stream) = buttplug::client::ButtplugClient::connect("WASM Client", connector)
+      let (client, event_stream) = buttplug::client::ButtplugClient::connect("WASM Client", connector)
         .await
         .unwrap();
       let event_manager = Arc::new(EventManager::default());
@@ -199,10 +201,6 @@ impl ButtplugClient {
       .add_listener(&event_name_str, callback.clone());
   }
 
-  fn emit(&self, event_name: &str) {
-    self.event_manager.emit(event_name, &JsValue::null());
-  }
-
   #[allow(non_snake_case)]
   pub fn startScanning(&self) -> Promise {
     let client_clone = self.client.clone();
@@ -216,7 +214,6 @@ impl ButtplugClient {
   }
 
   #[allow(non_snake_case)]
-  #[wasm_bindgen(js_name = stopScanning)]
   pub fn stopScanning(&self) -> Promise {
     let client_clone = self.client.clone();
     future_to_promise(async move {
