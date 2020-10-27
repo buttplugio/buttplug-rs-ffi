@@ -80,12 +80,16 @@ message ClientMessage {
   message StopScanning {
   }
 
+  message StopAllDevices {
+  }
+
   message FFIMessage {
     oneof msg {
       ConnectLocal connect_local = 1;
       ConnectWebsocket connect_websocket = 2;
       StartScanning start_scanning = 3;
       StopScanning stop_scanning = 4;
+      StopAllDevices stop_all_devices = 5;
     }
   }
 

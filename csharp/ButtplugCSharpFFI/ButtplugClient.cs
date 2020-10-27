@@ -169,6 +169,11 @@ namespace ButtplugCSharpFFI
             await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle);
         }
 
+        public async Task StopAllDevicesAsync()
+        {
+            await ButtplugFFI.SendStopAllDevices(_messageSorter, _clientHandle);
+        }
+
         public void Dispose()
         {
             _clientHandle.Dispose();

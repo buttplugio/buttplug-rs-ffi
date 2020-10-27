@@ -89,8 +89,8 @@ namespace ButtplugCSharpFFI
         internal static Task<ButtplugFFIServerMessage> SendConnectLocal(
             ButtplugFFIMessageSorter aSorter, 
             ButtplugFFIClientHandle aHandle,
-            string aServerName, 
-            uint aMaxPingTime, 
+            string aServerName,
+            uint aMaxPingTime,
             bool aAllowRawMessages,
             string aDeviceConfigJSON,
             string aUserDeviceConfigJSON,
@@ -137,6 +137,16 @@ namespace ButtplugCSharpFFI
             var msg = new ClientMessage();
             msg.Message = new ClientMessage.Types.FFIMessage();
             msg.Message.StopScanning = new ClientMessage.Types.StopScanning
+            {
+            };
+            return SendClientMessage(aSorter, aHandle, msg);
+        }
+
+        internal static Task<ButtplugFFIServerMessage> SendStopAllDevices(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
+        {
+            var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
+            msg.Message.StopAllDevices = new ClientMessage.Types.StopAllDevices
             {
             };
             return SendClientMessage(aSorter, aHandle, msg);

@@ -234,4 +234,16 @@ impl ButtplugClient {
     }
     JsValue::from(js_devices)
   }
+
+  #[allow(non_snake_case)]
+  pub fn stopAllDevices(&self) -> Promise {
+    let client_clone = self.client.clone();
+    future_to_promise(async move {
+      client_clone
+        .stop_all_devices()
+        .await
+        .and_then(|_| Ok(JsValue::null()))
+        .map_err(|e| JsValue::from(format!("{}", e)))
+    })
+  }
 }
