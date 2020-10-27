@@ -80,3 +80,8 @@ features = [
 opt-level = "z"
 lto = true
 debug = false
+
+# Without --enable-mutable-globals, wasm-opt fails and also prints out 12mb
+# worth of WASM bytecode. Neat!
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Oz", "--enable-mutable-globals"]
