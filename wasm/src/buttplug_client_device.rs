@@ -1,5 +1,8 @@
-use buttplug::client::{
-  device::{VibrateCommand, RotateCommand, LinearCommand, ButtplugClientDeviceEvent},
+use buttplug::{
+  client::{
+    device::{VibrateCommand, RotateCommand, LinearCommand, ButtplugClientDeviceEvent},
+  },
+  device::Endpoint
 };
 use super::event_manager::EventManager;
 use js_sys::{Promise, Array};
@@ -176,6 +179,97 @@ impl ButtplugClientDevice {
     let device = self.device.clone();
     future_to_promise(async move {
       match device.linear(linear_command).await {
+        Ok(_) => Ok(JsValue::null()),
+        Err(_) => Err(JsValue::null()),
+      }
+    })
+  }
+  
+  #[allow(non_snake_case)]
+  pub fn batteryLevel(&self) -> Promise {
+    let device = self.device.clone();
+    future_to_promise(async move {
+      match device.battery_level().await {
+        Ok(level) => Ok(JsValue::from(level)),
+        Err(_) => Err(JsValue::null()),
+      }
+    })
+  }
+
+  #[allow(non_snake_case)]
+  pub fn rssiLevel(&self) -> Promise {
+    let device = self.device.clone();
+    future_to_promise(async move {
+      match device.rssi_level().await {
+        Ok(level) => Ok(JsValue::from(level)),
+        Err(_) => Err(JsValue::null()),
+      }
+    })
+  }
+
+  #[allow(non_snake_case)]
+  pub fn rawRead(&self, endpoint: &JsValue, expected_length: &JsValue, timeout: &JsValue) -> Promise {
+    let endpoint = endpoint.into_serde().unwrap();
+    let device = self.device.clone();
+    let length = if let Some(len) = expected_length.as_f64() {
+      len as u32
+    } else {
+      return Promise::reject(&JsValue::null())
+    };
+    let timeout = if let Some(time) = timeout.as_f64() {
+      time as u32
+    } else {
+      return Promise::reject(&JsValue::null())
+    };
+
+    future_to_promise(async move {
+      match device.raw_read(endpoint, length, timeout).await {
+        Ok(_) => Ok(JsValue::null()),
+        Err(_) => Err(JsValue::null()),
+      }
+    })
+  }
+
+  #[allow(non_snake_case)]
+  pub fn rawWrite(&self, endpoint: &JsValue, data: &JsValue, write_with_response: &JsValue) -> Promise {
+    let endpoint = endpoint.into_serde().unwrap();
+    let device = self.device.clone();
+    let data_vec: Vec<u8> = if let Ok(d) = data.into_serde() {
+      d
+    } else {
+      return Promise::reject(&JsValue::null())
+    };
+    let wwr = if let Some(wwr) = write_with_response.as_bool() {
+      wwr
+    } else {
+      return Promise::reject(&JsValue::null())
+    };
+    future_to_promise(async move {
+      match device.raw_write(endpoint, data_vec, wwr).await {
+        Ok(_) => Ok(JsValue::null()),
+        Err(_) => Err(JsValue::null()),
+      }
+    })
+  }
+
+  #[allow(non_snake_case)]
+  pub fn rawSubscribe(&self, endpoint: &JsValue) -> Promise {
+    let endpoint = endpoint.into_serde().unwrap();
+    let device = self.device.clone();
+    future_to_promise(async move {
+      match device.raw_subscribe(endpoint).await {
+        Ok(_) => Ok(JsValue::null()),
+        Err(_) => Err(JsValue::null()),
+      }
+    })
+  }
+
+  #[allow(non_snake_case)]
+  pub fn rawUnsubscribe(&self, endpoint: &JsValue) -> Promise {
+    let endpoint = endpoint.into_serde().unwrap();
+    let device = self.device.clone();
+    future_to_promise(async move {
+      match device.raw_unsubscribe(endpoint).await {
         Ok(_) => Ok(JsValue::null()),
         Err(_) => Err(JsValue::null()),
       }
