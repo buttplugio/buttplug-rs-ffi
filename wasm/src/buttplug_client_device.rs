@@ -1,4 +1,5 @@
 use buttplug::{
+  core::messages::ButtplugDeviceMessageType,
   client::{
     device::{VibrateCommand, RotateCommand, LinearCommand, ButtplugClientDeviceEvent},
   },
@@ -11,6 +12,8 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use futures::{future, StreamExt};
 use wasm_bindgen_futures::{future_to_promise, spawn_local};
+use serde_json;
+use std::convert::TryFrom;
 
 async fn event_emitter_loop(
   event_manager: Arc<EventManager>,
@@ -62,7 +65,7 @@ impl ButtplugClientDevice {
     } else if Array::instanceof(speed) {
       let iter = match js_sys::try_iter(&Array::from(speed)) {
         Ok(iter) => iter.unwrap(),
-        Err(e) => return argument_error
+        Err(_) => return argument_error
       };
       let mut speed_vec: Vec<f64> = vec!();
       for elem in iter {
@@ -274,5 +277,27 @@ impl ButtplugClientDevice {
         Err(_) => Err(JsValue::null()),
       }
     })
+  }
+
+  #[allow(non_snake_case)]
+  #[wasm_bindgen(method, getter = allowedMessages)]
+  pub fn allowed_messages_getter(&self) -> JsValue {
+    // Since this is generated from a rust strust, it will always convert, so we
+    // assume its infallible and unwrap.
+    JsValue::from_serde(&self.device.allowed_messages).unwrap()
+  }
+
+  #[allow(non_snake_case)]
+  pub fn messageAttributes(&self, message_type: ButtplugDeviceMessageType) -> JsValue {
+    if self.supportsMessage(message_type) {
+      JsValue::from_serde(self.device.allowed_messages.get(&message_type).unwrap()).unwrap()
+    } else {
+      JsValue::undefined()
+    }
+  }
+
+  #[allow(non_snake_case)]
+  pub fn supportsMessage(&self, message_type: ButtplugDeviceMessageType) -> bool {
+    self.device.allowed_messages.contains_key(&message_type)
   }
 }
