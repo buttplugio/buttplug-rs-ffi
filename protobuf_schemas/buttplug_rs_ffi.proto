@@ -250,6 +250,12 @@ message DeviceEvent {
   message Disconnect {
     uint32 index = 1;
   }
+
+  message RawReading {
+    uint32 index = 1;
+    Endpoint endpoint = 2;
+    bytes data = 3;
+  }
   
   message BatteryLevelReading {
     uint32 index = 1;
@@ -258,13 +264,14 @@ message DeviceEvent {
   
   message RSSILevelReading {
     uint32 index = 1;
-    double reading = 2;
+    int32 reading = 2;
   }
- 
+
   oneof msg {
     Disconnect disconnect = 1;
     BatteryLevelReading battery_level_reading = 2;
     RSSILevelReading rssi_level_reading = 3;
+    RawReading raw_reading = 4;
   };  
 }
 

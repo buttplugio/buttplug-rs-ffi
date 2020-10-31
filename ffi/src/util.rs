@@ -18,7 +18,7 @@ use prost::Message;
 use std::convert::{TryFrom, TryInto};
 use std::error::Error;
 
-fn send_server_message(message: &FFIServerMessage, callback: &Option<FFICallback>) {
+pub fn send_server_message(message: &FFIServerMessage, callback: &Option<FFICallback>) {
   if callback.is_none() {
     return;
   }
@@ -114,6 +114,58 @@ impl TryFrom<ButtplugDeviceMessageType> for MessageAttributeType {
         error!("Command not convertible: {:?}", msg_type);
         Err(())
       }
+    }
+  }
+}
+
+impl Into<Endpoint> for SerializedEndpoint {
+  fn into(self) -> Endpoint {
+    match self {
+      SerializedEndpoint::Rx => Endpoint::Rx,
+      SerializedEndpoint::RxAccel => Endpoint::RxAccel,
+      SerializedEndpoint::RxPressure => Endpoint::RxPressure,
+      SerializedEndpoint::RxTouch => Endpoint::RxTouch,
+      SerializedEndpoint::Tx => Endpoint::Tx,
+      SerializedEndpoint::TxMode => Endpoint::TxMode,
+      SerializedEndpoint::TxShock  => Endpoint::TxShock,
+      SerializedEndpoint::TxVendorControl => Endpoint::TxVendorControl,
+      SerializedEndpoint::TxVibrate => Endpoint::TxVibrate,
+      SerializedEndpoint::Whitelist => Endpoint::Whitelist,
+      SerializedEndpoint::Command => Endpoint::Command,
+      SerializedEndpoint::Firmware => Endpoint::Firmware,
+      SerializedEndpoint::RxBleBattery  => Endpoint::RxBLEBattery ,
+      SerializedEndpoint::Generic0  => Endpoint::Generic0 ,
+      SerializedEndpoint::Generic1  => Endpoint::Generic1 ,
+      SerializedEndpoint::Generic2  => Endpoint::Generic2 ,
+      SerializedEndpoint::Generic3  => Endpoint::Generic3 ,
+      SerializedEndpoint::Generic4  => Endpoint::Generic4 ,
+      SerializedEndpoint::Generic5  => Endpoint::Generic5 ,
+      SerializedEndpoint::Generic6  => Endpoint::Generic6 ,
+      SerializedEndpoint::Generic7 => Endpoint::Generic7,
+      SerializedEndpoint::Generic8  => Endpoint::Generic8 ,
+      SerializedEndpoint::Generic9 => Endpoint::Generic9,
+      SerializedEndpoint::Generic10 => Endpoint::Generic10,
+      SerializedEndpoint::Generic11  => Endpoint::Generic11 ,
+      SerializedEndpoint::Generic12  => Endpoint::Generic12 ,
+      SerializedEndpoint::Generic13 => Endpoint::Generic13,
+      SerializedEndpoint::Generic14  => Endpoint::Generic14 ,
+      SerializedEndpoint::Generic15 => Endpoint::Generic15,
+      SerializedEndpoint::Generic16 => Endpoint::Generic16,
+      SerializedEndpoint::Generic17 => Endpoint::Generic17,
+      SerializedEndpoint::Generic18 => Endpoint::Generic18,
+      SerializedEndpoint::Generic19 => Endpoint::Generic19,
+      SerializedEndpoint::Generic20 => Endpoint::Generic20,
+      SerializedEndpoint::Generic21 => Endpoint::Generic21,
+      SerializedEndpoint::Generic22 => Endpoint::Generic22,
+      SerializedEndpoint::Generic23 => Endpoint::Generic23,
+      SerializedEndpoint::Generic24 => Endpoint::Generic24,
+      SerializedEndpoint::Generic25 => Endpoint::Generic25,
+      SerializedEndpoint::Generic26 => Endpoint::Generic26,
+      SerializedEndpoint::Generic27 => Endpoint::Generic27,
+      SerializedEndpoint::Generic28 => Endpoint::Generic28,
+      SerializedEndpoint::Generic29 => Endpoint::Generic29,
+      SerializedEndpoint::Generic30 => Endpoint::Generic30,
+      SerializedEndpoint::Generic31 => Endpoint::Generic31,
     }
   }
 }

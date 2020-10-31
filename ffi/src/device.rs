@@ -7,9 +7,11 @@ use super::{
       ButtplugErrorType, Error as OutgoingError, MessageAttributeType, Msg as ServerMessageType, Ok,
     },
     ButtplugFfiServerMessage as FFIServerMessage,
+    device_event::{RawReading, BatteryLevelReading, RssiLevelReading, Msg as DeviceEventType},
+    DeviceEvent,
     DeviceMessage, Endpoint as SerializedEndpoint, ServerMessage,
   },
-  util::{return_client_result, return_ok},
+  util::{return_client_result, return_ok, send_server_message, return_error},
   FFICallback,
 };
 use buttplug::{
@@ -110,22 +112,85 @@ impl ButtplugFFIDevice {
   }
 
   pub fn send_raw_read_cmd(&self, id: u32, msg: RawReadCmd) {
+    let callback = self.callback.clone();
+    let device = self.device.clone();
+    async_manager::spawn(async move {
+      match device.raw_read(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into(), msg.expected_length, msg.timeout).await {
+        Ok(raw_reading) => {
+          let raw_reading_msg = RawReading {
+            index: device.index(),
+            endpoint: msg.endpoint,
+            data: raw_reading
+          };
+          let output_msg = FFIServerMessage {
+            id,
+            message: Some(buttplug_ffi_server_message::FfiMessage {
+              msg: Some(FFIServerMessageType::DeviceEvent(DeviceEvent {
+                msg: Some(DeviceEventType::RawReading(raw_reading_msg)),
+              })),
+            }),
+          };
+          send_server_message(&output_msg, &callback);
+        }
+        Err(e) => {
+          return_error(id, &e, &callback);
+        }
+      }
+    })
+    .unwrap();
   }
 
   pub fn send_raw_write_cmd(&self, id: u32, msg: RawWriteCmd) {
+    let callback = self.callback.clone();
+    let device = self.device.clone();
+    async_manager::spawn(async move {
+      return_client_result(id, &device.raw_write(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into(), msg.data, msg.write_with_response).await, &callback);
+    })
+    .unwrap();
   }
 
   pub fn send_raw_subscribe_cmd(&self, id: u32, msg: RawSubscribeCmd) {
+    let callback = self.callback.clone();
+    let device = self.device.clone();
+    async_manager::spawn(async move {
+      return_client_result(id, &device.raw_subscribe(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into()).await, &callback);
+    })
+    .unwrap();
   }
 
   pub fn send_raw_unsubscribe_cmd(&self, id: u32, msg: RawUnsubscribeCmd) {
+    let callback = self.callback.clone();
+    let device = self.device.clone();
+    async_manager::spawn(async move {
+      return_client_result(id, &device.raw_unsubscribe(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into()).await, &callback);
+    })
+    .unwrap();
   }
 
   pub fn send_battery_level_cmd(&self, id: u32, msg: BatteryLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_ok(id, &callback);
+      match device.battery_level().await {
+        Ok(battery_reading) => {
+          let battery_reading_msg = BatteryLevelReading {
+            index: device.index(),
+            reading: battery_reading
+          };
+          let output_msg = FFIServerMessage {
+            id,
+            message: Some(buttplug_ffi_server_message::FfiMessage {
+              msg: Some(FFIServerMessageType::DeviceEvent(DeviceEvent {
+                msg: Some(DeviceEventType::BatteryLevelReading(battery_reading_msg)),
+              })),
+            }),
+          };
+          send_server_message(&output_msg, &callback);
+        }
+        Err(e) => {
+          return_error(id, &e, &callback);
+        }
+      }
     })
     .unwrap();
   }
@@ -134,7 +199,26 @@ impl ButtplugFFIDevice {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
-      return_ok(id, &callback);
+      match device.rssi_level().await {
+        Ok(rssi_level) => {
+          let rssi_reading_msg = RssiLevelReading {
+            index: device.index(),
+            reading: rssi_level
+          };
+          let output_msg = FFIServerMessage {
+            id,
+            message: Some(buttplug_ffi_server_message::FfiMessage {
+              msg: Some(FFIServerMessageType::DeviceEvent(DeviceEvent {
+                msg: Some(DeviceEventType::RssiLevelReading(rssi_reading_msg)),
+              })),
+            }),
+          };
+          send_server_message(&output_msg, &callback);
+        }
+        Err(e) => {
+          return_error(id, &e, &callback);
+        }
+      }
     })
     .unwrap();
   }
