@@ -235,5 +235,88 @@ namespace ButtplugCSharpFFI
             msg.Message.StopDeviceCmd = cmd;
             return SendDeviceMessage(aSorter, aHandle, msg);
         }
+
+        internal static Task<ButtplugFFIServerMessage> SendBatteryLevelCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex)
+        {
+            var msg = new DeviceMessage();
+            msg.Message = new DeviceMessage.Types.FFIMessage();
+            msg.Index = aDeviceIndex;
+            var cmd = new DeviceMessage.Types.BatteryLevelCmd();
+            msg.Message.BatteryLevelCmd = cmd;
+            return SendDeviceMessage(aSorter, aHandle, msg);
+        }
+
+        internal static Task<ButtplugFFIServerMessage> SendRSSILevelCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex)
+        {
+            var msg = new DeviceMessage();
+            msg.Message = new DeviceMessage.Types.FFIMessage();
+            msg.Index = aDeviceIndex;
+            var cmd = new DeviceMessage.Types.RSSILevelCmd();
+            msg.Message.RssiLevelCmd = cmd;
+            return SendDeviceMessage(aSorter, aHandle, msg);
+        }
+
+        internal static Task<ButtplugFFIServerMessage> SendRawReadCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Endpoint aEndpoint, uint aLength, uint aTimeout)
+        {
+            var msg = new DeviceMessage
+            {
+                Message = new DeviceMessage.Types.FFIMessage(),
+                Index = aDeviceIndex
+            };
+            var cmd = new DeviceMessage.Types.RawReadCmd {
+                Endpoint = aEndpoint,
+                ExpectedLength = aLength,
+                Timeout = aTimeout
+            };
+            msg.Message.RawReadCmd = cmd;
+            return SendDeviceMessage(aSorter, aHandle, msg);
+        }
+
+        internal static Task<ButtplugFFIServerMessage> SendRawWriteCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Endpoint aEndpoint, byte[] aData, bool aWriteWithResponse)
+        {
+            var msg = new DeviceMessage
+            {
+                Message = new DeviceMessage.Types.FFIMessage(),
+                Index = aDeviceIndex
+            };
+            var cmd = new DeviceMessage.Types.RawWriteCmd
+            {
+                Endpoint = aEndpoint,
+                Data = ByteString.CopyFrom(aData),
+                WriteWithResponse = aWriteWithResponse
+            };
+            msg.Message.RawWriteCmd = cmd;
+            return SendDeviceMessage(aSorter, aHandle, msg);
+        }
+
+        internal static Task<ButtplugFFIServerMessage> SendRawSubscribeCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Endpoint aEndpoint)
+        {
+            var msg = new DeviceMessage
+            {
+                Message = new DeviceMessage.Types.FFIMessage(),
+                Index = aDeviceIndex
+            };
+            var cmd = new DeviceMessage.Types.RawSubscribeCmd
+            {
+                Endpoint = aEndpoint,
+            };
+            msg.Message.RawSubscribeCmd = cmd;
+            return SendDeviceMessage(aSorter, aHandle, msg);
+        }
+
+        internal static Task<ButtplugFFIServerMessage> SendRawUnsubscribeCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Endpoint aEndpoint)
+        {
+            var msg = new DeviceMessage
+            {
+                Message = new DeviceMessage.Types.FFIMessage(),
+                Index = aDeviceIndex
+            };
+            var cmd = new DeviceMessage.Types.RawUnsubscribeCmd
+            {
+                Endpoint = aEndpoint,
+            };
+            msg.Message.RawUnsubscribeCmd = cmd;
+            return SendDeviceMessage(aSorter, aHandle, msg);
+        }
     }
 }

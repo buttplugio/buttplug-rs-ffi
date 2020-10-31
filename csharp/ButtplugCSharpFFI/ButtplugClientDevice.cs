@@ -56,31 +56,6 @@ namespace ButtplugCSharpFFI
             Handle.Dispose();
         }
 
-        /*
-        public MessageAttributes GetMessageAttributes(Type aMsgType)
-        {
-            ButtplugUtils.ArgumentNotNull(aMsgType, nameof(aMsgType));
-            if (!aMsgType.IsSubclassOf(typeof(ButtplugDeviceMessage)))
-            {
-                throw new ArgumentException("Argument must be subclass of ButtplugDeviceMessage");
-            }
-
-            if (!AllowedMessages.ContainsKey(aMsgType))
-            {
-                throw new ButtplugDeviceException($"Message type {aMsgType.Name} not allowed for device {Name}.");
-            }
-
-            return AllowedMessages[aMsgType];
-        }
-
-        public MessageAttributes GetMessageAttributes<T>()
-        where T : ButtplugDeviceMessage
-        {
-            return GetMessageAttributes(typeof(T));
-        }
-        */
-
-
         public bool Equals(ButtplugClientDevice aDevice)
         {
             return Index == aDevice.Index;
@@ -131,6 +106,50 @@ namespace ButtplugCSharpFFI
             return ButtplugFFI.SendLinearCmd(Sorter, Handle, Index, aCmds);
         }
 
+        public async Task<double> SendBatteryLevelCmd()
+        {
+            var reading = await ButtplugFFI.SendBatteryLevelCmd(Sorter, Handle, Index);
+            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.BatteryLevelReading)
+            {
+                return reading.Message.DeviceEvent.BatteryLevelReading.Reading;
+            }
+            throw new ButtplugDeviceException($"Expected message type of BatteryLevelReading not received, got {reading.Message.MsgCase} instead.");
+        }
+
+        public async Task<int> SendRSSIBatteryLevelCmd()
+        {
+            var reading = await ButtplugFFI.SendRSSILevelCmd(Sorter, Handle, Index);
+            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RssiLevelReading)
+            {
+                return reading.Message.DeviceEvent.RssiLevelReading.Reading;
+            }
+            throw new ButtplugDeviceException($"Expected message type of RssiLevelReading not received, got {reading.Message.MsgCase} instead.");
+        }
+
+        public async Task<byte[]> SendRawReadCmd(Endpoint aEndpoint, uint aExpectedLength, uint aTimeout)
+        {
+            var reading = await ButtplugFFI.SendRawReadCmd(Sorter, Handle, Index, aEndpoint, aExpectedLength, aTimeout);
+            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RawReading)
+            {
+                return reading.Message.DeviceEvent.RawReading.Data.ToArray();
+            }
+            throw new ButtplugDeviceException($"Expected message type of RssiLevelReading not received, got {reading.Message.MsgCase} instead.");
+        }
+
+        public Task SendRawWriteCmd(Endpoint aEndpoint, byte[] aData, bool aWriteWithResponse)
+        {
+            return ButtplugFFI.SendRawWriteCmd(Sorter, Handle, Index, aEndpoint, aData, aWriteWithResponse);
+        }
+
+        public Task SendRawSubscribeCmd(Endpoint aEndpoint)
+        {
+            return ButtplugFFI.SendRawSubscribeCmd(Sorter, Handle, Index, aEndpoint);
+        }
+
+        public Task SendRawUnsubscribeCmd(Endpoint aEndpoint)
+        {
+            return ButtplugFFI.SendRawUnsubscribeCmd(Sorter, Handle, Index, aEndpoint);
+        }
 
         public Task StopDeviceCmd()
         {

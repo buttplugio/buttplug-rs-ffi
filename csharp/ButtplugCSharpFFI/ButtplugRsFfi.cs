@@ -108,35 +108,38 @@ namespace ButtplugFFI {
             "DQoJTGluZWFyQ21kEAISEQoNU3RvcERldmljZUNtZBADEg4KClJhd1JlYWRD",
             "bWQQBBIPCgtSYXdXcml0ZUNtZBAFEhMKD1Jhd1N1YnNjcmliZUNtZBAGEhUK",
             "EVJhd1Vuc3Vic2NyaWJlQ21kEAcSEwoPQmF0dGVyeUxldmVsQ21kEAgSEAoM",
-            "UlNTSUxldmVsQ21kEAlCBQoDbXNnIu8CCgtEZXZpY2VFdmVudBI5CgpkaXNj",
+            "UlNTSUxldmVsQ21kEAlCBQoDbXNnIv8DCgtEZXZpY2VFdmVudBI5CgpkaXNj",
             "b25uZWN0GAEgASgLMiMuQnV0dHBsdWdGRkkuRGV2aWNlRXZlbnQuRGlzY29u",
             "bmVjdEgAEk0KFWJhdHRlcnlfbGV2ZWxfcmVhZGluZxgCIAEoCzIsLkJ1dHRw",
             "bHVnRkZJLkRldmljZUV2ZW50LkJhdHRlcnlMZXZlbFJlYWRpbmdIABJHChJy",
             "c3NpX2xldmVsX3JlYWRpbmcYAyABKAsyKS5CdXR0cGx1Z0ZGSS5EZXZpY2VF",
-            "dmVudC5SU1NJTGV2ZWxSZWFkaW5nSAAaGwoKRGlzY29ubmVjdBINCgVpbmRl",
-            "eBgBIAEoDRo1ChNCYXR0ZXJ5TGV2ZWxSZWFkaW5nEg0KBWluZGV4GAEgASgN",
-            "Eg8KB3JlYWRpbmcYAiABKAEaMgoQUlNTSUxldmVsUmVhZGluZxINCgVpbmRl",
-            "eBgBIAEoDRIPCgdyZWFkaW5nGAIgASgBQgUKA21zZyLmAQoYQnV0dHBsdWdG",
-            "RklTZXJ2ZXJNZXNzYWdlEgoKAmlkGAEgASgNEkEKB21lc3NhZ2UYAiABKAsy",
-            "MC5CdXR0cGx1Z0ZGSS5CdXR0cGx1Z0ZGSVNlcnZlck1lc3NhZ2UuRkZJTWVz",
-            "c2FnZRp7CgpGRklNZXNzYWdlEjQKDnNlcnZlcl9tZXNzYWdlGAEgASgLMhou",
-            "QnV0dHBsdWdGRkkuU2VydmVyTWVzc2FnZUgAEjAKDGRldmljZV9ldmVudBgC",
-            "IAEoCzIYLkJ1dHRwbHVnRkZJLkRldmljZUV2ZW50SABCBQoDbXNnKpMFCghF",
-            "bmRwb2ludBILCgdDb21tYW5kEAASDAoIRmlybXdhcmUQARIGCgJSeBACEgsK",
-            "B1J4QWNjZWwQAxIQCgxSeEJMRUJhdHRlcnkQBBIOCgpSeFByZXNzdXJlEAUS",
-            "CwoHUnhUb3VjaBAGEgYKAlR4EAcSCgoGVHhNb2RlEAgSCwoHVHhTaG9jaxAJ",
-            "Eg0KCVR4VmlicmF0ZRAKEhMKD1R4VmVuZG9yQ29udHJvbBALEg0KCVdoaXRl",
-            "bGlzdBAMEgwKCEdlbmVyaWMwEA0SDAoIR2VuZXJpYzEQDhIMCghHZW5lcmlj",
-            "MhAPEgwKCEdlbmVyaWMzEBASDAoIR2VuZXJpYzQQERIMCghHZW5lcmljNRAS",
-            "EgwKCEdlbmVyaWM2EBMSDAoIR2VuZXJpYzcQFBIMCghHZW5lcmljOBAVEgwK",
-            "CEdlbmVyaWM5EBYSDQoJR2VuZXJpYzEwEBcSDQoJR2VuZXJpYzExEBgSDQoJ",
-            "R2VuZXJpYzEyEBkSDQoJR2VuZXJpYzEzEBoSDQoJR2VuZXJpYzE0EBsSDQoJ",
-            "R2VuZXJpYzE1EBwSDQoJR2VuZXJpYzE2EB0SDQoJR2VuZXJpYzE3EB4SDQoJ",
-            "R2VuZXJpYzE4EB8SDQoJR2VuZXJpYzE5ECASDQoJR2VuZXJpYzIwECESDQoJ",
-            "R2VuZXJpYzIxECISDQoJR2VuZXJpYzIyECMSDQoJR2VuZXJpYzIzECQSDQoJ",
-            "R2VuZXJpYzI0ECUSDQoJR2VuZXJpYzI1ECYSDQoJR2VuZXJpYzI2ECcSDQoJ",
-            "R2VuZXJpYzI3ECgSDQoJR2VuZXJpYzI4ECkSDQoJR2VuZXJpYzI5ECoSDQoJ",
-            "R2VuZXJpYzMwECsSDQoJR2VuZXJpYzMxECxiBnByb3RvMw=="));
+            "dmVudC5SU1NJTGV2ZWxSZWFkaW5nSAASOgoLcmF3X3JlYWRpbmcYBCABKAsy",
+            "Iy5CdXR0cGx1Z0ZGSS5EZXZpY2VFdmVudC5SYXdSZWFkaW5nSAAaGwoKRGlz",
+            "Y29ubmVjdBINCgVpbmRleBgBIAEoDRpSCgpSYXdSZWFkaW5nEg0KBWluZGV4",
+            "GAEgASgNEicKCGVuZHBvaW50GAIgASgOMhUuQnV0dHBsdWdGRkkuRW5kcG9p",
+            "bnQSDAoEZGF0YRgDIAEoDBo1ChNCYXR0ZXJ5TGV2ZWxSZWFkaW5nEg0KBWlu",
+            "ZGV4GAEgASgNEg8KB3JlYWRpbmcYAiABKAEaMgoQUlNTSUxldmVsUmVhZGlu",
+            "ZxINCgVpbmRleBgBIAEoDRIPCgdyZWFkaW5nGAIgASgFQgUKA21zZyLmAQoY",
+            "QnV0dHBsdWdGRklTZXJ2ZXJNZXNzYWdlEgoKAmlkGAEgASgNEkEKB21lc3Nh",
+            "Z2UYAiABKAsyMC5CdXR0cGx1Z0ZGSS5CdXR0cGx1Z0ZGSVNlcnZlck1lc3Nh",
+            "Z2UuRkZJTWVzc2FnZRp7CgpGRklNZXNzYWdlEjQKDnNlcnZlcl9tZXNzYWdl",
+            "GAEgASgLMhouQnV0dHBsdWdGRkkuU2VydmVyTWVzc2FnZUgAEjAKDGRldmlj",
+            "ZV9ldmVudBgCIAEoCzIYLkJ1dHRwbHVnRkZJLkRldmljZUV2ZW50SABCBQoD",
+            "bXNnKpMFCghFbmRwb2ludBILCgdDb21tYW5kEAASDAoIRmlybXdhcmUQARIG",
+            "CgJSeBACEgsKB1J4QWNjZWwQAxIQCgxSeEJMRUJhdHRlcnkQBBIOCgpSeFBy",
+            "ZXNzdXJlEAUSCwoHUnhUb3VjaBAGEgYKAlR4EAcSCgoGVHhNb2RlEAgSCwoH",
+            "VHhTaG9jaxAJEg0KCVR4VmlicmF0ZRAKEhMKD1R4VmVuZG9yQ29udHJvbBAL",
+            "Eg0KCVdoaXRlbGlzdBAMEgwKCEdlbmVyaWMwEA0SDAoIR2VuZXJpYzEQDhIM",
+            "CghHZW5lcmljMhAPEgwKCEdlbmVyaWMzEBASDAoIR2VuZXJpYzQQERIMCghH",
+            "ZW5lcmljNRASEgwKCEdlbmVyaWM2EBMSDAoIR2VuZXJpYzcQFBIMCghHZW5l",
+            "cmljOBAVEgwKCEdlbmVyaWM5EBYSDQoJR2VuZXJpYzEwEBcSDQoJR2VuZXJp",
+            "YzExEBgSDQoJR2VuZXJpYzEyEBkSDQoJR2VuZXJpYzEzEBoSDQoJR2VuZXJp",
+            "YzE0EBsSDQoJR2VuZXJpYzE1EBwSDQoJR2VuZXJpYzE2EB0SDQoJR2VuZXJp",
+            "YzE3EB4SDQoJR2VuZXJpYzE4EB8SDQoJR2VuZXJpYzE5ECASDQoJR2VuZXJp",
+            "YzIwECESDQoJR2VuZXJpYzIxECISDQoJR2VuZXJpYzIyECMSDQoJR2VuZXJp",
+            "YzIzECQSDQoJR2VuZXJpYzI0ECUSDQoJR2VuZXJpYzI1ECYSDQoJR2VuZXJp",
+            "YzI2ECcSDQoJR2VuZXJpYzI3ECgSDQoJR2VuZXJpYzI4ECkSDQoJR2VuZXJp",
+            "YzI5ECoSDQoJR2VuZXJpYzMwECsSDQoJR2VuZXJpYzMxECxiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::ButtplugFFI.Endpoint), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -167,7 +170,8 @@ namespace ButtplugFFI {
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage.Types.DeviceAdded), global::ButtplugFFI.ServerMessage.Types.DeviceAdded.Parser, new[]{ "Name", "Index", "MessageAttributes" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage.Types.DeviceRemoved), global::ButtplugFFI.ServerMessage.Types.DeviceRemoved.Parser, new[]{ "Index" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ServerMessage.Types.Disconnect), global::ButtplugFFI.ServerMessage.Types.Disconnect.Parser, null, null, null, null, null)}),
-            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent), global::ButtplugFFI.DeviceEvent.Parser, new[]{ "Disconnect", "BatteryLevelReading", "RssiLevelReading" }, new[]{ "Msg" }, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.Disconnect), global::ButtplugFFI.DeviceEvent.Types.Disconnect.Parser, new[]{ "Index" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent), global::ButtplugFFI.DeviceEvent.Parser, new[]{ "Disconnect", "BatteryLevelReading", "RssiLevelReading", "RawReading" }, new[]{ "Msg" }, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.Disconnect), global::ButtplugFFI.DeviceEvent.Types.Disconnect.Parser, new[]{ "Index" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.RawReading), global::ButtplugFFI.DeviceEvent.Types.RawReading.Parser, new[]{ "Index", "Endpoint", "Data" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.BatteryLevelReading), global::ButtplugFFI.DeviceEvent.Types.BatteryLevelReading.Parser, new[]{ "Index", "Reading" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.DeviceEvent.Types.RSSILevelReading), global::ButtplugFFI.DeviceEvent.Types.RSSILevelReading.Parser, new[]{ "Index", "Reading" }, null, null, null, null)}),
             new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ButtplugFFIServerMessage), global::ButtplugFFI.ButtplugFFIServerMessage.Parser, new[]{ "Id", "Message" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::ButtplugFFI.ButtplugFFIServerMessage.Types.FFIMessage), global::ButtplugFFI.ButtplugFFIServerMessage.Types.FFIMessage.Parser, new[]{ "ServerMessage", "DeviceEvent" }, new[]{ "Msg" }, null, null, null)})
@@ -5465,6 +5469,9 @@ namespace ButtplugFFI {
         case MsgOneofCase.RssiLevelReading:
           RssiLevelReading = other.RssiLevelReading.Clone();
           break;
+        case MsgOneofCase.RawReading:
+          RawReading = other.RawReading.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -5508,6 +5515,17 @@ namespace ButtplugFFI {
       }
     }
 
+    /// <summary>Field number for the "raw_reading" field.</summary>
+    public const int RawReadingFieldNumber = 4;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::ButtplugFFI.DeviceEvent.Types.RawReading RawReading {
+      get { return msgCase_ == MsgOneofCase.RawReading ? (global::ButtplugFFI.DeviceEvent.Types.RawReading) msg_ : null; }
+      set {
+        msg_ = value;
+        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.RawReading;
+      }
+    }
+
     private object msg_;
     /// <summary>Enum of possible cases for the "msg" oneof.</summary>
     public enum MsgOneofCase {
@@ -5515,6 +5533,7 @@ namespace ButtplugFFI {
       Disconnect = 1,
       BatteryLevelReading = 2,
       RssiLevelReading = 3,
+      RawReading = 4,
     }
     private MsgOneofCase msgCase_ = MsgOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5544,6 +5563,7 @@ namespace ButtplugFFI {
       if (!object.Equals(Disconnect, other.Disconnect)) return false;
       if (!object.Equals(BatteryLevelReading, other.BatteryLevelReading)) return false;
       if (!object.Equals(RssiLevelReading, other.RssiLevelReading)) return false;
+      if (!object.Equals(RawReading, other.RawReading)) return false;
       if (MsgCase != other.MsgCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -5554,6 +5574,7 @@ namespace ButtplugFFI {
       if (msgCase_ == MsgOneofCase.Disconnect) hash ^= Disconnect.GetHashCode();
       if (msgCase_ == MsgOneofCase.BatteryLevelReading) hash ^= BatteryLevelReading.GetHashCode();
       if (msgCase_ == MsgOneofCase.RssiLevelReading) hash ^= RssiLevelReading.GetHashCode();
+      if (msgCase_ == MsgOneofCase.RawReading) hash ^= RawReading.GetHashCode();
       hash ^= (int) msgCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -5580,6 +5601,10 @@ namespace ButtplugFFI {
         output.WriteRawTag(26);
         output.WriteMessage(RssiLevelReading);
       }
+      if (msgCase_ == MsgOneofCase.RawReading) {
+        output.WriteRawTag(34);
+        output.WriteMessage(RawReading);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -5596,6 +5621,9 @@ namespace ButtplugFFI {
       }
       if (msgCase_ == MsgOneofCase.RssiLevelReading) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(RssiLevelReading);
+      }
+      if (msgCase_ == MsgOneofCase.RawReading) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(RawReading);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -5626,6 +5654,12 @@ namespace ButtplugFFI {
             RssiLevelReading = new global::ButtplugFFI.DeviceEvent.Types.RSSILevelReading();
           }
           RssiLevelReading.MergeFrom(other.RssiLevelReading);
+          break;
+        case MsgOneofCase.RawReading:
+          if (RawReading == null) {
+            RawReading = new global::ButtplugFFI.DeviceEvent.Types.RawReading();
+          }
+          RawReading.MergeFrom(other.RawReading);
           break;
       }
 
@@ -5665,6 +5699,15 @@ namespace ButtplugFFI {
             }
             input.ReadMessage(subBuilder);
             RssiLevelReading = subBuilder;
+            break;
+          }
+          case 34: {
+            global::ButtplugFFI.DeviceEvent.Types.RawReading subBuilder = new global::ButtplugFFI.DeviceEvent.Types.RawReading();
+            if (msgCase_ == MsgOneofCase.RawReading) {
+              subBuilder.MergeFrom(RawReading);
+            }
+            input.ReadMessage(subBuilder);
+            RawReading = subBuilder;
             break;
           }
         }
@@ -5804,6 +5847,191 @@ namespace ButtplugFFI {
 
       }
 
+      public sealed partial class RawReading : pb::IMessage<RawReading> {
+        private static readonly pb::MessageParser<RawReading> _parser = new pb::MessageParser<RawReading>(() => new RawReading());
+        private pb::UnknownFieldSet _unknownFields;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public static pb::MessageParser<RawReading> Parser { get { return _parser; } }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public static pbr::MessageDescriptor Descriptor {
+          get { return global::ButtplugFFI.DeviceEvent.Descriptor.NestedTypes[1]; }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        pbr::MessageDescriptor pb::IMessage.Descriptor {
+          get { return Descriptor; }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public RawReading() {
+          OnConstruction();
+        }
+
+        partial void OnConstruction();
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public RawReading(RawReading other) : this() {
+          index_ = other.index_;
+          endpoint_ = other.endpoint_;
+          data_ = other.data_;
+          _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public RawReading Clone() {
+          return new RawReading(this);
+        }
+
+        /// <summary>Field number for the "index" field.</summary>
+        public const int IndexFieldNumber = 1;
+        private uint index_;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public uint Index {
+          get { return index_; }
+          set {
+            index_ = value;
+          }
+        }
+
+        /// <summary>Field number for the "endpoint" field.</summary>
+        public const int EndpointFieldNumber = 2;
+        private global::ButtplugFFI.Endpoint endpoint_ = global::ButtplugFFI.Endpoint.Command;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public global::ButtplugFFI.Endpoint Endpoint {
+          get { return endpoint_; }
+          set {
+            endpoint_ = value;
+          }
+        }
+
+        /// <summary>Field number for the "data" field.</summary>
+        public const int DataFieldNumber = 3;
+        private pb::ByteString data_ = pb::ByteString.Empty;
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public pb::ByteString Data {
+          get { return data_; }
+          set {
+            data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+          }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public override bool Equals(object other) {
+          return Equals(other as RawReading);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public bool Equals(RawReading other) {
+          if (ReferenceEquals(other, null)) {
+            return false;
+          }
+          if (ReferenceEquals(other, this)) {
+            return true;
+          }
+          if (Index != other.Index) return false;
+          if (Endpoint != other.Endpoint) return false;
+          if (Data != other.Data) return false;
+          return Equals(_unknownFields, other._unknownFields);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public override int GetHashCode() {
+          int hash = 1;
+          if (Index != 0) hash ^= Index.GetHashCode();
+          if (Endpoint != global::ButtplugFFI.Endpoint.Command) hash ^= Endpoint.GetHashCode();
+          if (Data.Length != 0) hash ^= Data.GetHashCode();
+          if (_unknownFields != null) {
+            hash ^= _unknownFields.GetHashCode();
+          }
+          return hash;
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public override string ToString() {
+          return pb::JsonFormatter.ToDiagnosticString(this);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void WriteTo(pb::CodedOutputStream output) {
+          if (Index != 0) {
+            output.WriteRawTag(8);
+            output.WriteUInt32(Index);
+          }
+          if (Endpoint != global::ButtplugFFI.Endpoint.Command) {
+            output.WriteRawTag(16);
+            output.WriteEnum((int) Endpoint);
+          }
+          if (Data.Length != 0) {
+            output.WriteRawTag(26);
+            output.WriteBytes(Data);
+          }
+          if (_unknownFields != null) {
+            _unknownFields.WriteTo(output);
+          }
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public int CalculateSize() {
+          int size = 0;
+          if (Index != 0) {
+            size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Index);
+          }
+          if (Endpoint != global::ButtplugFFI.Endpoint.Command) {
+            size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Endpoint);
+          }
+          if (Data.Length != 0) {
+            size += 1 + pb::CodedOutputStream.ComputeBytesSize(Data);
+          }
+          if (_unknownFields != null) {
+            size += _unknownFields.CalculateSize();
+          }
+          return size;
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void MergeFrom(RawReading other) {
+          if (other == null) {
+            return;
+          }
+          if (other.Index != 0) {
+            Index = other.Index;
+          }
+          if (other.Endpoint != global::ButtplugFFI.Endpoint.Command) {
+            Endpoint = other.Endpoint;
+          }
+          if (other.Data.Length != 0) {
+            Data = other.Data;
+          }
+          _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+        }
+
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public void MergeFrom(pb::CodedInputStream input) {
+          uint tag;
+          while ((tag = input.ReadTag()) != 0) {
+            switch(tag) {
+              default:
+                _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+                break;
+              case 8: {
+                Index = input.ReadUInt32();
+                break;
+              }
+              case 16: {
+                Endpoint = (global::ButtplugFFI.Endpoint) input.ReadEnum();
+                break;
+              }
+              case 26: {
+                Data = input.ReadBytes();
+                break;
+              }
+            }
+          }
+        }
+
+      }
+
       public sealed partial class BatteryLevelReading : pb::IMessage<BatteryLevelReading> {
         private static readonly pb::MessageParser<BatteryLevelReading> _parser = new pb::MessageParser<BatteryLevelReading>(() => new BatteryLevelReading());
         private pb::UnknownFieldSet _unknownFields;
@@ -5812,7 +6040,7 @@ namespace ButtplugFFI {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::ButtplugFFI.DeviceEvent.Descriptor.NestedTypes[1]; }
+          get { return global::ButtplugFFI.DeviceEvent.Descriptor.NestedTypes[2]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5969,7 +6197,7 @@ namespace ButtplugFFI {
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::ButtplugFFI.DeviceEvent.Descriptor.NestedTypes[2]; }
+          get { return global::ButtplugFFI.DeviceEvent.Descriptor.NestedTypes[3]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6009,9 +6237,9 @@ namespace ButtplugFFI {
 
         /// <summary>Field number for the "reading" field.</summary>
         public const int ReadingFieldNumber = 2;
-        private double reading_;
+        private int reading_;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-        public double Reading {
+        public int Reading {
           get { return reading_; }
           set {
             reading_ = value;
@@ -6032,7 +6260,7 @@ namespace ButtplugFFI {
             return true;
           }
           if (Index != other.Index) return false;
-          if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Reading, other.Reading)) return false;
+          if (Reading != other.Reading) return false;
           return Equals(_unknownFields, other._unknownFields);
         }
 
@@ -6040,7 +6268,7 @@ namespace ButtplugFFI {
         public override int GetHashCode() {
           int hash = 1;
           if (Index != 0) hash ^= Index.GetHashCode();
-          if (Reading != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Reading);
+          if (Reading != 0) hash ^= Reading.GetHashCode();
           if (_unknownFields != null) {
             hash ^= _unknownFields.GetHashCode();
           }
@@ -6058,9 +6286,9 @@ namespace ButtplugFFI {
             output.WriteRawTag(8);
             output.WriteUInt32(Index);
           }
-          if (Reading != 0D) {
-            output.WriteRawTag(17);
-            output.WriteDouble(Reading);
+          if (Reading != 0) {
+            output.WriteRawTag(16);
+            output.WriteInt32(Reading);
           }
           if (_unknownFields != null) {
             _unknownFields.WriteTo(output);
@@ -6073,8 +6301,8 @@ namespace ButtplugFFI {
           if (Index != 0) {
             size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Index);
           }
-          if (Reading != 0D) {
-            size += 1 + 8;
+          if (Reading != 0) {
+            size += 1 + pb::CodedOutputStream.ComputeInt32Size(Reading);
           }
           if (_unknownFields != null) {
             size += _unknownFields.CalculateSize();
@@ -6090,7 +6318,7 @@ namespace ButtplugFFI {
           if (other.Index != 0) {
             Index = other.Index;
           }
-          if (other.Reading != 0D) {
+          if (other.Reading != 0) {
             Reading = other.Reading;
           }
           _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -6108,8 +6336,8 @@ namespace ButtplugFFI {
                 Index = input.ReadUInt32();
                 break;
               }
-              case 17: {
-                Reading = input.ReadDouble();
+              case 16: {
+                Reading = input.ReadInt32();
                 break;
               }
             }
