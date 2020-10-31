@@ -254,7 +254,7 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
           vec![]
         };
         let attrs = MessageAttributes {
-            message_type: attr_type as i32,
+            message_type: MessageAttributeType::try_from(attr_type).unwrap() as i32,
             feature_count: message_attrs.feature_count.unwrap_or(0),
             step_count: step_count,
             endpoints: serialized_endpoints,
