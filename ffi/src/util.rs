@@ -285,7 +285,7 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         message: Some(buttplug_ffi_server_message::FfiMessage {
           msg: Some(FFIServerMessageType::ServerMessage(ServerMessage {
             msg: Some(ServerMessageType::DeviceRemoved(DeviceRemoved {
-              index: device.device_index,
+              index: device.index(),
             }))
           }))
         })

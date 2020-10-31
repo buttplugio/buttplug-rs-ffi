@@ -100,7 +100,7 @@ impl ButtplugFFIClient {
                   device_map.insert(device.index(), device.clone());
                 },
                 ButtplugClientEvent::DeviceRemoved(device) => {
-                  device_map.remove(&device.device_index);
+                  device_map.remove(&device.index());
                 }
                 // Events will be forwarded to the client in send_event, so we
                 // can ignore them here unless they specifically need to modify

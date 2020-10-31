@@ -3,15 +3,12 @@ use super::{
     buttplug_ffi_server_message,
     buttplug_ffi_server_message::ffi_message::Msg as FFIServerMessageType,
     device_message::{VibrateCmd, RotateCmd, LinearCmd, StopDeviceCmd, RawReadCmd, RawWriteCmd, RawSubscribeCmd, RawUnsubscribeCmd, BatteryLevelCmd, RssiLevelCmd, ffi_message::Msg as DeviceMessageType},
-    server_message::{
-      ButtplugErrorType, Error as OutgoingError, MessageAttributeType, Msg as ServerMessageType, Ok,
-    },
     ButtplugFfiServerMessage as FFIServerMessage,
     device_event::{RawReading, BatteryLevelReading, RssiLevelReading, Msg as DeviceEventType},
     DeviceEvent,
-    DeviceMessage, Endpoint as SerializedEndpoint, ServerMessage,
+    DeviceMessage, Endpoint as SerializedEndpoint,
   },
-  util::{return_client_result, return_ok, send_server_message, return_error},
+  util::{return_client_result, send_server_message, return_error},
   FFICallback,
 };
 use buttplug::{
@@ -102,7 +99,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_stop_device_cmd(&self, id: u32, msg: StopDeviceCmd) {
+  pub fn send_stop_device_cmd(&self, id: u32, _msg: StopDeviceCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -167,7 +164,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_battery_level_cmd(&self, id: u32, msg: BatteryLevelCmd) {
+  pub fn send_battery_level_cmd(&self, id: u32, _msg: BatteryLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -195,7 +192,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_rssi_level_cmd(&self, id: u32, msg: RssiLevelCmd) {
+  pub fn send_rssi_level_cmd(&self, id: u32, _msg: RssiLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
