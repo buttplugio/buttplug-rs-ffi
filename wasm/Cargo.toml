@@ -16,6 +16,8 @@ rustflags = "--cfg=web_sys_unstable_apis"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 wasm-bindgen = { version = "0.2.68", features = ["serde-serialize"] }
+# buttplug = { path = "../../buttplug-rs/buttplug", default-features = false, features = ["wasm-bindgen-runtime", "client", "server", "serialize-json"] }
+buttplug = { version = "0.11.0", default-features = false, features = ["wasm-bindgen-runtime", "client", "server", "serialize-json"] }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
