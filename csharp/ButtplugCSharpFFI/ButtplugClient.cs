@@ -92,6 +92,11 @@ namespace ButtplugCSharpFFI
             await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, "ws://127.0.0.1:12345", false);
         }
 
+        public async Task Disconnect()
+        {
+            await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle);
+        }
+
         public void SorterCallback(UIntPtr buf, int buf_length)
         {
             Span<byte> byteArray;

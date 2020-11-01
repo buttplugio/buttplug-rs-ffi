@@ -122,6 +122,14 @@ namespace ButtplugCSharpFFI
             return SendClientMessage(aSorter, aHandle, msg);
         }
 
+        internal static Task<ButtplugFFIServerMessage> SendDisconnect(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
+        {
+            var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
+            msg.Message.Disconnect = new ClientMessage.Types.Disconnect();
+            return SendClientMessage(aSorter, aHandle, msg);
+        }
+
         internal static Task<ButtplugFFIServerMessage> SendStartScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
         {
             var msg = new ClientMessage();

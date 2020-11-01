@@ -83,6 +83,9 @@ message ClientMessage {
   message StopAllDevices {
   }
 
+  message Disconnect {
+  }
+
   message FFIMessage {
     oneof msg {
       ConnectLocal connect_local = 1;
@@ -90,6 +93,7 @@ message ClientMessage {
       StartScanning start_scanning = 3;
       StopScanning stop_scanning = 4;
       StopAllDevices stop_all_devices = 5;
+      Disconnect disconnect = 6;
     }
   }
 

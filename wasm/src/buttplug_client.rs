@@ -193,6 +193,17 @@ impl ButtplugClient {
     })
   }
 
+  pub fn disconnect(&self) -> Promise {
+    let client_clone = self.client.clone();
+    future_to_promise(async move {
+      client_clone
+        .disconnect()
+        .await
+        .and_then(|_| Ok(JsValue::null()))
+        .map_err(|e| JsValue::from(format!("{}", e)))
+    })
+  }
+
   #[allow(non_snake_case)]
   pub fn addListener(&mut self, event_name: &JsValue, callback: &js_sys::Function) {
     let event_name_str = event_name.as_string().unwrap();

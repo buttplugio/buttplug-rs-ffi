@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using ButtplugCSharpFFI;
 using ButtplugFFI;
+using System.ComponentModel;
+using System.Text;
 
 namespace ButtplugCSharpFFITest
 {
@@ -17,20 +19,43 @@ namespace ButtplugCSharpFFITest
             Console.ReadKey(true);
         }
 
+        private static void LogCallback(string aMsg)
+        {
+            Console.WriteLine(aMsg);
+        }
+
         private static async Task RunExample()
         {
-            var client = new ButtplugClient("Test Client"); 
+            //ButtplugFFILog.SetLogCallback(LogCallback, ButtplugLogLevel.Info);
+            //ButtplugFFILog.SetLogLevel(ButtplugLogLevel.Error);
+            var client = new ButtplugClient("Test Client");
             client.DeviceAdded += async (obj, args) =>
             {
                 var device = args.Device;
-                if (device.AllowedMessages.ContainsKey(ServerMessage.Types.MessageAttributeType.VibrateCmd))
-                {
-                    await device.SendVibrateCmd(0.5);
+                foreach (var msg in args.Device.AllowedMessages) {
+                    Console.WriteLine($"{msg.Key} {msg.Value}");
+                    foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(msg.Value))
+                    {
+                        string name = descriptor.Name;
+                        object value = descriptor.GetValue(obj);
+                        Console.WriteLine("{0}={1}", name, value);
+                    }
                 }
-                device.Dispose();
-                device = null;
+                if (device.AllowedMessages.ContainsKey(ServerMessage.Types.MessageAttributeType.BatteryLevelCmd))
+                {
+                    Console.WriteLine("Fetching Battery");
+                    Console.WriteLine($"Battery: {await device.SendBatteryLevelCmd()}");
+                    await device.SendRawWriteCmd(Endpoint.Tx, Encoding.ASCII.GetBytes("Vibrate:10;"), false);
+                    //await device.SendVibrateCmd(0.5);
+                }
             };
-            await client.ConnectLocal();
+            client.DeviceRemoved += (obj, args) =>
+            {
+                Console.WriteLine($"Device removed: {args.Device.Name}");
+            };
+            await client.ConnectLocal(new ButtplugServerOptions {
+//                AllowRawMessages = true
+            });
             //await client.ConnectWebsocket();
             await client.StartScanningAsync();
             await WaitForKey();

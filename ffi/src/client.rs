@@ -77,6 +77,7 @@ impl ButtplugFFIClient {
       ClientMessageType::StartScanning(_) => self.start_scanning(msg_id),
       ClientMessageType::StopScanning(_) => self.stop_scanning(msg_id),
       ClientMessageType::StopAllDevices(_) => self.stop_all_devices(msg_id),
+      ClientMessageType::Disconnect(_) => self.disconnect(msg_id),
     }
   }
 
@@ -156,6 +157,18 @@ impl ButtplugFFIClient {
       ButtplugRemoteClientConnector::new(transport)
     };
     self.connect(msg_id, connector);
+  }
+
+  fn disconnect(&self, msg_id: u32) {
+    let client = self.client.clone();
+    let callback = self.callback.clone();
+    async_manager::spawn(async move {
+      if let Some(usable_client) = &(*client.read().await) {
+        return_client_result(msg_id, &usable_client.disconnect().await, &callback);
+      } else {
+        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
+      }
+    }).unwrap();
   }
 
   fn start_scanning(&self, msg_id: u32) {
