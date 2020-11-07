@@ -128,6 +128,11 @@ async fn event_emitter_loop(
 
 #[wasm_bindgen]
 impl ButtplugClient {
+  #[wasm_bindgen(getter)]
+  pub fn connected(&self) -> bool {
+    self.client.connected()
+  }
+
   #[allow(non_snake_case)]
   pub fn connectEmbedded() -> Promise {
     let mut options = ButtplugServerOptions::default();
@@ -210,6 +215,14 @@ impl ButtplugClient {
     self
       .event_manager
       .add_listener(&event_name_str, callback.clone());
+  }
+
+  #[allow(non_snake_case)]
+  pub fn removeListener(&mut self, event_name: &JsValue, callback: &js_sys::Function) {
+    let event_name_str = event_name.as_string().unwrap();
+    self
+      .event_manager
+      .remove_listener(&event_name_str, callback.clone());
   }
 
   #[allow(non_snake_case)]

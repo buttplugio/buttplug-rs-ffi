@@ -58,6 +58,32 @@ impl ButtplugClientDevice {
     }
   }
 
+  #[wasm_bindgen(getter)]
+  pub fn name(&self) -> String {
+      self.device.name.clone()
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn index(&self) -> u32 {
+      self.device.index()
+  }
+
+  #[allow(non_snake_case)]
+  pub fn addListener(&mut self, event_name: &JsValue, callback: &js_sys::Function) {
+    let event_name_str = event_name.as_string().unwrap();
+    self
+      .event_manager
+      .add_listener(&event_name_str, callback.clone());
+  }
+
+  #[allow(non_snake_case)]
+  pub fn removeListener(&mut self, event_name: &JsValue, callback: &js_sys::Function) {
+    let event_name_str = event_name.as_string().unwrap();
+    self
+      .event_manager
+      .remove_listener(&event_name_str, callback.clone());
+  }
+
   pub fn vibrate(&self, speed: &JsValue) -> Promise {
     let argument_error = future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 or an array of f64's with the same bounds."))));
     let vibrate_command = if let Some(speed_f64) = speed.as_f64() {
@@ -300,4 +326,6 @@ impl ButtplugClientDevice {
   pub fn supportsMessage(&self, message_type: ButtplugDeviceMessageType) -> bool {
     self.device.allowed_messages.contains_key(&message_type)
   }
+
+  
 }

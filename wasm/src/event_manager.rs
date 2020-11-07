@@ -19,6 +19,15 @@ impl EventManager {
     self.event_holder.get_mut(event_name).unwrap().push(callback);
   }
 
+  pub fn remove_listener(&self, event_name: &str, callback: js_sys::Function) {
+    if let Some(mut val) = self.event_holder.get_mut(event_name) {
+      if let Some(pos) = val.value().iter().position(|x| *x == callback) {
+        val.value_mut().remove(pos);
+        return;
+      }
+    }
+  }
+
   pub fn emit(&self, event_name: &str, emitter_value: &JsValue) {
     let this = JsValue::null();
     if !self.event_holder.contains_key(event_name) {
