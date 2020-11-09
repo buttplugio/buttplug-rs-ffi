@@ -1,3 +1,5 @@
+// Glue method taken from https://github.com/rustwasm/wasm-pack/pull/705#issuecomment-623016429
+
 import * as wasmBase64Bytes from "./buttplug_wasm_bg.wasm";
 // CUSTOM INITIALIZATION START
 function _base64ToArrayBuffer(base64) {
