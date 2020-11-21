@@ -87,15 +87,15 @@ jobs:
      - script: sudo apt-get -y install libudev-dev libusb-1.0-0-dev
        displayName: Install packages
        condition: eq(variables['Agent.OS'], 'Linux')
-     - task: Cache@2
-       displayName: Cache vcpkg
-       condition: eq(variables['Agent.OS'], 'Windows_NT')
-       inputs:
-         # As 'key' use the content of the response file, vcpkg's commit id and build agent name.
-         # The key must be one liner, each segment separated by pipe, non-path segments enclosed by
-         # double quotes.
-         key: $(Build.SourcesDirectory)/build/vcpkg_x64-windows.txt | "$(Agent.OS)"
-         path: 'c:/vcpkg'
+#     - task: Cache@2
+#       displayName: Cache vcpkg
+#       condition: eq(variables['Agent.OS'], 'Windows_NT')
+#       inputs:
+#         # As 'key' use the content of the response file, vcpkg's commit id and build agent name.
+#         # The key must be one liner, each segment separated by pipe, non-path segments enclosed by
+#         # double quotes.
+#         key: $(Build.SourcesDirectory)/build/vcpkg_x64-windows.txt | "$(Agent.OS)"
+#         path: 'c:/vcpkg'
      - script: cargo check --all --bins --examples --release
        displayName: cargo check
      - task: CopyFiles@2
