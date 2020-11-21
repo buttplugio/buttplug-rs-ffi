@@ -2,3 +2,4 @@
 **/obj/**
 **/properties/**
 **/.vs/**
+**/nupkg-build/**

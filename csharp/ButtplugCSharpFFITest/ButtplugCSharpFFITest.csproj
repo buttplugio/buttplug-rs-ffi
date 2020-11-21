@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ButtplugCSharpFFI\ButtplugCSharpFFI.csproj" />
+    <ProjectReference Include="..\ButtplugCSharpFFI\Buttplug.csproj" />
   </ItemGroup>
 
 </Project>

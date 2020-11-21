@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using ButtplugFFI;
@@ -52,22 +52,22 @@ namespace ButtplugCSharpFFI
 
     internal class ButtplugFFICalls
     {
-        [DllImport("buttplug_ffi")]
+        [DllImport("buttplug_rs_ffi")]
         internal static extern ButtplugFFIClientHandle buttplug_create_client(ButtplugCallback callback, string client_name);
 
-        [DllImport("buttplug_ffi")]
+        [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_free_client(IntPtr client_handle);
 
-        [DllImport("buttplug_ffi")]
+        [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_parse_client_message(ButtplugFFIClientHandle client_handle, byte[] buf, int buf_length);
 
-        [DllImport("buttplug_ffi")]
+        [DllImport("buttplug_rs_ffi")]
         internal static extern ButtplugFFIDeviceHandle buttplug_create_device(ButtplugFFIClientHandle client_handle, uint device_index);
 
-        [DllImport("buttplug_ffi")]
+        [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_parse_device_message(ButtplugFFIDeviceHandle client_handle, byte[] buf, int buf_length);
 
-        [DllImport("buttplug_ffi")]
+        [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_free_device(IntPtr device_handle);
     }
 
