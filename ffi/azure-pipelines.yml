@@ -1,8 +1,8 @@
 trigger:
   branches:
-    include: ['*']
+    exclude: ['*']
   tags:
-    include: ['*']
+    exclude: ['*']
 
 jobs:
  - template: build/default.yml
