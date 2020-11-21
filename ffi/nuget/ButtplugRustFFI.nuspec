@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ButtplugRustFFI</id>
+    <version>1.0.0-beta.1</version>
+    <title>Buttplug</title>
+    <authors>Kyle Machulis</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <copyright>Copyright 2017-2020 © Nonpolynomial. All rights reserved.</copyright>
+    <repository type="git" url="https://github.com/buttplugio/buttplug-rs-ffi" />
+    <description>FFI Layer for buttplug-rs. Used by other languages for implementing buttplug-rs bindings.</description>
+    <dependencies>
+      <dependency id="Microsoft.NETCore.Platforms" version="[1.0.1, )" />
+    </dependencies>
+  </metadata>
+</package>
