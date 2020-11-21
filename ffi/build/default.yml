@@ -87,6 +87,25 @@ jobs:
      - script: sudo apt-get -y install libudev-dev libusb-1.0-0-dev
        displayName: Install packages
        condition: eq(variables['Agent.OS'], 'Linux')
+     - task: AzureKeyVault@1
+       displayName: "Retreive Signing Key"
+       condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/master')))
+       inputs:
+         azureSubscription: "azure-nplabs"
+         keyVaultName: "nplabs"
+     - task: PowerShell@2
+       displayName: 'Setup Signing Key'
+       condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/master')))
+       inputs:
+         targetType: inline
+         script: |
+           $kvSecretBytes = [System.Convert]::FromBase64String("$(NPLabsCodeSigningCert)")
+           $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+           $certCollection.Import($kvSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
+           $password = "$(NPLabsRepoSigningKey)"
+           $protectedCertificateBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12, $password)
+           $pfxPath = "SigningCert.pfx"
+           [System.IO.File]::WriteAllBytes($pfxPath, $protectedCertificateBytes)       
 #     - task: Cache@2
 #       displayName: Cache vcpkg
 #       condition: eq(variables['Agent.OS'], 'Windows_NT')
@@ -96,8 +115,8 @@ jobs:
 #         # double quotes.
 #         key: $(Build.SourcesDirectory)/build/vcpkg_x64-windows.txt | "$(Agent.OS)"
 #         path: 'c:/vcpkg'
-     - script: cargo check --all --bins --examples --release
-       displayName: cargo check
+     - script: cargo build --release
+       displayName: cargo build
        workingDirectory: ffi/
      - task: CopyFiles@2
        displayName: "Copy DLL"
