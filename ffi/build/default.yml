@@ -98,6 +98,7 @@ jobs:
 #         path: 'c:/vcpkg'
      - script: cargo check --all --bins --examples --release
        displayName: cargo check
+       workingDirectory: ffi/
      - task: CopyFiles@2
        displayName: "Copy DLL"
        inputs:
