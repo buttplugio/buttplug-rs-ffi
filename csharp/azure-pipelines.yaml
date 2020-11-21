@@ -5,7 +5,7 @@ trigger:
     exclude: ['*']
 
 variables:
-  solution: 'ButtplugCSharpFFI.sln'
+  solution: 'csharp/ButtplugCSharpFFI.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -27,7 +27,6 @@ jobs:
       - template: build/setup-signing-key.yml
       - task: VSBuild@1
         displayName: "Build Project"
-        workingDirectory: "csharp/"
         inputs:
           solution: '$(solution)'
           platform: '$(buildPlatform)'
