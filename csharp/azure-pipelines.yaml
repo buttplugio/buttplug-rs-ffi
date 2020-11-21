@@ -42,7 +42,7 @@ jobs:
         displayName: "Copy nuget packages to staging"
         inputs:
           # Prefix this with Buttplug, otherwise we'll archive the packages directory too.
-          contents: "$(System.DefaultWorkingDirectory)/Buttplug*/**/*.nupkg"
+          contents: "$(System.DefaultWorkingDirectory)/csharp/Buttplug*/**/*.nupkg"
           targetFolder: '$(Build.ArtifactStagingDirectory)/nuget'
           cleanTargetFolder: true
       - task: PowerShell@2
