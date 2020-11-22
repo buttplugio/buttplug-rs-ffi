@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -64,7 +64,7 @@ namespace Buttplug
             SorterCallbackDelegate = SorterCallback;
             _clientHandle = ButtplugFFI.SendCreateClient(aClientName, SorterCallbackDelegate);
         }
-        public async Task Connect(ButtplugEmbeddedConnectorOptions aConnector)
+        public async Task ConnectAsync(ButtplugEmbeddedConnectorOptions aConnector)
         {
             if (aConnector == null)
             {
@@ -81,12 +81,12 @@ namespace Buttplug
                 aConnector.DeviceCommunicationManagerTypes);
         }
 
-        public async Task Connect(ButtplugWebsocketConnectorOptions aConnector)
+        public async Task ConnectAsync(ButtplugWebsocketConnectorOptions aConnector)
         {
-            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress, false);
+            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false);
         }
 
-        public async Task Disconnect()
+        public async Task DisconnectAsync()
         {
             await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle);
         }

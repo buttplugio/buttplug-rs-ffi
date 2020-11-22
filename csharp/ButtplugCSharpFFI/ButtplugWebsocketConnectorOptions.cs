@@ -6,9 +6,9 @@ namespace Buttplug
 {
     public class ButtplugWebsocketConnectorOptions
     {
-        public string NetworkAddress;
+        public Uri NetworkAddress;
 
-        public ButtplugWebsocketConnectorOptions(string aAddress)
+        public ButtplugWebsocketConnectorOptions(Uri aAddress)
         {
             NetworkAddress = aAddress;
         }
