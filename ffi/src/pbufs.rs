@@ -1,1 +1,1 @@
-include!(concat!(env!("OUT_DIR"), "/buttplug_ffi.rs"));
+include!(concat!(env!("OUT_DIR"), "/buttplug.rs"));
