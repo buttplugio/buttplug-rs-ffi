@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     public class ButtplugServerOptions
     {

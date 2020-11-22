@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ButtplugFFI;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     public class ButtplugClientDevice : IDisposable
     {

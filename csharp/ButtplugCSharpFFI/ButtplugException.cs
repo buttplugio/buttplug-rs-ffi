@@ -1,7 +1,7 @@
 ﻿using System;
 using ButtplugFFI;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     public class ButtplugException : Exception
     {

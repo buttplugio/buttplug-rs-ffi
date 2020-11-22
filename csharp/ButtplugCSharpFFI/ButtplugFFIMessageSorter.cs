@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ButtplugFFI;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     public class ButtplugFFIMessageSorter
     {

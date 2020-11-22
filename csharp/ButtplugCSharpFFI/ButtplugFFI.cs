@@ -5,7 +5,7 @@ using ButtplugFFI;
 using System.Collections.Generic;
 using Google.Protobuf;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void ButtplugCallback(UIntPtr buf, int buf_length);

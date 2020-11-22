@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void ButtplugLogCallback(string log_msg);

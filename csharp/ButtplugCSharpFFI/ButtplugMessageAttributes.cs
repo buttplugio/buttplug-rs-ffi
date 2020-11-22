@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ButtplugFFI;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     public class ButtplugMessageAttributes
     {

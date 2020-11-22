@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ButtplugCSharpFFI
+namespace Buttplug
 {
     public class ButtplugDeviceException : ButtplugException
     {
