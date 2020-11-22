@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -70,7 +70,6 @@ namespace Buttplug
             {
                 aConnector = new ButtplugEmbeddedConnectorOptions();
             }
-            Console.WriteLine("Trying to connect");
             await ButtplugFFI.SendConnectLocal(
                 _messageSorter,
                 _clientHandle,
@@ -80,7 +79,6 @@ namespace Buttplug
                 aConnector.DeviceConfigJSON,
                 aConnector.UserDeviceConfigJSON,
                 aConnector.DeviceCommunicationManagerTypes);
-            Console.WriteLine("Connected");
         }
 
         public async Task Connect(ButtplugWebsocketConnectorOptions aConnector)

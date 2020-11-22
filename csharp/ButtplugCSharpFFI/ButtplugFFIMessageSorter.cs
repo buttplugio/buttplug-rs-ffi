@@ -51,7 +51,6 @@ namespace Buttplug
 
             var promise = new TaskCompletionSource<ButtplugFFIServerMessage>();
             _waitingMsgs.TryAdd(id, promise);
-            Console.WriteLine($"Sending a client message with Id {id}");
             return promise.Task;
         }
 
@@ -63,13 +62,11 @@ namespace Buttplug
 
             var promise = new TaskCompletionSource<ButtplugFFIServerMessage>();
             _waitingMsgs.TryAdd(id, promise);
-            Console.WriteLine($"Sending a client message with Id {id}");
             return promise.Task;
         }
 
         public void CheckMessage(ButtplugFFIServerMessage aMsg)
         {
-            Console.WriteLine($"Got a message back with Id {aMsg.Id}");
             // We'll never match a system message, those are server -> client only.
             if (aMsg.Id == 0)
             {
