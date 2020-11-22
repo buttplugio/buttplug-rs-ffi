@@ -64,31 +64,28 @@ namespace Buttplug
             SorterCallbackDelegate = SorterCallback;
             _clientHandle = ButtplugFFI.SendCreateClient(aClientName, SorterCallbackDelegate);
         }
-
-        public async Task ConnectLocal(
-            ButtplugServerOptions aOptions = null,
-            ushort aDeviceCommManagerTypes = (ushort)ClientMessage.Types.DeviceCommunicationManagerTypes.All)
+        public async Task Connect(ButtplugEmbeddedConnectorOptions aConnector)
         {
-            if (aOptions == null)
+            if (aConnector == null)
             {
-                aOptions = new ButtplugServerOptions();
+                aConnector = new ButtplugEmbeddedConnectorOptions();
             }
             Console.WriteLine("Trying to connect");
             await ButtplugFFI.SendConnectLocal(
                 _messageSorter,
                 _clientHandle,
-                aOptions.ServerName,
-                aOptions.MaxPingTime,
-                aOptions.AllowRawMessages,
-                aOptions.DeviceConfigurationJson,
-                aOptions.UserDeviceConfigurationJson,
-                aDeviceCommManagerTypes);
+                aConnector.ServerName,
+                aConnector.MaxPingTime,
+                aConnector.AllowRawMessages,
+                aConnector.DeviceConfigJSON,
+                aConnector.UserDeviceConfigJSON,
+                aConnector.DeviceCommunicationManagerTypes);
             Console.WriteLine("Connected");
         }
 
-        public async Task ConnectWebsocket()
+        public async Task Connect(ButtplugWebsocketConnectorOptions aConnector)
         {
-            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, "ws://127.0.0.1:12345", false);
+            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress, false);
         }
 
         public async Task Disconnect()
