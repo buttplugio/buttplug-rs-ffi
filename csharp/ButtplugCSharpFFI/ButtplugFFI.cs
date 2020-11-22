@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using ButtplugFFI;
 using System.Collections.Generic;
 using Google.Protobuf;
 

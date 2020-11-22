@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ButtplugCSharpFFI;
-using ButtplugFFI;
+using Buttplug;
 using System.ComponentModel;
 using System.Text;
 
