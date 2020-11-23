@@ -52,7 +52,7 @@ namespace ButtplugCSharpFFITest
             {
                 Console.WriteLine($"Device removed: {args.Device.Name}");
             };
-            await client.Connect(new Buttplug.ButtplugEmbeddedConnectorOptions());
+            await client.ConnectAsync(new Buttplug.ButtplugEmbeddedConnectorOptions());
             //await client.ConnectWebsocket();
             await client.StartScanningAsync();
             await WaitForKey();
