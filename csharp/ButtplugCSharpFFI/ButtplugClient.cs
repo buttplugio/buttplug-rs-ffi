@@ -171,6 +171,10 @@ namespace Buttplug
         {
             await ButtplugFFI.SendStopAllDevices(_messageSorter, _clientHandle);
         }
+        public async Task PingAsync()
+        {
+            await ButtplugFFI.SendPing(_messageSorter, _clientHandle);
+        }
 
         public void Dispose()
         {

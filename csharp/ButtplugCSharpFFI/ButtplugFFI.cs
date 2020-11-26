@@ -158,6 +158,15 @@ namespace Buttplug
             };
             return SendClientMessage(aSorter, aHandle, msg);
         }
+        internal static Task<ButtplugFFIServerMessage> SendPing(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle)
+        {
+            var msg = new ClientMessage();
+            msg.Message = new ClientMessage.Types.FFIMessage();
+            msg.Message.Ping = new ClientMessage.Types.Ping
+            {
+            };
+            return SendClientMessage(aSorter, aHandle, msg);
+        }
 
         internal static ButtplugFFIDeviceHandle SendCreateDevice(ButtplugFFIClientHandle aHandle, uint aDeviceIndex)
         {
