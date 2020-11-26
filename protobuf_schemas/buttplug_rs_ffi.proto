@@ -86,6 +86,9 @@ message ClientMessage {
   message Disconnect {
   }
 
+  message Ping {
+  }
+
   message FFIMessage {
     oneof msg {
       ConnectLocal connect_local = 1;
@@ -94,6 +97,7 @@ message ClientMessage {
       StopScanning stop_scanning = 4;
       StopAllDevices stop_all_devices = 5;
       Disconnect disconnect = 6;
+      Ping ping = 7;
     }
   }
 

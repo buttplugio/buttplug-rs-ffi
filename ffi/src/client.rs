@@ -78,6 +78,7 @@ impl ButtplugFFIClient {
       ClientMessageType::StopScanning(_) => self.stop_scanning(msg_id),
       ClientMessageType::StopAllDevices(_) => self.stop_all_devices(msg_id),
       ClientMessageType::Disconnect(_) => self.disconnect(msg_id),
+      ClientMessageType::Ping(_) => self.ping(msg_id),
     }
   }
 
@@ -189,6 +190,18 @@ impl ButtplugFFIClient {
     async_manager::spawn(async move {
       if let Some(usable_client) = &(*client.read().await) {
         return_client_result(msg_id, &usable_client.stop_scanning().await, &callback);
+      } else {
+        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
+      }
+    }).unwrap();
+  }
+
+  fn ping(&self, msg_id: u32) {
+    let client = self.client.clone();
+    let callback = self.callback.clone();
+    async_manager::spawn(async move {
+      if let Some(usable_client) = &(*client.read().await) {
+        return_client_result(msg_id, &usable_client.ping().await, &callback);
       } else {
         return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
       }
