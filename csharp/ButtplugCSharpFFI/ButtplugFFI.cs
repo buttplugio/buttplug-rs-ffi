@@ -68,6 +68,9 @@ namespace Buttplug
 
         [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_free_device(IntPtr device_handle);
+
+        [DllImport("buttplug_rs_ffi")]
+        internal static extern void buttplug_activate_env_logger();
     }
 
     internal class ButtplugFFI
@@ -333,6 +336,11 @@ namespace Buttplug
             };
             msg.Message.RawUnsubscribeCmd = cmd;
             return SendDeviceMessage(aSorter, aHandle, msg);
+        }
+
+        internal static void ActivateEnvLogger()
+        {
+            ButtplugFFICalls.buttplug_activate_env_logger();
         }
     }
 }
