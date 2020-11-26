@@ -150,7 +150,7 @@ namespace Buttplug
             return ButtplugFFI.SendRawUnsubscribeCmd(Sorter, Handle, Index, aEndpoint);
         }
 
-        public Task StopDeviceCmd()
+        public Task SendStopDeviceCmd()
         {
             // Every message should support this, but it doesn't hurt to check
             return ButtplugFFI.SendStopDeviceCmd(Sorter, Handle, Index);
