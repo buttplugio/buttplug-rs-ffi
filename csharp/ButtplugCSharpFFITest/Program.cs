@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Buttplug;
 using System.ComponentModel;
-using System.Text;
 
 namespace ButtplugCSharpFFITest
 {
@@ -44,17 +43,22 @@ namespace ButtplugCSharpFFITest
                 {
                     Console.WriteLine("Fetching Battery");
                     Console.WriteLine($"Battery: {await device.SendBatteryLevelCmd()}");
-                    await device.SendRawWriteCmd(Endpoint.Tx, Encoding.ASCII.GetBytes("Vibrate:10;"), false);
-                    //await device.SendVibrateCmd(0.5);
+                    //await device.SendRawWriteCmd(Endpoint.Tx, Encoding.ASCII.GetBytes("Vibrate:10;"), false);
+                    await device.SendVibrateCmd(0.5);
+                    await Task.Delay(500);
+                    await device.SendStopDeviceCmd();
                 }
             };
             client.DeviceRemoved += (obj, args) =>
             {
                 Console.WriteLine($"Device removed: {args.Device.Name}");
             };
-            await client.ConnectAsync(new Buttplug.ButtplugEmbeddedConnectorOptions());
-            //await client.ConnectWebsocket();
+            //await client.ConnectAsync(new Buttplug.ButtplugEmbeddedConnectorOptions());
+            await client.ConnectAsync(new Buttplug.ButtplugWebsocketConnectorOptions(new Uri("ws://localhost:12345")));
             await client.StartScanningAsync();
+            await WaitForKey();
+            Console.WriteLine("Disconnecting");
+            await client.DisconnectAsync();
             await WaitForKey();
             client.Dispose();
             client = null;
@@ -63,6 +67,7 @@ namespace ButtplugCSharpFFITest
 
         static void Main(string[] args)
         {
+            // ButtplugUtils.ActivateEnvLogger();
             RunExample().Wait();
         }
     }
