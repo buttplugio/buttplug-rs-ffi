@@ -1,6 +1,7 @@
 use super::{client::ButtplugFFIClient, device::ButtplugFFIDevice, FFICallback};
 use libc::c_char;
 use std::ffi::CStr;
+use tracing_subscriber;
 
 #[no_mangle]
 pub extern "C" fn buttplug_create_client(
@@ -80,5 +81,12 @@ pub extern "C" fn buttplug_free_device(ptr: *mut ButtplugFFIDevice) {
     unsafe {
       Box::from_raw(ptr);
     }
+  }
+}
+
+#[no_mangle]
+pub extern "C" fn buttplug_activate_env_logger() {
+  if tracing_subscriber::fmt::try_init().is_err() {
+    error!("Cannot re-init env logger, this should only be called once");
   }
 }
