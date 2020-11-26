@@ -1,3 +1,15 @@
+# 1.0.0 beta 4 (2020-11-26)
+
+## Features
+
+- Added client ping method
+- Added utility method for console logging
+
+## Bugfixes
+
+- StopDeviceCmd should now work on all devices, not just device with index 0
+- Disconnect should now actually disconnect
+
 # 1.0.0 Beta 1 (2020-11-23)
 
 ## Bugfixes
