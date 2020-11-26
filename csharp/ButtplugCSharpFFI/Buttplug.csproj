@@ -42,8 +42,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="ButtplugRustFFI" Version="1.0.0-beta.1" />
-    <PackageReference Include="Google.Protobuf" Version="3.13.0" />
+    <PackageReference Include="ButtplugRustFFI" Version="1.0.0-beta.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
 
