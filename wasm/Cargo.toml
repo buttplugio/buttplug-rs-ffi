@@ -1,14 +1,18 @@
 [package]
 name = "buttplug-wasm"
 version = "1.0.0-beta1"
-authors = ["Kyle Machulis <kyle@nonpolynomial.com>"]
+authors = ["Nonpolynomial, LLC <kyle@nonpolynomial.com>"]
 edition = "2018"
+description = "Buttplug WASM library for web applications (Node/Web). Does not work for native node."
+repository = "https://github.com/buttplugio/buttplug-rs-ffi"
+license = "BSD-3-Clause"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["console_error_panic_hook"]
+default = ["panic_hook"]
+panic_hook = ["console_error_panic_hook"]
 
 [build]
 rustflags = "--cfg=web_sys_unstable_apis"
