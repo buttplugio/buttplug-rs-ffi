@@ -14,7 +14,8 @@ use buttplug::{
       ButtplugConnectorTransport,
       ButtplugConnectorTransportConnectResult,
       ButtplugConnectorTransportSpecificError,
-      ButtplugTransportMessage,
+      ButtplugTransportIncomingMessage,
+      ButtplugTransportOutgoingMessage,
     },
     ButtplugConnectorError,
     ButtplugConnectorResultFuture,
@@ -24,6 +25,8 @@ use buttplug::{
 };
 use futures::{future, SinkExt, StreamExt};
 use std::sync::Arc;
+use async_channel::Sender;
+use async_lock::Mutex;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
@@ -33,6 +36,7 @@ use web_sys::{self, ErrorEvent, MessageEvent, WebSocket};
 pub struct ButtplugBrowserWebsocketClientTransport {
   /// Address of the server we'll connect to.
   address: String,
+  disconnect_sender: Arc<Mutex<Sender<ButtplugTransportOutgoingMessage>>>
 }
 
 impl ButtplugBrowserWebsocketClientTransport {
@@ -42,8 +46,10 @@ impl ButtplugBrowserWebsocketClientTransport {
   /// server. Address should be the full URL of the server, i.e.
   /// "ws://127.0.0.1:12345"
   pub fn new(address: &str) -> Self {
+    let (unused_sender, _) = bounded(256);
     Self {
       address: address.to_owned(),
+      disconnect_sender: Arc::new(Mutex::new(unused_sender))
     }
   }
 }
@@ -61,7 +67,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
         spawn_local(async move {
           if rscc
             .clone()
-            .send(ButtplugTransportMessage::Message(
+            .send(ButtplugTransportIncomingMessage::Message(
               ButtplugSerializedMessage::Text(str),
             ))
             .await
@@ -86,8 +92,18 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       spawn_local(async move {
         while let Ok(msg) = recvr_clone.recv().await {
           match msg {
-            ButtplugSerializedMessage::Text(text) => wscs.send_with_str(&text).unwrap(), //Message::Text(text),
-            ButtplugSerializedMessage::Binary(bin) => {} //Message::Binary(bin),
+            ButtplugTransportOutgoingMessage::Message(out_msg) => {
+              match out_msg {
+                ButtplugSerializedMessage::Text(text) => wscs.send_with_str(&text).unwrap(),
+                ButtplugSerializedMessage::Binary(bin) => {
+                  // TOOD Make this an error?
+                }
+              }
+            }
+            ButtplugTransportOutgoingMessage::Close => {
+              wscs.close();
+              return;
+            }
           };
           // TODO see what happens when we try to send to a remote that's closed connection.
         }
@@ -95,11 +111,28 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
     }) as Box<dyn FnMut(JsValue)>);
     ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
     onopen_callback.forget();
-    Box::pin(future::ready(Ok((request_sender, response_receiver))))
+    let disconnect_sender = self.disconnect_sender.clone();
+    Box::pin(async move{
+      *disconnect_sender.lock().await = request_sender.clone();
+      Ok((request_sender, response_receiver))
+    })
   }
 
   fn disconnect(self) -> ButtplugConnectorResultFuture {
-    // TODO We should definitely allow people to disconnect. That would be a good thing.
-    Box::pin(future::ready(Ok(())))
+    let disconnect_sender = self.disconnect_sender.clone();
+    Box::pin(async move {
+      // If we can't send the message, we have no loop, so we're not connected.
+      if disconnect_sender
+        .lock()
+        .await
+        .send(ButtplugTransportOutgoingMessage::Close)
+        .await
+        .is_err()
+      {
+        Err(ButtplugConnectorError::ConnectorNotConnected)
+      } else {
+        Ok(())
+      }
+    })
   }
 }
