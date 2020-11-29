@@ -4,7 +4,7 @@
     "Nonpolynomial, LLC <kyle@nonpolynomial.com>"
   ],
   "description": "Buttplug WASM library for web applications (Node/Web). Does not work for native node at the moment.",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0-beta2",
   "license": "BSD-3-Clause",
   "homepage": "https://buttplug.io",
   "repository": {
@@ -15,16 +15,9 @@
     "url": "https://github.com/buttplugio/buttplug-rs-ffi/issues"
   },
   "files": [
-    "buttplug-wasm.bundler/buttplug_wasm_bg.wasm",
-    "buttplug-wasm.bundler/buttplug_wasm_bg.wasm.d.ts",
-    "buttplug-wasm.bundler/buttplug_wasm_bg.js",
-    "buttplug-wasm.bundler/buttplug_wasm.js",
-    "buttplug-wasm.bundler/buttplug_wasm.d.ts",
-    "buttplug-wasm.web/buttplug_wasm_bg.wasm",
-    "buttplug-wasm.web/buttplug_wasm_bg.wasm.d.ts",
-    "buttplug-wasm.web/buttplug_wasm.js",
-    "buttplug-wasm.web/buttplug_wasm_bg.js",
-    "buttplug-wasm.web/buttplug_wasm.d.ts"
+    "buttplug-wasm.bundler/**",
+    "buttplug-wasm.web/**",
+    "LICENSE.md"
   ],
   "module": "buttplug-wasm.bundler/buttplug_wasm.js",
   "types": "buttplug-wasm.bundler/buttplug_wasm.d.ts",
