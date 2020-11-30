@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ButtplugRustFFI</id>
-    <version>1.0.0-beta.2</version>
+    <version>1.0.0-beta.3</version>
     <title>Buttplug</title>
     <authors>Nonpolynomial, LLC</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,8 +11,5 @@
     <copyright>Copyright 2017-2020 © Nonpolynomial. All rights reserved.</copyright>
     <repository type="git" url="https://github.com/buttplugio/buttplug-rs-ffi" />
     <description>FFI Layer for buttplug-rs. Used by other languages for implementing buttplug-rs bindings.</description>
-    <dependencies>
-      <dependency id="Microsoft.NETCore.Platforms" version="[1.0.1, )" />
-    </dependencies>
   </metadata>
 </package>
