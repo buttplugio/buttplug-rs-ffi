@@ -3,3 +3,4 @@
 **/properties/**
 **/.vs/**
 **/nupkg-build/**
+packages/**
