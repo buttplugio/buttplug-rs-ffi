@@ -1,3 +1,10 @@
+# 1.0.0 beta 5 (2020-11-28)
+
+## Bugfixes
+
+- Change Build system to account for .Net Core or .Net Framework building. Currently only works on
+  x64 builds, "Any CPU" will not work.
+
 # 1.0.0 beta 4 (2020-11-26)
 
 ## Features
