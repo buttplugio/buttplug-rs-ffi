@@ -12,6 +12,7 @@
     <Copyright>Copyright 2017-2020 © Nonpolynomial. All rights reserved.</Copyright>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <Description>Buttplug Sex Toy Control Library for .Net. FFI layer on top of Buttplug Rust for .Net Access. Contains full system (Core, Client, Server, Device Comm Managers, etc...) for Windows. (.Net Framework 4.7+/.Net Standard 2.0)</Description>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,7 +30,15 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -42,7 +51,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="ButtplugRustFFI" Version="1.0.0-beta.2" />
+    <PackageReference Include="ButtplugRustFFI" Version="1.0.0-beta.3" />
     <PackageReference Include="Google.Protobuf" Version="3.14.0" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
