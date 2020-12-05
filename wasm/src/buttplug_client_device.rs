@@ -313,6 +313,13 @@ impl ButtplugClientDevice {
       }
     })
   }
+
+  pub fn stop(&self) -> Promise {
+    let device = self.device.clone();
+    future_to_promise(async move {
+      match device.stop().await {
+        Ok(_) => Ok(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
