@@ -5,7 +5,10 @@ use buttplug::{
   },
   device::Endpoint
 };
-use super::event_manager::EventManager;
+use super::{
+  event_manager::EventManager,
+  errors::ButtplugError
+};
 use js_sys::{Promise, Array};
 use std::sync::Arc;
 use wasm_bindgen::prelude::*;
@@ -85,13 +88,15 @@ impl ButtplugClientDevice {
   }
 
   pub fn vibrate(&self, speed: &JsValue) -> Promise {
-    let argument_error = future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 or an array of f64's with the same bounds."))));
+    // This needs to be a closure that generates the promise on call, converting
+    // to a promise automatically runs the future.
+    let argument_error = || future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 or an array of f64's with the same bounds."))));
     let vibrate_command = if let Some(speed_f64) = speed.as_f64() {
       VibrateCommand::Speed(speed_f64)
     } else if Array::instanceof(speed) {
       let iter = match js_sys::try_iter(&Array::from(speed)) {
         Ok(iter) => iter.unwrap(),
-        Err(_) => return argument_error
+        Err(_) => return argument_error()
       };
       let mut speed_vec: Vec<f64> = vec!();
       for elem in iter {
@@ -99,19 +104,19 @@ impl ButtplugClientDevice {
         if let Some(val) = elem.as_f64() {
           speed_vec.push(val);
         } else {
-          return argument_error;
+          return argument_error();
         }
       }
       VibrateCommand::SpeedVec(speed_vec)
     } else {
-      return argument_error;
+      return argument_error();
     };
 
     let device = self.device.clone();
     future_to_promise(async move {
       match device.vibrate(vibrate_command).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -123,44 +128,46 @@ impl ButtplugClientDevice {
   }
 
   pub fn rotate(&self, speed_or_rotations: &JsValue, rotation: &JsValue) -> Promise {
-    let argument_failure = future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 and a bool, or an array of f64/bool pairs with the same bounds."))));
+    // This needs to be a closure that generates the promise on call, converting
+    // to a promise automatically runs the future.
+    let argument_failure = || future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 and a bool, or an array of f64/bool pairs with the same bounds."))));
     let rotate_command = if !rotation.is_undefined() || !rotation.is_null() {
       if let Some(value) = self.convert_to_rotate_command(speed_or_rotations, rotation) {
         RotateCommand::Rotate(value.0, value.1)
       } else {
-        return argument_failure; 
+        return argument_failure(); 
       }
     } else if Array::instanceof(speed_or_rotations) {
       let iter = match js_sys::try_iter(&Array::from(speed_or_rotations)) {
         Ok(iter) => iter.unwrap(),
-        Err(e) => return argument_failure
+        Err(e) => return argument_failure()
       };
       let mut rotation_vec: Vec<(f64, bool)> = vec!();
       for elem in iter {
         let elem = elem.unwrap();
         if !Array::instanceof(&elem) {
-          return argument_failure;
+          return argument_failure();
         }
         let value_array = Array::from(&elem);
         if value_array.length() != 2 {
-          return argument_failure;
+          return argument_failure();
         }
         if let Some(val) = self.convert_to_rotate_command(&value_array.get(0), &value_array.get(1)) {
           rotation_vec.push(val);
         } else {
-          return argument_failure;
+          return argument_failure();
         }
       }
       RotateCommand::RotateVec(rotation_vec)
     } else {
-      return argument_failure;
+      return argument_failure();
     };
 
     let device = self.device.clone();
     future_to_promise(async move {
       match device.rotate(rotate_command).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -172,44 +179,46 @@ impl ButtplugClientDevice {
   }
 
   pub fn linear(&self, duration_or_vectors: &JsValue, position: &JsValue) -> Promise {
-    let argument_failure = future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 and a u32, or an array of f64/u32 pairs with the same bounds."))));
+    // This needs to be a closure that generates the promise on call, converting
+    // to a promise automatically runs the future.
+    let argument_failure = || future_to_promise(future::ready(Err(JsValue::from_str("Invalid argument type, must be a f64 between 0.0 and 1.0 and a u32, or an array of f64/u32 pairs with the same bounds."))));
     let linear_command = if !position.is_undefined() || !position.is_null() {
       if let Some(value) = self.convert_to_linear_command(duration_or_vectors, position) {
         LinearCommand::Linear(value.0, value.1)
       } else {
-        return argument_failure; 
+        return argument_failure(); 
       }
     } else if Array::instanceof(duration_or_vectors) {
       let iter = match js_sys::try_iter(&Array::from(duration_or_vectors)) {
         Ok(iter) => iter.unwrap(),
-        Err(e) => return argument_failure
+        Err(e) => return argument_failure()
       };
       let mut linear_vec = vec!();
       for elem in iter {
         let elem = elem.unwrap();
         if !Array::instanceof(&elem) {
-          return argument_failure;
+          return argument_failure();
         }
         let value_array = Array::from(&elem);
         if value_array.length() != 2 {
-          return argument_failure;
+          return argument_failure();
         }
         if let Some(val) = self.convert_to_linear_command(&value_array.get(0), &value_array.get(1)) {
           linear_vec.push(val);
         } else {
-          return argument_failure;
+          return argument_failure();
         }
       }
       LinearCommand::LinearVec(linear_vec)
     } else {
-      return argument_failure;
+      return argument_failure();
     };
 
     let device = self.device.clone();
     future_to_promise(async move {
       match device.linear(linear_command).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -220,7 +229,7 @@ impl ButtplugClientDevice {
     future_to_promise(async move {
       match device.battery_level().await {
         Ok(level) => Ok(JsValue::from(level)),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -231,7 +240,7 @@ impl ButtplugClientDevice {
     future_to_promise(async move {
       match device.rssi_level().await {
         Ok(level) => Ok(JsValue::from(level)),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -254,7 +263,7 @@ impl ButtplugClientDevice {
     future_to_promise(async move {
       match device.raw_read(endpoint, length, timeout).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -276,7 +285,7 @@ impl ButtplugClientDevice {
     future_to_promise(async move {
       match device.raw_write(endpoint, data_vec, wwr).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -288,7 +297,7 @@ impl ButtplugClientDevice {
     future_to_promise(async move {
       match device.raw_subscribe(endpoint).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
       }
     })
   }
@@ -300,7 +309,10 @@ impl ButtplugClientDevice {
     future_to_promise(async move {
       match device.raw_unsubscribe(endpoint).await {
         Ok(_) => Ok(JsValue::null()),
-        Err(_) => Err(JsValue::null()),
+        Err(e) => Err(JsValue::from(ButtplugError::from(e))),
+      }
+    })
+  }
       }
     })
   }

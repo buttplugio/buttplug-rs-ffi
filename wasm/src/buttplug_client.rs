@@ -6,6 +6,7 @@ use buttplug::{
   core::messages::serializer::ButtplugClientJSONSerializer,
 };
 use super::{
+  errors::ButtplugError,
   event_manager::EventManager, 
   buttplug_client_device::ButtplugClientDevice, 
   webbluetooth_manager::WebBluetoothCommunicationManager,
@@ -220,9 +221,10 @@ impl ButtplugClient {
           &address,
         ),
       );
-      let (client, event_stream) = buttplug::client::ButtplugClient::connect(&client_name_clone, connector)
-        .await
-        .unwrap();
+      let (client, event_stream) = match buttplug::client::ButtplugClient::connect(&client_name_clone, connector).await {
+        Ok((client, event_stream)) => (client, event_stream),
+        Err(e) => return Err(JsValue::from(ButtplugError::from(e)))
+      };
       let event_manager = Arc::new(EventManager::default());
       let event_manager_clone = event_manager.clone();
       spawn_local(async move {
@@ -245,7 +247,7 @@ impl ButtplugClient {
         .disconnect()
         .await
         .and_then(|_| Ok(JsValue::null()))
-        .map_err(|e| JsValue::from(format!("{}", e)))
+        .map_err(|e| JsValue::from(ButtplugError::from(e)))
     })
   }
 
@@ -273,7 +275,7 @@ impl ButtplugClient {
         .start_scanning()
         .await
         .and_then(|_| Ok(JsValue::null()))
-        .map_err(|e| JsValue::from(format!("{}", e)))
+        .map_err(|e| JsValue::from(ButtplugError::from(e)))
     })
   }
 
@@ -285,7 +287,7 @@ impl ButtplugClient {
         .stop_scanning()
         .await
         .and_then(|_| Ok(JsValue::null()))
-        .map_err(|e| JsValue::from(format!("{}", e)))
+        .map_err(|e| JsValue::from(ButtplugError::from(e)))
     })
   }
 
@@ -307,7 +309,7 @@ impl ButtplugClient {
         .stop_all_devices()
         .await
         .and_then(|_| Ok(JsValue::null()))
-        .map_err(|e| JsValue::from(format!("{}", e)))
+        .map_err(|e| JsValue::from(ButtplugError::from(e)))
     })
   }
 }

@@ -13,6 +13,7 @@ mod utils;
 mod webbluetooth_device;
 mod webbluetooth_manager;
 mod websocket_client_connector;
+mod errors;
 
 pub use buttplug_client::ButtplugClient;
 use wasm_bindgen::prelude::*;
