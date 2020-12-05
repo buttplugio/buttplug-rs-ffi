@@ -180,7 +180,7 @@ impl ButtplugClient {
     })
   }
 
-  pub fn connect_embedded(client_name: &str, options: &ButtplugEmbeddedConnectorOptions) -> Promise {
+  fn connect_embedded(client_name: &str, options: &ButtplugEmbeddedConnectorOptions) -> Promise {
     let server_opts = options.clone();
     let client_name_clone = client_name.to_owned();
     future_to_promise(async move {
@@ -208,7 +208,7 @@ impl ButtplugClient {
     })
   }
 
-  pub fn connect_websocket(client_name: &str, options: &ButtplugWebsocketConnectorOptions) -> Promise {
+  fn connect_websocket(client_name: &str, options: &ButtplugWebsocketConnectorOptions) -> Promise {
     let address = options.address.clone();
     let client_name_clone = client_name.to_owned();
     future_to_promise(async move {
