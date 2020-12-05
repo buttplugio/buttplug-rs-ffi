@@ -2,95 +2,129 @@ use buttplug::{
   client::{
     ButtplugClientEvent,
   },
-  connector::{ButtplugInProcessClientConnector, ButtplugRemoteClientConnector},
+  connector::{ButtplugInProcessClientConnector, ButtplugRemoteClientConnector, ButtplugConnectorError},
   core::messages::serializer::ButtplugClientJSONSerializer,
 };
 use super::{
   event_manager::EventManager, 
   buttplug_client_device::ButtplugClientDevice, 
   webbluetooth_manager::WebBluetoothCommunicationManager,
-  websocket_client_connector::ButtplugBrowserWebsocketClientTransport
+  websocket_client_connector::ButtplugBrowserWebsocketClientTransport,
+  utils::generic_of_jsval
 };
 use futures::StreamExt;
 use js_sys::{Array, Promise};
 use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{future_to_promise, spawn_local};
+use serde::{Serialize, Deserialize};
 
 // This is a copy of ButtplugServerOptions from the buttplug-rs library.
 // However, since that doesn't have a wasm-bindgen marker on it, we can't use it
-// here. Is there a way to mark external types for WASM Bindgen?
+// here, so we'll need to update this whenever that option set changes.
 #[wasm_bindgen]
-#[derive(Debug, Clone, Default)]
-pub struct ButtplugServerOptions {
-  pub(self) options: buttplug::server::ButtplugServerOptions
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ButtplugEmbeddedConnectorOptions {
+  server_name: String,
+  max_ping_time: u64,
+  allow_raw_messages: bool,
+  device_configuration_json: Option<String>,
+  user_device_configuration_json: Option<String>,
 }
 
 #[wasm_bindgen]
-impl ButtplugServerOptions {
+impl ButtplugEmbeddedConnectorOptions {
+  #[wasm_bindgen(constructor)]
   pub fn new() -> Self {
-    Self {
-      options: buttplug::server::ButtplugServerOptions::default()
-    }
+    ButtplugEmbeddedConnectorOptions::default()
   }
 
   #[wasm_bindgen(getter)]
-  pub fn name(&self) -> String {
-      self.options.name.clone()
+  pub fn server_name(&self) -> String {
+      self.server_name.clone()
   }
 
   #[wasm_bindgen(setter)]
-  pub fn set_name(&mut self, name: String) {
-      self.options.name = name;
+  pub fn set_server_name(&mut self, name: String) {
+      self.server_name = name;
   }
 
   #[wasm_bindgen(getter)]
   pub fn max_ping_time(&self) -> u64 {
-    self.options.max_ping_time
+    self.max_ping_time
   }
 
   #[wasm_bindgen(setter)]
   pub fn set_max_ping_time(&mut self, max_ping_time: u64) {
-    self.options.max_ping_time = max_ping_time;
+    self.max_ping_time = max_ping_time;
   }
 
   #[wasm_bindgen(getter)]
   pub fn allow_raw_messages(&self) -> bool {
-    self.options.allow_raw_messages
+    self.allow_raw_messages
   }
 
   #[wasm_bindgen(setter)]
   pub fn set_allow_raw_messages(&mut self, allow_raw_messages: bool) {
-    self.options.allow_raw_messages = allow_raw_messages;
+    self.allow_raw_messages = allow_raw_messages;
   }
 
   #[wasm_bindgen(getter)]
   pub fn device_configuration_json(&self) -> Option<String> {
-    self.options.device_configuration_json.clone()
+    self.device_configuration_json.clone()
   }
 
   #[wasm_bindgen(setter)]
   pub fn set_device_configuration_json(&mut self, device_configuration_json: Option<String>) {
-    self.options.device_configuration_json = device_configuration_json;
+    self.device_configuration_json = device_configuration_json;
   }
 
   #[wasm_bindgen(getter)]
   pub fn user_device_configuration_json(&self) -> Option<String> {
-    self.options.user_device_configuration_json.clone()
+    self.user_device_configuration_json.clone()
   }
 
   #[wasm_bindgen(setter)]
   pub fn set_user_device_configuration_json(&mut self, user_device_configuration_json: Option<String>) {
-    self.options.user_device_configuration_json = user_device_configuration_json;
+    self.user_device_configuration_json = user_device_configuration_json;
   }
 }
 
-impl From<ButtplugServerOptions> for buttplug::server::ButtplugServerOptions {
-  fn from(other: ButtplugServerOptions) -> Self {
-      other.options
+impl Into<buttplug::server::ButtplugServerOptions> for ButtplugEmbeddedConnectorOptions {
+  fn into(self) -> buttplug::server::ButtplugServerOptions {
+      let mut options = buttplug::server::ButtplugServerOptions::default();
+      options.name = self.server_name;
+      options.max_ping_time = self.max_ping_time;
+      options.allow_raw_messages = self.allow_raw_messages;
+      options.device_configuration_json = self.device_configuration_json;
+      options.user_device_configuration_json = self.user_device_configuration_json;
+      options
   }
 }
 
+#[wasm_bindgen]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ButtplugWebsocketConnectorOptions {
+  address: String,
+}
+
+#[wasm_bindgen]
+impl ButtplugWebsocketConnectorOptions {
+  #[wasm_bindgen(constructor)]
+  pub fn new() -> Self {
+    ButtplugWebsocketConnectorOptions::default()
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn address(&self) -> String {
+      self.address.clone()
+  }
+
+  #[wasm_bindgen(setter)]
+  pub fn set_address(&mut self, address: String) {
+      self.address = address;
+  }
+}
 
 #[wasm_bindgen]
 pub struct ButtplugClient {
@@ -133,24 +167,30 @@ impl ButtplugClient {
     self.client.connected()
   }
 
-  #[allow(non_snake_case)]
-  pub fn connectEmbedded() -> Promise {
-    let mut options = ButtplugServerOptions::default();
-    options.set_name("Buttplug WASM Browser Server".to_owned());
-    ButtplugClient::connectEmbeddedWithOptions(&options)
+  pub fn connect(client_name: &str, connector_options: &JsValue) -> Promise {
+    if let Ok(server_options) = generic_of_jsval(connector_options.clone(), "ButtplugEmbeddedConnectorOptions") {
+      return ButtplugClient::connect_embedded(client_name, &server_options);
+    }
+    if let Ok(websocket_options) = generic_of_jsval(connector_options.clone(), "ButtplugWebsocketConnectorOptions") {
+      return ButtplugClient::connect_websocket(client_name, &websocket_options);
+    }
+
+    future_to_promise(async move {
+      Err(JsValue::from(format!("{}", ButtplugConnectorError::ConnectorGenericError("Did not specify usable connector options".to_owned()))))
+    })
   }
 
-  #[allow(non_snake_case)]
-  pub fn connectEmbeddedWithOptions(options: &ButtplugServerOptions) -> Promise {
+  pub fn connect_embedded(client_name: &str, options: &ButtplugEmbeddedConnectorOptions) -> Promise {
     let server_opts = options.clone();
+    let client_name_clone = client_name.to_owned();
     future_to_promise(async move {
-      let connector = ButtplugInProcessClientConnector::new_with_options(&server_opts.options).map_err(|e| JsValue::from(format!("{}", e)))?;
+      let connector = ButtplugInProcessClientConnector::new_with_options(&server_opts.into()).map_err(|e| JsValue::from(format!("{}", e)))?;
       connector
         .server_ref()
         .add_comm_manager::<WebBluetoothCommunicationManager>()
         .unwrap();
       // This is infallible due to the in process connector, we can call unwrap here.
-      let (client, event_stream) = buttplug::client::ButtplugClient::connect("Example Client", connector)
+      let (client, event_stream) = buttplug::client::ButtplugClient::connect(&client_name_clone, connector)
         .await
         .unwrap();
       let event_manager = Arc::new(EventManager::default());
@@ -167,10 +207,10 @@ impl ButtplugClient {
       )
     })
   }
-  
-  #[allow(non_snake_case)]
-  pub fn connectWebsocket(js_address: &JsValue) -> Promise {
-    let address = js_address.as_string().unwrap();
+
+  pub fn connect_websocket(client_name: &str, options: &ButtplugWebsocketConnectorOptions) -> Promise {
+    let address = options.address.clone();
+    let client_name_clone = client_name.to_owned();
     future_to_promise(async move {
       let connector = ButtplugRemoteClientConnector::<
         ButtplugBrowserWebsocketClientTransport,
@@ -180,7 +220,7 @@ impl ButtplugClient {
           &address,
         ),
       );
-      let (client, event_stream) = buttplug::client::ButtplugClient::connect("WASM Client", connector)
+      let (client, event_stream) = buttplug::client::ButtplugClient::connect(&client_name_clone, connector)
         .await
         .unwrap();
       let event_manager = Arc::new(EventManager::default());
