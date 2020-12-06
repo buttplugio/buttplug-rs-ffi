@@ -31,11 +31,7 @@ impl ButtplugFFIDevice {
     }
   }
 
-  pub fn parse_message(&self, buf: *const u8, buf_len: i32) {
-    let msg_ptr: &[u8];
-    unsafe {
-      msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
-    }
+  pub fn parse_message(&self, msg_ptr: &[u8]) {
     let device_msg = DeviceMessage::decode(msg_ptr).unwrap();
     let msg_id = device_msg.id;
     match device_msg.message.unwrap().msg.unwrap() {

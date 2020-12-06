@@ -15,6 +15,10 @@ use buttplug::{
   device::Endpoint,
 };
 use prost::Message;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+#[cfg(feature = "wasm")]
+use js_sys::Uint8Array;
 use std::convert::{TryFrom, TryInto};
 use std::error::Error;
 
@@ -24,7 +28,14 @@ pub fn send_server_message(message: &FFIServerMessage, callback: &Option<FFICall
   }
   let mut buf = vec![];
   message.encode(&mut buf).unwrap();
+  #[cfg(not(feature = "wasm"))]
   callback.unwrap()(buf.as_ptr(), buf.len() as u32);
+  #[cfg(feature = "wasm")]
+  {
+    let this = JsValue::null();
+    let uint8buf = unsafe { Uint8Array::new(&Uint8Array::view(&buf)) };
+    callback.clone().unwrap().call1(&this, &JsValue::from(uint8buf));
+  }
 }
 
 pub fn return_client_result(

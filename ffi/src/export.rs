@@ -1,6 +1,9 @@
 use super::{client::ButtplugFFIClient, device::ButtplugFFIDevice, FFICallback};
 use libc::c_char;
-use std::ffi::CStr;
+use std::{
+  ffi::CStr,
+  slice
+};
 use tracing_subscriber;
 
 #[no_mangle]
@@ -43,7 +46,11 @@ pub extern "C" fn buttplug_parse_client_message(
     assert!(!client_ptr.is_null());
     &mut *client_ptr
   };
-  client.parse_message(buf, buf_len);
+  let msg_ptr;
+  unsafe {
+    msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
+  }
+  client.parse_message(msg_ptr);
 }
 
 #[no_mangle]
@@ -72,7 +79,11 @@ pub extern "C" fn buttplug_parse_device_message(
     assert!(!device_ptr.is_null());
     &mut *device_ptr
   };
-  device.parse_message(buf, buf_len);
+  let msg_ptr;
+  unsafe {
+    msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
+  }
+  device.parse_message(msg_ptr);
 }
 
 #[no_mangle]

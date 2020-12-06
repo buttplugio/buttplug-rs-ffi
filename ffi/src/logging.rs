@@ -1,10 +1,15 @@
-use buttplug::util::logging::ChannelWriter;
+use buttplug::{
+  util::logging::ChannelWriter,
+  util::async_manager
+};
 use std::{
   ffi::{CString, CStr},
   str::FromStr
 };
+#[cfg(not(feature = "wasm"))]
 use libc::c_char;
-use async_std::task;
+#[cfg(feature = "wasm")]
+use super::wasm_types::c_char;
 use async_channel::bounded;
 use tracing::{Level};
 use futures::StreamExt;
@@ -26,7 +31,7 @@ type LogFFICallback = extern "C" fn(*const c_char);
 #[no_mangle]
 pub extern "C" fn buttplug_set_log_callback(callback: LogFFICallback, max_level_cchar: *const c_char) {
   let (sender, mut receiver) = bounded(256);
-  task::spawn(async move {
+  async_manager::spawn(async move {
     while let Some(msg) = receiver.next().await {
       let str = CString::new(msg).expect("Issue with conversion of log message.");
       callback(str.as_ptr());

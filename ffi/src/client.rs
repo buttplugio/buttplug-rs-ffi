@@ -8,11 +8,18 @@ use super::{
   }
 };
 use std::{slice, sync::Arc};
-use async_std::sync::RwLock;
+use async_lock::RwLock;
 use buttplug::{
   core::messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer},
   client::{ButtplugClient, ButtplugClientEvent, device::ButtplugClientDevice},
-  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugConnectorError, ButtplugWebsocketClientTransport, ButtplugRemoteClientConnector},
+  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugConnectorError, ButtplugRemoteClientConnector},
+  server::ButtplugServerOptions,
+  util::async_manager
+};
+use dashmap::DashMap;
+#[cfg(not(feature = "wasm"))]
+use buttplug::{
+  connector::ButtplugWebsocketClientTransport,
   server::{
     comm_managers::{
       btleplug::BtlePlugCommunicationManager,
@@ -20,13 +27,10 @@ use buttplug::{
         LovenseHIDDongleCommunicationManager, LovenseSerialDongleCommunicationManager,
       },
       serialport::SerialPortCommunicationManager,
-    },
-    ButtplugServerOptions,
-  },
-  util::async_manager
+    }
+  }
 };
-use dashmap::DashMap;
-#[cfg(target_os = "windows")]
+#[cfg(all(target_os = "windows", not(feature = "wasm")))]
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use futures::StreamExt;
 use prost::Message;
@@ -57,18 +61,14 @@ impl ButtplugFFIClient {
   pub fn get_device(&self, device_index: u32) -> Option<ButtplugFFIDevice> {
     if self.devices.contains_key(&device_index) {
       let device = self.devices.get(&device_index).unwrap();
-      Some(ButtplugFFIDevice::new(device.value().clone(), self.callback))
+      Some(ButtplugFFIDevice::new(device.value().clone(), self.callback.clone()))
     } else {
       error!("Device id {} not available.", device_index);
       None
     }
   }
 
-  pub fn parse_message(&self, buf: *const u8, buf_len: i32) {
-    let msg_ptr: &[u8];
-    unsafe {
-      msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
-    }
+  pub fn parse_message(&self, msg_ptr: &[u8]) {
     let client_msg = ClientMessage::decode(msg_ptr).unwrap();
     let msg_id = client_msg.id;
     match client_msg.message.unwrap().msg.unwrap() {
@@ -109,7 +109,7 @@ impl ButtplugFFIClient {
                 // the FFI client somehow.
                 _ => {}
               };
-              send_event(e, event_callback);
+              send_event(e, event_callback.clone());
             }
           }).unwrap();
           return_ok(client_msg_id, &callback);    
@@ -130,25 +130,29 @@ impl ButtplugFFIClient {
     options.user_device_configuration_json = if connect_local_msg.user_device_configuration_json.is_empty() { None } else { Some(connect_local_msg.user_device_configuration_json.clone()) };
     let connector = ButtplugInProcessClientConnector::new_with_options(&options).unwrap();
     let device_mgrs = connect_local_msg.comm_manager_types;
-    if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0 || device_mgrs == 0 {
-      connector.server_ref().add_comm_manager::<LovenseHIDDongleCommunicationManager>().unwrap(); 
-    }
-    if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0 || device_mgrs == 0 {
-      connector.server_ref().add_comm_manager::<LovenseSerialDongleCommunicationManager>().unwrap(); 
-    }
-    if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u32 > 0 || device_mgrs == 0 {
-      connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap(); 
-    }
-    #[cfg(target_os="windows")]
-    if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
-      connector.server_ref().add_comm_manager::<XInputDeviceCommunicationManager>().unwrap(); 
-    }
-    if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
-      connector.server_ref().add_comm_manager::<SerialPortCommunicationManager>().unwrap(); 
+    #[cfg(not(feature = "wasm"))]
+    {
+      if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0 || device_mgrs == 0 {
+        connector.server_ref().add_comm_manager::<LovenseHIDDongleCommunicationManager>().unwrap(); 
+      }
+      if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0 || device_mgrs == 0 {
+        connector.server_ref().add_comm_manager::<LovenseSerialDongleCommunicationManager>().unwrap(); 
+      }
+      if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u32 > 0 || device_mgrs == 0 {
+        connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap(); 
+      }
+      #[cfg(target_os="windows")]
+      if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
+        connector.server_ref().add_comm_manager::<XInputDeviceCommunicationManager>().unwrap(); 
+      }
+      if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
+        connector.server_ref().add_comm_manager::<SerialPortCommunicationManager>().unwrap(); 
+      }
     }
     self.connect(msg_id, connector);
   }
 
+  #[cfg(not(feature = "wasm"))]
   fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket) {
     let connector: ButtplugRemoteClientConnector<_, ButtplugClientJSONSerializer> = if connect_websocket_msg.address.contains("wss://") {
       let transport = ButtplugWebsocketClientTransport::new_secure_connector(&connect_websocket_msg.address, connect_websocket_msg.bypass_cert_verification);
@@ -158,6 +162,10 @@ impl ButtplugFFIClient {
       ButtplugRemoteClientConnector::new(transport)
     };
     self.connect(msg_id, connector);
+  }
+
+  #[cfg(feature = "wasm")]
+  fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket) {
   }
 
   fn disconnect(&self, msg_id: u32) {
