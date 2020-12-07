@@ -18,6 +18,8 @@ mod logging;
 mod wasm_types;
 #[cfg(feature = "wasm")]
 mod export_wasm;
+#[cfg(feature = "wasm")]
+mod wasm;
 
 #[cfg(not(feature = "wasm"))]
 pub use export::*;

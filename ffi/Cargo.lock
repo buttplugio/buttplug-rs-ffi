@@ -387,6 +387,8 @@ dependencies = [
  "async-channel",
  "async-lock",
  "async-std",
+ "async-trait",
+ "broadcaster",
  "buttplug",
  "dashmap 3.11.10",
  "futures",
@@ -401,6 +403,8 @@ dependencies = [
  "uuid",
  "vergen",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys 0.3.45",
 ]
 
 [[package]]
@@ -914,7 +918,7 @@ dependencies = [
  "futures-core",
  "js-sys",
  "wasm-bindgen",
- "web-sys",
+ "web-sys 0.3.46",
 ]
 
 [[package]]
@@ -1717,7 +1721,7 @@ dependencies = [
  "once_cell",
  "spin",
  "untrusted",
- "web-sys",
+ "web-sys 0.3.46",
  "winapi",
 ]
 
@@ -2320,7 +2324,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "js-sys",
  "wasm-bindgen",
- "web-sys",
+ "web-sys 0.3.46",
 ]
 
 [[package]]
@@ -2351,6 +2355,14 @@ name = "wasm-bindgen-shared"
 version = "0.2.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e7811dd7f9398f14cc76efd356f98f03aa30419dea46aa810d71e819fc97158"
+
+[[package]]
+name = "web-sys"
+version = "0.3.45"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "web-sys"

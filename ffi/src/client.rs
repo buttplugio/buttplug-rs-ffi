@@ -17,6 +17,11 @@ use buttplug::{
   util::async_manager
 };
 use dashmap::DashMap;
+#[cfg(feature = "wasm")]
+use super::wasm::{
+  webbluetooth_manager::WebBluetoothCommunicationManager,
+  websocket_client_connector::ButtplugBrowserWebsocketClientTransport
+};
 #[cfg(not(feature = "wasm"))]
 use buttplug::{
   connector::ButtplugWebsocketClientTransport,
@@ -149,6 +154,10 @@ impl ButtplugFFIClient {
         connector.server_ref().add_comm_manager::<SerialPortCommunicationManager>().unwrap(); 
       }
     }
+    #[cfg(feature = "wasm")] 
+    {
+      connector.server_ref().add_comm_manager::<WebBluetoothCommunicationManager>().unwrap(); 
+    }
     self.connect(msg_id, connector);
   }
 
@@ -166,6 +175,15 @@ impl ButtplugFFIClient {
 
   #[cfg(feature = "wasm")]
   fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket) {
+    let connector = ButtplugRemoteClientConnector::<
+        ButtplugBrowserWebsocketClientTransport,
+        ButtplugClientJSONSerializer,
+      >::new(
+        ButtplugBrowserWebsocketClientTransport::new(
+          &connect_websocket_msg.address,
+        ),
+      );
+    self.connect(msg_id, connector);
   }
 
   fn disconnect(&self, msg_id: u32) {

@@ -9,7 +9,7 @@ edition = "2018"
 
 [features]
 default = ["buttplug/async-std-runtime", "buttplug/btleplug-manager", "buttplug/websockets", "buttplug/xinput-manager", "buttplug/serial-manager", "buttplug/lovense-dongle-manager"]
-wasm = ["wasm-bindgen", "uuid", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime"]
+wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures", "broadcaster"]
 
 [dependencies]
 # buttplug = { version = "0.11.1", default-features = false, features = ["client", "server", "serialize-json"] }
@@ -29,6 +29,9 @@ uuid = { version = "0.8.1", features = ["wasm-bindgen"], optional = true }
 async-lock = "2.3.0"
 js-sys = { version = "0.3.45", optional = true }
 tracing-wasm = { version = "0.1.0", optional = true }
+async-trait = { version = "0.1.42", optional = true }
+wasm-bindgen-futures = { version = "0.4.19", optional = true }
+broadcaster = { version = "1.0.0", optional = true }
 
 [build-dependencies]
 prost-build = "0.6.1"
@@ -38,3 +41,30 @@ vergen = "3.1.0"
 name = "buttplug_rs_ffi"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
+
+[dependencies.web-sys]
+#version = "0.3.45"
+path = "../../wasm-bindgen/crates/web-sys"
+#git = "https://github.com/rustwasm/wasm-bindgen"
+optional = true
+features = [
+  "Navigator",
+  "Bluetooth",
+  "BluetoothDevice",
+  "BluetoothLeScanFilterInit",
+  "BluetoothRemoteGattCharacteristic",
+  "BluetoothRemoteGattServer",
+  "BluetoothRemoteGattService",
+  "BinaryType",
+  "Blob",
+  "console",
+  "DataView",
+  "ErrorEvent",
+  "Event",
+  "FileReader",
+  "MessageEvent",
+  "ProgressEvent",
+  "RequestDeviceOptions",
+  "WebSocket",
+  "Window",
+]
