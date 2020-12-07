@@ -1,3 +1,4 @@
+/*
 console.log(performance.now() / 1000);
 import { buttplug_create_client, buttplug_parse_client_message, buttplug_activate_env_logger } from "buttplug-rs-ffi";
 import { Buttplug } from "./buttplug_ffi";
@@ -25,3 +26,20 @@ let connect_msg = Buttplug.ClientMessage.create({
 let buffer = Buffer.from(Buttplug.ClientMessage.encode(connect_msg).finish())
 buttplug_parse_client_message(client, buffer);
 console.log(performance.now() / 1000);
+*/
+
+import { ButtplugClient } from "./client";
+import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
+
+async function run() {
+  let client = new ButtplugClient("test");
+  //client.connect(new ButtplugEmbeddedConnectorOptions()).then(() => "Done trying to connect");
+  // let options = new ButtplugWebsocketConnectorOptions();
+  let options = new ButtplugEmbeddedConnectorOptions();
+  await client.connect(options);
+  await client.startScanning();
+}
+
+// run().then(() => console.log("Done"));
+let el = document.getElementById("run");
+el!.addEventListener("click", async () => await run());
