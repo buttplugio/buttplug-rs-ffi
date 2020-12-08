@@ -1,4 +1,4 @@
-import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device } from "buttplug-rs-ffi";
+import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_parse_device_message } from "buttplug-rs-ffi";
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "connectors";
 import { ButtplugMessageSorter } from "sorter";
 import { Buttplug } from "./buttplug_ffi";
@@ -59,12 +59,76 @@ export function stopScanning(sorter: ButtplugMessageSorter, clientPtr: number) {
   return sendClientMessage(sorter, clientPtr, msg);
 }
 
+export function stopAllDevices(sorter: ButtplugMessageSorter, clientPtr: number) {
+  let msg = Buttplug.ClientMessage.create({
+    message: Buttplug.ClientMessage.FFIMessage.create({
+      stopAllDevices: Buttplug.ClientMessage.StopAllDevices.create({})
+    }),
+    id: 1
+  });
+  return sendClientMessage(sorter, clientPtr, msg);
+}
+
+function sendDeviceMessage(sorter: ButtplugMessageSorter, devicePtr: number, message: Buttplug.DeviceMessage): Promise<Buttplug.ButtplugFFIServerMessage> {
+  let promise = sorter.PrepareOutgoingMessage(message);
+  let buffer = Buffer.from(Buttplug.DeviceMessage.encode(message).finish())
+  buttplug_parse_device_message(devicePtr, buffer);
+  return promise;
+}
+
+export function vibrate(sorter: ButtplugMessageSorter, devicePtr: number, speeds: Buttplug.DeviceMessage.VibrateComponent[]) {
+  let msg = Buttplug.DeviceMessage.create({
+    message: Buttplug.DeviceMessage.FFIMessage.create({
+      vibrateCmd: Buttplug.DeviceMessage.VibrateCmd.create({
+        speeds: speeds
+      })
+    }),
+    id: 1
+  });
+  return sendDeviceMessage(sorter, devicePtr, msg);
+}
+
+export function rotate(sorter: ButtplugMessageSorter, devicePtr: number, rotations: Buttplug.DeviceMessage.RotateComponent[]) {
+  let msg = Buttplug.DeviceMessage.create({
+    message: Buttplug.DeviceMessage.FFIMessage.create({
+      rotateCmd: Buttplug.DeviceMessage.RotateCmd.create({
+        rotations: rotations
+      })
+    }),
+    id: 1
+  });
+  return sendDeviceMessage(sorter, devicePtr, msg);
+}
+
+export function linear(sorter: ButtplugMessageSorter, devicePtr: number, vectors: Buttplug.DeviceMessage.LinearComponent[]) {
+  let msg = Buttplug.DeviceMessage.create({
+    message: Buttplug.DeviceMessage.FFIMessage.create({
+      linearCmd: Buttplug.DeviceMessage.LinearCmd.create({
+        movements: vectors
+      })
+    }),
+    id: 1
+  });
+  return sendDeviceMessage(sorter, devicePtr, msg);
+}
+
+export function stopDevice(sorter: ButtplugMessageSorter, devicePtr: number) {
+  let msg = Buttplug.DeviceMessage.create({
+    message: Buttplug.DeviceMessage.FFIMessage.create({
+      stopDeviceCmd: Buttplug.DeviceMessage.StopDeviceCmd.create({
+      })
+    }),
+    id: 1
+  });
+  return sendDeviceMessage(sorter, devicePtr, msg);
+}
+
 export function createClientPtr(eventCallback: Function, clientName: string): number {
   return buttplug_create_client(eventCallback, clientName);
 }
 
-export function createDevicePtr(): number| null {
-  return null;
+export function createDevicePtr(clientPtr: number, deviceIndex: number): number | null {
+  return buttplug_create_device(clientPtr, deviceIndex);
 }
 
 export function freeClientPtr(clientPtr: number) {

@@ -28,6 +28,7 @@ buttplug_parse_client_message(client, buffer);
 console.log(performance.now() / 1000);
 */
 
+import { ButtplugClientDevice } from "device";
 import { ButtplugClient } from "./client";
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
 
@@ -36,10 +37,14 @@ async function run() {
   //client.connect(new ButtplugEmbeddedConnectorOptions()).then(() => "Done trying to connect");
   // let options = new ButtplugWebsocketConnectorOptions();
   let options = new ButtplugEmbeddedConnectorOptions();
+  client.addListener("deviceadded", async (device: ButtplugClientDevice) => {
+    await device.vibrate(1.0);
+    await new Promise(r => setTimeout(r, 1000));
+    await device.stop();
+  })
   await client.connect(options);
   await client.startScanning();
 }
 
 // run().then(() => console.log("Done"));
-let el = document.getElementById("run");
-el!.addEventListener("click", async () => await run());
+document.getElementById("run")!.addEventListener("click", async () => await run());

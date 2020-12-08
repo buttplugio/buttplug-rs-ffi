@@ -11,18 +11,12 @@
 import { EventEmitter } from "events";
 import { Buttplug } from "./buttplug_ffi";
 import { ButtplugClientConnectorError } from "./errors";
-import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning } from "./ffi";
+import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices } from "./ffi";
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
 import { ButtplugMessageSorter } from "./sorter";
-/* import { ButtplugClientDevice } from "./ButtplugClientDevice";
-import { IButtplugClientConnector } from "./IButtplugClientConnector";
-import * as Messages from "../core/Messages";
-import { CheckMessage } from "../core/MessageUtils";
-import { ButtplugDeviceException, ButtplugException,
-         ButtplugInitException, ButtplugMessageException } from "../core/Exceptions";
- */
+import { ButtplugClientDevice } from "./device";
 export class ButtplugClient extends EventEmitter {
-  // protected _devices: Map<number, ButtplugClientDevice> = new Map();
+  protected _devices: Map<number, ButtplugClientDevice> = new Map();
   protected _clientName: string;
   // This will either be null, or our WASM heap pointer for our connected client object.
   private _clientPtr?: number = undefined;
@@ -91,6 +85,10 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public stopAllDevices = async () => {
+    if (!this._connected) {
+      throw new ButtplugClientConnectorError("Not connected.");
+    }
+    await stopAllDevices(this._sorter, this._clientPtr!);
   }
 
   protected CheckConnector() {
@@ -103,99 +101,40 @@ export class ButtplugClient extends EventEmitter {
     const msg = Buttplug.ButtplugFFIServerMessage.decode(buf);
     if (msg.id > 0) {
       this._sorter.ParseIncomingMessages(msg);
+      return;
+    }
+    if (msg.message?.serverMessage?.deviceAdded) {
+      const addedMsg = msg.message?.serverMessage?.deviceAdded;
+      const devicePtr = createDevicePtr(this._clientPtr!, addedMsg.index!);
+      const device = new ButtplugClientDevice(devicePtr!, this._sorter, addedMsg.index!, addedMsg.name!, addedMsg.messageAttributes!);
+      this._devices.set(addedMsg.index!, device);
+      this.emit("deviceadded", device);
+      return;
+    }
+    if (msg.message?.serverMessage?.deviceRemoved) {
+      const removedMsg = msg.message?.serverMessage?.deviceRemoved;
+      if (this._devices.has(removedMsg.index!)) {
+        const removedDevice = this._devices.get(removedMsg.index!);
+        removedDevice?.EmitDisconnected();
+        this._devices.delete(removedMsg.index!);
+        this.emit("deviceremoved", removedDevice);
+      }
+      return;
+    }
+    if (msg.message?.serverMessage?.scanningFinished) {
+      this._isScanning = false;
+      this.emit("scanningfinished");
+      return;
     }
   }
 
   /*
-  public async SendDeviceMessage(aDevice: ButtplugClientDevice,
-                                 aDeviceMsg: Messages.ButtplugDeviceMessage): Promise<void> {
-    this.CheckConnector();
-    const dev = this._devices.get(aDevice.Index);
-    if (dev === undefined) {
-      throw ButtplugException.LogAndError(ButtplugDeviceException,
-                                          this._logger,
-                                          `Device ${aDevice.Index} not available.`);
-    }
-    if (dev.AllowedMessages.indexOf(aDeviceMsg.Type.name) === -1) {
-      throw ButtplugException.LogAndError(ButtplugDeviceException,
-                                          this._logger,
-                                          `Device ${aDevice.Name} does not accept message type ${aDeviceMsg.Type}.`);
-    }
-    aDeviceMsg.DeviceIndex = aDevice.Index;
-    await this.SendMsgExpectOk(aDeviceMsg);
-  }
-
-  public ParseMessages = (aMsgs: Messages.ButtplugMessage[]) => {
-    this.ParseMessagesInternal(aMsgs);
-  }
-
-  protected ParseMessagesInternal(aMsgs: Messages.ButtplugMessage[]) {
-    for (const x of aMsgs) {
-      switch (x.constructor) {
-        case Messages.Log:
-          this.emit("log", x);
-          break;
-        case Messages.DeviceAdded:
-          const addedMsg = x as Messages.DeviceAdded;
-          const addedDevice = ButtplugClientDevice.fromMsg(addedMsg, this.SendDeviceMessageClosure);
-          this._devices.set(addedMsg.DeviceIndex, addedDevice);
-          this.emit("deviceadded", addedDevice);
-          break;
-        case Messages.DeviceRemoved:
-          const removedMsg = x as Messages.DeviceRemoved;
-          if (this._devices.has(removedMsg.DeviceIndex)) {
-            const removedDevice = this._devices.get(removedMsg.DeviceIndex);
-            removedDevice?.EmitDisconnected();
-            this._devices.delete(removedMsg.DeviceIndex);
-            this.emit("deviceremoved", removedDevice);
-          }
-          break;
-        case Messages.ScanningFinished:
-          this._isScanning = false;
-          this.emit("scanningfinished", x);
-          break;
-      }
-    }
-  }
-
   protected ShutdownConnection = async () => {
     await this.StopAllDevices();
     if (this._pingTimer !== null) {
       clearInterval(this._pingTimer);
       this._pingTimer = null;
     }
-  }
-
-  protected async SendMessage(aMsg: Messages.ButtplugMessage): Promise<Messages.ButtplugMessage> {
-    this.CheckConnector();
-    // This will throw if our message is invalid
-    CheckMessage(aMsg);
-    return await this._connector!.Send(aMsg);
-  }
-
-  protected CheckConnector() {
-    if (!this.Connected) {
-      throw new ButtplugClientConnectorException("ButtplugClient not connected");
-    }
-  }
-
-  protected SendMsgExpectOk = async (aMsg: Messages.ButtplugMessage): Promise<void> => {
-    const msg = await this.SendMessage(aMsg);
-    switch (msg.constructor) {
-      case Messages.Ok:
-        return;
-      case Messages.Error:
-        throw ButtplugException.FromError(msg as Messages.Error);
-      default:
-        throw ButtplugException.LogAndError(ButtplugMessageException,
-                                            this._logger,
-                                            `Message type ${msg.constructor} not handled bySendMsgExpectOk`);
-    }
-  }
-
-  protected SendDeviceMessageClosure = async (aDevice: ButtplugClientDevice,
-                                              aMsg: Messages.ButtplugDeviceMessage): Promise<void> => {
-    await this.SendDeviceMessage(aDevice, aMsg);
   }
   */
 }

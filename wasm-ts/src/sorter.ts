@@ -18,7 +18,7 @@ export class ButtplugMessageSorter {
   // One of the places we should actually return a promise, as we need to store
   // them while waiting for them to return across the line.
   // tslint:disable:promise-function-async
-  public PrepareOutgoingMessage(aMsg: Buttplug.ClientMessage): Promise<Buttplug.ButtplugFFIServerMessage> {
+  public PrepareOutgoingMessage(aMsg: Buttplug.ClientMessage | Buttplug.DeviceMessage) : Promise<Buttplug.ButtplugFFIServerMessage> {
     aMsg.id = this._counter;
     // Always increment last, otherwise we might lose sync
     this._counter += 1;
