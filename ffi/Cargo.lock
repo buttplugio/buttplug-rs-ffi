@@ -418,7 +418,7 @@ dependencies = [
  "vergen",
  "wasm-bindgen",
  "wasm-bindgen-futures",
- "web-sys 0.3.45",
+ "web-sys",
 ]
 
 [[package]]
@@ -932,7 +932,7 @@ dependencies = [
  "futures-core",
  "js-sys",
  "wasm-bindgen",
- "web-sys 0.3.46",
+ "web-sys",
 ]
 
 [[package]]
@@ -1735,7 +1735,7 @@ dependencies = [
  "once_cell",
  "spin",
  "untrusted",
- "web-sys 0.3.46",
+ "web-sys",
  "winapi",
 ]
 
@@ -2357,7 +2357,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "js-sys",
  "wasm-bindgen",
- "web-sys 0.3.46",
+ "web-sys",
 ]
 
 [[package]]
@@ -2388,14 +2388,6 @@ name = "wasm-bindgen-shared"
 version = "0.2.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e7811dd7f9398f14cc76efd356f98f03aa30419dea46aa810d71e819fc97158"
-
-[[package]]
-name = "web-sys"
-version = "0.3.45"
-dependencies = [
- "js-sys",
- "wasm-bindgen",
-]
 
 [[package]]
 name = "web-sys"

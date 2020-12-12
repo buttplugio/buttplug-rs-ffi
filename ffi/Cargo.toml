@@ -42,9 +42,12 @@ name = "buttplug_rs_ffi"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
+[build]
+rustflags = ["--cfg=web_sys_unstable_apis"]
+
 [dependencies.web-sys]
-#version = "0.3.45"
-path = "../../wasm-bindgen/crates/web-sys"
+version = "0.3.46"
+# path = "../../wasm-bindgen/crates/web-sys"
 #git = "https://github.com/rustwasm/wasm-bindgen"
 optional = true
 features = [
@@ -58,7 +61,7 @@ features = [
   "BinaryType",
   "Blob",
   "console",
-  "DataView",
+  # "DataView",
   "ErrorEvent",
   "Event",
   "FileReader",
@@ -66,5 +69,5 @@ features = [
   "ProgressEvent",
   "RequestDeviceOptions",
   "WebSocket",
-  "Window",
+  "Window"
 ]
