@@ -130,7 +130,7 @@ jobs:
        inputs:
          rootFolderOrFile: "$(System.DefaultWorkingDirectory)/ffi/nuget/"
          archiveType: "zip"
-         archiveFile: "$(Build.ArtifactStagingDirectory)/ButtplugRustFFI.1.0.0-beta3.nupkg"
+         archiveFile: "$(Build.ArtifactStagingDirectory)/ButtplugRustFFI.1.0.0-beta4.nupkg"
          includeRootFolder: false
      - task: PowerShell@2
        displayName: 'Sign Exported Nuget Packages'
