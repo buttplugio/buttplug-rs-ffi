@@ -53,8 +53,16 @@ namespace ButtplugCSharpFFITest
             {
                 Console.WriteLine($"Device removed: {args.Device.Name}");
             };
-            //await client.ConnectAsync(new Buttplug.ButtplugEmbeddedConnectorOptions());
-            await client.ConnectAsync(new Buttplug.ButtplugWebsocketConnectorOptions(new Uri("ws://localhost:12345")));
+            client.ScanningFinished += (obj, args) =>
+            {
+                Console.WriteLine("Scanning finished.");
+            };
+            client.ServerDisconnect += (obj, args) =>
+            {
+                Console.WriteLine("Server disconnected.");
+            };
+            await client.ConnectAsync(new Buttplug.ButtplugEmbeddedConnectorOptions());
+            //await client.ConnectAsync(new Buttplug.ButtplugWebsocketConnectorOptions(new Uri("ws://localhost:12345")));
             await client.StartScanningAsync();
             await WaitForKey();
             Console.WriteLine("Disconnecting");
