@@ -12,6 +12,8 @@ namespace Buttplug
         /// </summary>
         public readonly string Name;
 
+        public bool Connected { get; private set; } = false;
+
         private ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
 
         private ButtplugFFIClientHandle _clientHandle;
@@ -84,11 +86,13 @@ namespace Buttplug
         public async Task ConnectAsync(ButtplugWebsocketConnectorOptions aConnector)
         {
             await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false);
+            Connected = true;
         }
 
         public async Task DisconnectAsync()
         {
             await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle);
+            Connected = false;
         }
 
         public void SorterCallback(UIntPtr buf, int buf_length)
@@ -130,6 +134,7 @@ namespace Buttplug
                 }
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
                 {
+                    Connected = false;
                     ServerDisconnect?.Invoke(this, null);
                 }
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Error)
