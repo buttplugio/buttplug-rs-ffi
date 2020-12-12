@@ -34,7 +34,6 @@ export class ButtplugClient extends EventEmitter {
     return this._connected;
   }
 
-  /*
   public get Devices(): ButtplugClientDevice[] {
     // While this function doesn't actually send a message, if we don't have a
     // connector, we shouldn't have devices.
@@ -45,7 +44,6 @@ export class ButtplugClient extends EventEmitter {
     });
     return devices;
   }
-  */
 
   public get isScanning(): boolean {
     return this._isScanning;
