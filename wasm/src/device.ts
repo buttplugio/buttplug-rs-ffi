@@ -10,7 +10,8 @@
 import { Buttplug } from "./buttplug_ffi";
 import { ButtplugDeviceError } from "./errors";
 import { EventEmitter } from "events";
-import { createDevicePtr, vibrate, rotate, stopDevice, linear } from "./ffi";
+import { vibrate, rotate, stopDevice, linear, batteryLevel,
+  rssiLevel, rawRead, rawWrite, rawSubscribe, rawUnsubscribe } from "./ffi";
 import { ButtplugMessageSorter } from "sorter";
 
 class MessageAttributes {
@@ -213,11 +214,48 @@ export class ButtplugClientDevice extends EventEmitter {
     await linear(this._sorter, this._devicePtr, msgVectors);
   }
 
-  public async stop(): Promise<void> {
-    stopDevice(this._sorter, this._devicePtr);
+  public async batteryLevel(): Promise<number> {
+    let batteryMsg = await batteryLevel(this._sorter, this._devicePtr);
+    if (batteryMsg.message?.deviceEvent?.batteryLevelReading) {
+      let reading = batteryMsg.message?.deviceEvent?.batteryLevelReading;
+      return reading.reading!;
+    }
+    throw new ButtplugDeviceError("Wrong reply message received for batteryLevel: " + batteryMsg);
   }
 
-  public EmitDisconnected() {
+  public async rssiLevel(): Promise<number> {
+    let rssiMsg = await rssiLevel(this._sorter, this._devicePtr);
+    if (rssiMsg.message?.deviceEvent?.rssiLevelReading) {
+      return rssiMsg.message?.deviceEvent?.rssiLevelReading.reading!;
+    }
+    throw new ButtplugDeviceError("Wrong reply message received for rssiLevel: " + rssiMsg);
+  }
+
+  public async rawRead(endpoint: Buttplug.Endpoint, expectedLength: number, timeout: number): Promise<Uint8Array> {
+    let readingMsg = await rawRead(this._sorter, this._devicePtr, endpoint, expectedLength, timeout);
+    if (readingMsg.message?.deviceEvent?.rawReading) {
+      return readingMsg.message.deviceEvent.rawReading.data!;
+    }
+    throw new ButtplugDeviceError("Wrong reply message received for rawRead: " + readingMsg);
+  }
+
+  public async rawWrite(endpoint: Buttplug.Endpoint, data: Uint8Array, writeWithResponse: boolean): Promise<void> {
+    await rawWrite(this._sorter, this._devicePtr, endpoint, data, writeWithResponse);
+  }
+
+  public async rawSubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
+    await rawSubscribe(this._sorter, this._devicePtr, endpoint);
+  }
+
+  public async rawUnsubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
+    await rawUnsubscribe(this._sorter, this._devicePtr, endpoint);
+  }
+
+  public async stop(): Promise<void> {
+    await stopDevice(this._sorter, this._devicePtr);
+  }
+
+  public emitDisconnected() {
     this.emit("deviceremoved");
   }
 }

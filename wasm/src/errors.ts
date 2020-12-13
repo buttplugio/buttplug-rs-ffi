@@ -1,3 +1,4 @@
+import { Buttplug } from "buttplug_ffi";
 
 export class ButtplugError extends Error {
   /*
@@ -47,7 +48,7 @@ export class ButtplugError extends Error {
   }
 }
 
-export class ButtplugInitError extends ButtplugError {
+export class ButtplugHandshakeError extends ButtplugError {
   public constructor(aMessage: string, aId: number = 0) {
     super(aMessage, aId);
   }
@@ -81,4 +82,26 @@ export class ButtplugClientConnectorError extends ButtplugError {
   public constructor(aMessage: string, aId: number = 0) {
     super(aMessage, aId);
   }
+}
+
+export function convertPBufError(err: Buttplug.ServerMessage.IError, id: number): ButtplugError {
+  if (err.errorType === Buttplug.ServerMessage.ButtplugErrorType.ButtplugConnectorError) {
+    return new ButtplugClientConnectorError(err.message!, id);
+  }
+  if (err.errorType === Buttplug.ServerMessage.ButtplugErrorType.ButtplugDeviceError) {
+    return new ButtplugDeviceError(err.message!, id);
+  }
+  if (err.errorType === Buttplug.ServerMessage.ButtplugErrorType.ButtplugHandshakeError) {
+    return new ButtplugHandshakeError(err.message!, id);
+  }
+  if (err.errorType === Buttplug.ServerMessage.ButtplugErrorType.ButtplugMessageError) {
+    return new ButtplugMessageError(err.message!, id);
+  }
+  if (err.errorType === Buttplug.ServerMessage.ButtplugErrorType.ButtplugPingError) {
+    return new ButtplugPingError(err.message!, id);
+  }
+  if (err.errorType === Buttplug.ServerMessage.ButtplugErrorType.ButtplugUnknownError) {
+    return new ButtplugUnknownError(err.message!, id);
+  }
+  throw new ButtplugUnknownError("Cannot convert error: " + err);
 }

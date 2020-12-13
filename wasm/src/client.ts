@@ -11,7 +11,7 @@
 import { EventEmitter } from "events";
 import { Buttplug } from "./buttplug_ffi";
 import { ButtplugClientConnectorError } from "./errors";
-import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices } from "./ffi";
+import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices, disconnect } from "./ffi";
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
 import { ButtplugMessageSorter } from "./sorter";
 import { ButtplugClientDevice } from "./device";
@@ -50,8 +50,8 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public connect = async (options: ButtplugEmbeddedConnectorOptions | ButtplugWebsocketConnectorOptions): Promise<void> => {
-    if (!this._clientPtr) {
-
+    if (this._connected) {
+      throw new ButtplugClientConnectorError("Client already connected.");
     }
     if (options instanceof ButtplugEmbeddedConnectorOptions) {
       await connectEmbedded(this._sorter, this._clientPtr!, options);
@@ -64,6 +64,10 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public disconnect = async () => {
+    if (!this._clientPtr) {
+      throw new ButtplugClientConnectorError("Not connected.");
+    }
+    await disconnect(this._sorter, this._clientPtr);
   }
 
   public startScanning = async () => {
@@ -113,7 +117,7 @@ export class ButtplugClient extends EventEmitter {
       const removedMsg = msg.message?.serverMessage?.deviceRemoved;
       if (this._devices.has(removedMsg.index!)) {
         const removedDevice = this._devices.get(removedMsg.index!);
-        removedDevice?.EmitDisconnected();
+        removedDevice?.emitDisconnected();
         this._devices.delete(removedMsg.index!);
         this.emit("deviceremoved", removedDevice);
       }
@@ -124,15 +128,9 @@ export class ButtplugClient extends EventEmitter {
       this.emit("scanningfinished");
       return;
     }
-  }
-
-  /*
-  protected ShutdownConnection = async () => {
-    await this.StopAllDevices();
-    if (this._pingTimer !== null) {
-      clearInterval(this._pingTimer);
-      this._pingTimer = null;
+    if (msg.message?.serverMessage?.disconnect) {
+      this._connected = false;
+      this.emit("serverdisconnect");
     }
   }
-  */
 }

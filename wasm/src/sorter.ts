@@ -7,6 +7,7 @@
  */
 
 import { Buttplug } from "./buttplug_ffi";
+import { convertPBufError } from "./errors";
 
 export class ButtplugMessageSorter {
   protected _counter: number = 1;
@@ -34,12 +35,10 @@ export class ButtplugMessageSorter {
       const [res, rej] = this._waitingMsgs.get(msg.id)!;
       // If we've gotten back an error, reject the related promise using a
       // ButtplugException derived type.
-      /*
-      if (x.Type === Messages.Error) {
-        rej(ButtplugException.FromError(x as Messages.Error));
+      if (msg.message?.serverMessage?.error) {
+        rej(convertPBufError(msg.message?.serverMessage?.error, msg.id));
         return null;
       }
-      */
       res(msg);
       return null;
     }
