@@ -7,7 +7,7 @@ use super::{
     client_message::{ConnectLocal, ConnectWebsocket, DeviceCommunicationManagerTypes, ffi_message::Msg as ClientMessageType}
   }
 };
-use std::{slice, sync::Arc};
+use std::sync::Arc;
 use async_lock::RwLock;
 use buttplug::{
   core::messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer},

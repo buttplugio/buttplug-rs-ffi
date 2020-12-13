@@ -16,7 +16,7 @@ use buttplug::{
   util::async_manager,
 };
 use prost::Message;
-use std::{slice, sync::Arc, collections::HashMap, iter::FromIterator};
+use std::{sync::Arc, collections::HashMap, iter::FromIterator};
 
 pub struct ButtplugFFIDevice {
   callback: Option<FFICallback>,
