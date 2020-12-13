@@ -1,4 +1,9 @@
-use super::{client::ButtplugFFIClient, device::ButtplugFFIDevice, FFICallback};
+use super::{
+  client::ButtplugFFIClient, 
+  device::ButtplugFFIDevice, 
+  FFICallback,
+  logging::{buttplug_create_log_handler, LogFFICallback}
+};
 use libc::c_char;
 use std::{
   ffi::CStr,
@@ -100,4 +105,17 @@ pub extern "C" fn buttplug_activate_env_logger() {
   if tracing_subscriber::fmt::try_init().is_err() {
     error!("Cannot re-init env logger, this should only be called once");
   }
+}
+
+#[no_mangle]
+pub extern "C" fn buttplug_add_log_handler(callback: LogFFICallback, max_level: *const c_char, use_json: bool) {
+  let max_level_cstr = unsafe {
+    assert!(!max_level.is_null());
+
+    CStr::from_ptr(max_level)
+  };
+
+  // If we were handed a wrong client name, just panic.
+  let max_level_str = max_level_cstr.to_str().unwrap();
+  buttplug_create_log_handler(callback, max_level_str, use_json);
 }

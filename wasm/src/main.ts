@@ -31,6 +31,7 @@ console.log(performance.now() / 1000);
 import { ButtplugClientDevice } from "device";
 import { ButtplugClient } from "./client";
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
+import { activateConsoleLogger } from "./ffi";
 
 async function run() {
   let client = new ButtplugClient("test");
@@ -46,5 +47,6 @@ async function run() {
   await client.startScanning();
 }
 
+activateConsoleLogger("info");
 // run().then(() => console.log("Done"));
 document.getElementById("run")!.addEventListener("click", async () => await run());

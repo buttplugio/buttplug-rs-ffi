@@ -221,3 +221,13 @@ export function freeClientPtr(clientPtr: number) {
 export function freeDevicePtr(devicePtr: number) {
   buttplug_free_device(devicePtr);
 }
+
+export function activateConsoleLogger(logLevel: "error" | "warn" | "info" | "debug" | "trace") {
+  buttplug_activate_env_logger(logLevel);
+}
+
+/*
+export function addLogHandler(logCallback: Function, logLevel: "error" | "warn" | "info" | "debug" | "trace", useJSON: boolean) {
+  buttplug_add_log_handler(logCallback, logLevel, useJSON);
+}
+*/

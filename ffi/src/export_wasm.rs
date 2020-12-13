@@ -1,10 +1,16 @@
-use super::{client::ButtplugFFIClient, device::ButtplugFFIDevice, FFICallback};
-use super::wasm_types::c_char;
-use tracing_wasm;
+use super::{
+  client::ButtplugFFIClient, 
+  device::ButtplugFFIDevice, 
+  FFICallback,
+  wasm_types::c_char,
+  logging::{buttplug_create_log_handler, LogFFICallback}
+};
+use tracing_subscriber::{Registry, EnvFilter, layer::SubscriberExt};
+use tracing_wasm::{WASMLayer, WASMLayerConfig};
 use wasm_bindgen::prelude::*;
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 pub fn buttplug_create_client(
   callback: &FFICallback,
   client_name: &str,
@@ -15,7 +21,7 @@ pub fn buttplug_create_client(
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 pub fn buttplug_free_client(ptr: *mut ButtplugFFIClient) {
   if !ptr.is_null() {
     unsafe {
@@ -25,7 +31,7 @@ pub fn buttplug_free_client(ptr: *mut ButtplugFFIClient) {
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 pub fn buttplug_parse_client_message(
   client_ptr: *mut ButtplugFFIClient,
   buf: &[u8]
@@ -38,7 +44,7 @@ pub fn buttplug_parse_client_message(
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 pub fn buttplug_create_device(
   client_ptr: *mut ButtplugFFIClient,
   device_index: u32,
@@ -55,7 +61,7 @@ pub fn buttplug_create_device(
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 pub fn buttplug_parse_device_message(
   device_ptr: *mut ButtplugFFIDevice,
   buf: &[u8]
@@ -68,7 +74,7 @@ pub fn buttplug_parse_device_message(
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 pub fn buttplug_free_device(ptr: *mut ButtplugFFIDevice) {
   if !ptr.is_null() {
     unsafe {
@@ -78,7 +84,18 @@ pub fn buttplug_free_device(ptr: *mut ButtplugFFIDevice) {
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-pub fn buttplug_activate_env_logger() {
-  tracing_wasm::set_as_global_default();
+#[wasm_bindgen]
+pub fn buttplug_activate_env_logger(max_level: &str) {
+  tracing::subscriber::set_global_default(
+    Registry::default().with(EnvFilter::new(max_level)).with(WASMLayer::new(WASMLayerConfig::default())),
+  )
+  .expect("default global");
 }
+
+/*
+#[no_mangle]
+#[wasm_bindgen]
+pub fn buttplug_add_log_handler(callback: &LogFFICallback, max_level: &str, use_json: bool) {
+  buttplug_create_log_handler(callback.clone(), max_level, use_json);
+}
+*/
