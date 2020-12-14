@@ -1,9 +1,10 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Buttplug
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void ButtplugLogCallback(string log_msg);
+    delegate void ButtplugLogCallback(string aLogMsg);
 
     public enum ButtplugLogLevel
     {
@@ -16,23 +17,23 @@ namespace Buttplug
 
     internal class ButtplugFFILogCalls
     { 
-        [DllImport("buttplug_ffi")]
-        internal static extern void buttplug_set_log_callback(ButtplugLogCallback callback, string level);
-
-        [DllImport("buttplug_ffi")]
-        internal static extern void buttplug_set_log_level(string level);
+        [DllImport("buttplug_rs_ffi")]
+        internal static extern void buttplug_add_log_handler(ButtplugLogCallback callback, string level, bool aUseJSON);
     }
 
     public class ButtplugFFILog
     {
-        public static void SetLogCallback(ButtplugLogCallback aCallback, ButtplugLogLevel aLevel)
+        public static event EventHandler<string> LogMessage;
+
+        private static void OnLogMessage(string aLogMessage)
         {
-            ButtplugFFILogCalls.buttplug_set_log_callback(aCallback, aLevel.ToString("f").ToLower());
+            LogMessage?.Invoke(null, aLogMessage);
         }
 
-        public static void SetLogLevel(ButtplugLogLevel aLevel)
+        public static void StartLogHandler(ButtplugLogLevel aMaxLevel, bool aUseJSON)
         {
-            ButtplugFFILogCalls.buttplug_set_log_level(aLevel.ToString("f").ToLower());
+            Console.WriteLine(aMaxLevel.ToString());
+            ButtplugFFILogCalls.buttplug_add_log_handler(OnLogMessage, aMaxLevel.ToString(), aUseJSON);
         }
     }
 }

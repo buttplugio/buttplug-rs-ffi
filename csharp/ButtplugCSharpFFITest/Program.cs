@@ -26,6 +26,8 @@ namespace ButtplugCSharpFFITest
         {
             //ButtplugFFILog.SetLogCallback(LogCallback, ButtplugLogLevel.Info);
             //ButtplugFFILog.SetLogLevel(ButtplugLogLevel.Error);
+            ButtplugFFILog.StartLogHandler(ButtplugLogLevel.Info, true);
+            ButtplugFFILog.LogMessage += (aObj, aMsg) => { Console.WriteLine($"LOG: {aMsg}"); };
             var client = new ButtplugClient("Test Client");
             client.DeviceAdded += async (obj, args) =>
             {
