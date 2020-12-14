@@ -16,6 +16,7 @@ use wasm_bindgen::JsValue;
 use tracing_wasm::WASMLayer;
 use async_channel::bounded;
 use tracing::{Level};
+use tracing_subscriber::filter::{EnvFilter, LevelFilter};
 use futures::StreamExt;
 
 // Uncomment this once single type filter lands in tracing.
@@ -67,12 +68,14 @@ pub fn buttplug_create_log_handler(callback: LogFFICallback, max_level: &str, us
     }
   }).unwrap();
   //let max_level_cstr: &CStr = unsafe { CStr::from_ptr(max_level_cchar) };
+  let filter = EnvFilter::from_default_env()
+    .add_directive(LevelFilter::from_str(max_level).unwrap().into());
   if use_json_formatting{
     if tracing_subscriber::fmt()
       .json()
       .with_ansi(false)
       .with_writer(ChannelWriter::new(sender))
-      .with_env_filter(max_level)
+      .with_env_filter(filter)
       .with_filter_reloading()
       .try_init()
       .is_err() {
@@ -82,7 +85,7 @@ pub fn buttplug_create_log_handler(callback: LogFFICallback, max_level: &str, us
     if tracing_subscriber::fmt()
       .with_ansi(false)
       .with_writer(ChannelWriter::new(sender))
-      .with_env_filter(max_level)
+      .with_env_filter(filter)
       .with_filter_reloading()
       .try_init()
       .is_err() {
