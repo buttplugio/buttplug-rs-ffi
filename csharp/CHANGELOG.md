@@ -1,3 +1,16 @@
+# 1.0.0 beta 7 (2020-12-13)
+
+## Features
+
+- Added Connected getter to client
+- Added ability to request log level output, and emit logs via event.
+
+# 1.0.0 beta 6 (2020-12-11)
+
+## Bugfixes
+
+- Fixes emitting of ServerDisconnected and ScanningFinished events in client.
+
 # 1.0.0 beta 5 (2020-11-28)
 
 ## Bugfixes
