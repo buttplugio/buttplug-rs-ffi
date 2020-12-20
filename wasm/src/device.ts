@@ -12,9 +12,13 @@ import { ButtplugDeviceError } from "./errors";
 import { EventEmitter } from "events";
 import { vibrate, rotate, stopDevice, linear, batteryLevel,
   rssiLevel, rawRead, rawWrite, rawSubscribe, rawUnsubscribe } from "./ffi";
-import { ButtplugMessageSorter } from "sorter";
+import { ButtplugMessageSorter } from "./sorter";
 
-class MessageAttributes {
+// Re-export the protobuf enum, so we don't require users to have to know the
+// full resolution path.
+export import ButtplugDeviceMessageType = Buttplug.ServerMessage.MessageAttributeType;
+
+export class MessageAttributes {
   /** MessageAttributes featureCount */
   featureCount?: (number | null);
 
@@ -77,7 +81,7 @@ export class ButtplugClientDevice extends EventEmitter {
   private _name: string;
   private _index: number;
   private _devicePtr: number;
-  private _messageAttributes: Map<Buttplug.ServerMessage.MessageAttributeType, MessageAttributes> = new Map();
+  private _messageAttributes: Map<ButtplugDeviceMessageType, MessageAttributes> = new Map();
   private _sorter: ButtplugMessageSorter;
 
   /**
@@ -97,19 +101,9 @@ export class ButtplugClientDevice extends EventEmitter {
   /**
    * Return a list of message types the device accepts.
    */
-  public get AllowedMessages(): string[] {
-    return [];
-    //return Array.from(this.allowedMsgs.keys());
+  public get AllowedMessages(): ButtplugDeviceMessageType[] {
+    return Array.from(this._messageAttributes.keys());
   }
-
-  public get AllowedMessagesObject(): object {
-    const obj = {};
-    // this.allowedMsgs.forEach((value, key) => { obj[key] = value; });
-    return obj;
-  }
-
-  // Map of messages and their attributes (feature count, etc...)
-  // private allowedMsgs: Map<string, Messages.MessageAttributes> = new Map<string, Messages.MessageAttributes>();
 
   /**
    * @param _index Index of the device, as created by the device manager.
@@ -135,32 +129,30 @@ export class ButtplugClientDevice extends EventEmitter {
   /**
    * Return the message attributes related to the given message
    */
-  /*
-  public MessageAttributes(messageName: string): Messages.MessageAttributes {
-    return this.allowedMsgs.get(messageName)!;
+  public messageAttributes(messageName: ButtplugDeviceMessageType): MessageAttributes | undefined {
+    return this._messageAttributes.get(messageName);
   }
-  */
 
-  protected checkAllowedMessageType(messageType: number) {
+  protected checkAllowedMessageType(messageType: ButtplugDeviceMessageType) {
     if (!this._messageAttributes.has(messageType)) {
-      throw new ButtplugDeviceError(`Message ${Buttplug.ServerMessage.MessageAttributeType[messageType]} does not exist on device ${this._name}`);
+      throw new ButtplugDeviceError(`Message ${ButtplugDeviceMessageType[messageType]} does not exist on device ${this._name}`);
     }
   }
 
   public async vibrate(speeds: number | VibrationCmd[]): Promise<void> {
-    this.checkAllowedMessageType(Buttplug.ServerMessage.MessageAttributeType.VibrateCmd);
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.VibrateCmd);
     let msgSpeeds: Buttplug.DeviceMessage.VibrateComponent[];
     if (typeof (speeds) === "number") {
       // We can skip the check here since we're building the command array ourselves.
-      const features = this._messageAttributes.get(Buttplug.ServerMessage.MessageAttributeType.VibrateCmd)!.featureCount!;
+      const features = this._messageAttributes.get(ButtplugDeviceMessageType.VibrateCmd)!.featureCount!;
       msgSpeeds = Array.from({length: features}, (_, i) => Buttplug.DeviceMessage.VibrateComponent.create({
         index: i,
         speed: speeds,
       }));
     } else if (Array.isArray(speeds) && speeds.every(x => x instanceof VibrationCmd)) {
-      msgSpeeds = (speeds as any).map(x => Buttplug.DeviceMessage.VibrateComponent.create({
-        index: x.index,
-        speed: x.speed
+      msgSpeeds = (speeds as VibrationCmd[]).map(x => Buttplug.DeviceMessage.VibrateComponent.create({
+        index: x.Index,
+        speed: x.Speed
       }));
     } else {
       throw new ButtplugDeviceError("vibrate can only take numbers or arrays of numbers.");
@@ -169,11 +161,11 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rotate(speeds: number | RotationCmd[], clockwise: boolean | undefined): Promise<void> {
-    this.checkAllowedMessageType(Buttplug.ServerMessage.MessageAttributeType.RotateCmd);
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RotateCmd);
     let msgRotations: Buttplug.DeviceMessage.RotateComponent[];
     if (typeof (speeds) === "number" && clockwise !== undefined) {
       // We can skip the check here since we're building the command array ourselves.
-      const features = this._messageAttributes.get(Buttplug.ServerMessage.MessageAttributeType.RotateCmd)!.featureCount!;
+      const features = this._messageAttributes.get(ButtplugDeviceMessageType.RotateCmd)!.featureCount!;
       msgRotations = Array.from({length: features}, (_, i) => Buttplug.DeviceMessage.RotateComponent.create({
         index: i,
         speed: speeds,
@@ -192,11 +184,11 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async linear(position: number | VectorCmd[], duration: number | undefined): Promise<void> {
-    this.checkAllowedMessageType(Buttplug.ServerMessage.MessageAttributeType.RotateCmd);
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RotateCmd);
     let msgVectors: Buttplug.DeviceMessage.LinearComponent[];
     if (typeof (position) === "number" && duration !== undefined) {
       // We can skip the check here since we're building the command array ourselves.
-      const features = this._messageAttributes.get(Buttplug.ServerMessage.MessageAttributeType.LinearCmd)!.featureCount!;
+      const features = this._messageAttributes.get(ButtplugDeviceMessageType.LinearCmd)!.featureCount!;
       msgVectors = Array.from({length: features}, (_, i) => Buttplug.DeviceMessage.LinearComponent.create({
         index: i,
         position: position,
