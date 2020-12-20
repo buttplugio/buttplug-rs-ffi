@@ -42,9 +42,6 @@ name = "buttplug_rs_ffi"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
-[build]
-rustflags = ["--cfg=web_sys_unstable_apis"]
-
 [dependencies.web-sys]
 version = "0.3.46"
 # path = "../../wasm-bindgen/crates/web-sys"

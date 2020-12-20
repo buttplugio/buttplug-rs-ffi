@@ -16,7 +16,8 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --hot --config webpack.base.js",
-    "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.d.ts\" dist/module",
+    "build:rust": "cd ../ffi && env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../wasm/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../wasm && rm src/buttplug-rs-ffi/.gitignore && rm src/buttplug-rs-ffi/package.json && rm src/buttplug-rs-ffi/README.md",
+    "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
     "build:proto": "pbjs -t static-module -w commonjs -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
     "build:webpack": "yarn build:main && webpack --progress --config webpack.base.js"
   },
