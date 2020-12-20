@@ -1,6 +1,6 @@
-import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_parse_device_message } from "buttplug-rs-ffi";
-import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "connectors";
-import { ButtplugMessageSorter } from "sorter";
+import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_parse_device_message } from "./buttplug-rs-ffi/buttplug_rs_ffi";
+import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
+import { ButtplugMessageSorter } from "./sorter";
 import { Buttplug } from "./buttplug_ffi";
 
 function sendClientMessage(sorter: ButtplugMessageSorter, clientPtr: number, message: Buttplug.ClientMessage): Promise<Buttplug.ButtplugFFIServerMessage> {
