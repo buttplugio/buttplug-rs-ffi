@@ -16,8 +16,8 @@ module.exports = {
   },
   entry: path.resolve('./src/bootstrap.ts'),
   output: {
-    path: path.resolve('./dist'),
-    publicPath: '/dist/',
+    path: path.resolve('./dist/web'),
+    publicPath: '/dist/web',
     filename: 'build.js'
   },
   module: {

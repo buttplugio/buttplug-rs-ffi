@@ -12,11 +12,11 @@
     "noImplicitThis": true,
     "declaration": true,
     "outDir": "./dist/module",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowJs": true
   },
   "include": [
-    "./src/*.ts",
-    "./src/**/*.ts",
+    "./src/**/*",
     "./tests/**/*.ts"
   ]
 }
