@@ -1,7 +1,40 @@
-import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_parse_device_message } from "./buttplug-rs-ffi/buttplug_rs_ffi";
+
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
 import { ButtplugMessageSorter } from "./sorter";
 import { Buttplug } from "./buttplug_ffi";
+
+function must_run_init_1(a: any | undefined): any {
+  throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
+}
+
+function must_run_init_2(a: any | undefined, b: any | undefined): any {
+  throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
+}
+// import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_parse_device_message } from "./buttplug-rs-ffi/buttplug_rs_ffi";
+
+let buttplug_create_client = must_run_init_2;
+let buttplug_free_client = must_run_init_1;
+let buttplug_parse_client_message = must_run_init_2;
+let buttplug_activate_env_logger = must_run_init_1;
+let buttplug_free_device = must_run_init_1;
+let buttplug_create_device = must_run_init_2;
+let buttplug_parse_device_message = must_run_init_2;
+
+export async function buttplugInit() {
+  console.log("trying to load new path?!");
+  let index = await import(/* webpackPrefetch: 1 */ "./buttplug-rs-ffi/buttplug_rs_ffi").catch((e) => {
+    console.log(e);
+    return Promise.reject(e);
+  });
+  console.log(index);
+  buttplug_create_client = index.buttplug_create_client;
+  buttplug_free_client = index.buttplug_free_client;
+  buttplug_parse_client_message = index.buttplug_parse_client_message;
+  buttplug_activate_env_logger = index.buttplug_activate_env_logger;
+  buttplug_free_device = index.buttplug_free_device;
+  buttplug_create_device = index.buttplug_create_device;
+  buttplug_parse_device_message = index.buttplug_parse_device_message;
+}
 
 function sendClientMessage(sorter: ButtplugMessageSorter, clientPtr: number, message: Buttplug.ClientMessage): Promise<Buttplug.ButtplugFFIServerMessage> {
   let promise = sorter.PrepareOutgoingMessage(message);

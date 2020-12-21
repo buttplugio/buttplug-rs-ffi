@@ -2,3 +2,5 @@ c/
 **/node_modules
 **/target
 **/dist*
+# Local Netlify folder
+.netlify
