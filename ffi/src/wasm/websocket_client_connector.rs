@@ -58,7 +58,14 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
   fn connect(&self) -> ButtplugConnectorTransportConnectResult {
     let (request_sender, request_receiver) = bounded(256);
     let (response_sender, response_receiver) = bounded(256);
-    let ws = WebSocket::new(&self.address).unwrap();
+    // Could also do this with a future but eh.
+    let (connect_sender, mut connect_receiver) = bounded(1);
+    // Probably a rusty-er way to do this but eh.
+    let ws;
+    match WebSocket::new(&self.address) {
+      Ok(websocket) => ws = websocket,
+      Err(e) => return Box::pin(future::ready(Err(ButtplugConnectorError::ConnectorGenericError("Could not connect to websocket, possibly due to URL issue.".to_owned()))))
+    }
     let response_sender_clone = response_sender.clone();
     let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
       if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
@@ -85,6 +92,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
     // forget the callback to keep it alive
     onmessage_callback.forget();
 
+    let success_sender = connect_sender.clone();
     let ws_sender_clone = ws.clone();
     let onopen_callback = Closure::wrap(Box::new(move |_| {
       let recvr_clone = request_receiver.clone();
@@ -108,13 +116,32 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
           // TODO see what happens when we try to send to a remote that's closed connection.
         }
       });
+      let ssc = success_sender.clone();
+      async_manager::spawn(async move {
+        ssc.send(true).await;
+      }).unwrap();
     }) as Box<dyn FnMut(JsValue)>);
     ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
     onopen_callback.forget();
+
+    let failure_sender = connect_sender.clone();
+    let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
+      let fsc = failure_sender.clone();
+      async_manager::spawn(async move {
+        fsc.send(false).await;
+      }).unwrap();
+    }) as Box<dyn FnMut(ErrorEvent)>);
+    ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
+    onerror_callback.forget();
+
     let disconnect_sender = self.disconnect_sender.clone();
     Box::pin(async move{
       *disconnect_sender.lock().await = request_sender.clone();
-      Ok((request_sender, response_receiver))
+      if connect_receiver.next().await.unwrap() {
+        Ok((request_sender, response_receiver))
+      } else {
+        Err(ButtplugConnectorError::ConnectorGenericError("Could not connect to websocket, possibly due to server issue.".to_owned()))
+      }
     })
   }
 
