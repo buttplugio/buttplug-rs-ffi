@@ -1,3 +1,9 @@
+# 1.0.0 Beta 7 (2020/12/20)
+
+## Bugfixes
+
+- Fix browser websockets not throwing errors on invalid URLs or connection errors.
+
 # 1.0.0 Beta 6 (2020/12/20)
 
 ## Bugfixes
