@@ -1,4 +1,10 @@
-# 1.0.0 Beta 5 (2020/12/13)
+# 1.0.0 Beta 6 (2020/12/20)
+
+## Bugfixes
+
+- Fix webpack build/load strategies for static (CDN loadable) web package.
+
+# 1.0.0 Beta 5 (2020/12/19)
 
 ## Features
 
