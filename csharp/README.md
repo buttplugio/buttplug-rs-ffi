@@ -44,7 +44,7 @@ If you have questions, you can [ask on the discord](https://discord.buttplug.io)
 
 ## A Note on Architecture
 
-Buttplug C# is only about 10% C#. There's enough C# to get us to Rust, but most of Buttplug's logic, including toy control, hardware access, network communications, etc, are in Rust. This means that if something fails in Rust, it may look somewhat opaque in C#. If you find yourself running into these cases, please [file an issue on this repo](https://github.com/buttplugio/buttplug-rs-ffi) and we'll try to get things cleared up. The goal for the future is to return rust panic stacks across the C# boundary for better logging, but this is still something we're working on.
+Buttplug C# is only about 10% C#. There's enough C# to get us to Rust, but most of Buttplug's logic, including toy control, hardware access, network communications, etc, are in Rust, via [buttplug-rs](https://github.com/buttplugio/buttplug-rs). This means that if something fails in Rust, it may look somewhat opaque in C#. If you find yourself running into these cases, please [file an issue on this repo](https://github.com/buttplugio/buttplug-rs-ffi) and we'll try to get things cleared up. The goal for the future is to return rust panic stacks across the C# boundary for better logging, but this is still something we're working on.
 
 This also means that, unlike Buttplug C# v0.x, we will be packaging native, platform dependent code with the library. The rust code compiles for each platform specifically, so we'll be packaging those platforms in with this library as they are developed and tested.
 
@@ -68,7 +68,7 @@ Unity support for Buttplug is handled in the [Buttplug Unity Repo](https://githu
 
 If you have issues or feature requests, please feel free to [file an issue](https://github.com/buttplugio/buttplug-rs-ffi/issues).
 
-We are not looking for code contributions or pull requests at this time, and will not accept pull requests that do not have a matching issue where the matter was previously discussed. Pull requests should only be submitted after talking to @qdot and receiving approval to develop code based on an issue. Any random or non-issue pull requests will most likely be closed without merging.
+We are not looking for code contributions or pull requests at this time, and will not accept pull requests that do not have a matching issue where the matter was previously discussed. Pull requests should only be submitted after talking to [qdot](https://github.com/qdot) via issues (or on [discord](https://discord.buttplug.io) or [twitter DMs](https://twitter.com/buttplugio) if you would like to stay anonymous and out of recorded info on the repo) before submitting PRs. Random PRs without matching issues and discussion are likely to be closed without merging. and receiving approval to develop code based on an issue. Any random or non-issue pull requests will most likely be closed without merging.
 
 ## License
 
