@@ -14,6 +14,18 @@ Control Library to other langauges.
 
 If you don't work in Rust but still want to control sex toys, you're in the right place!
 
+## Support The Project
+
+If you find this project helpful, you can [support us via Patreon](http://patreon.com/qdot) or
+[Github Sponsors](https://github.com/sponsors/qdot)! Every donation helps us afford more research materials (sex toys).
+
+## FFI Implementations
+
+Finished FFI implementations available in this repo:
+
+- [C#](https://github.com/buttplugio/buttplug-rs-ffi/tree/master/csharp)
+- [Javascript/Typescript (Web Only)](https://github.com/buttplugio/buttplug-rs-ffi/tree/master/js)
+
 ## Implementation Details
 
 The Buttplug Rust FFI library exposes access to the Buttplug Client API of
