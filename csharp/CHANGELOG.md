@@ -1,3 +1,10 @@
+# 1.0.0 beta 8 (2020-12-20)
+
+## Bugfixes
+
+- Update to buttplug-rs 0.11.3 via ButtplugFFI v1b6. Fixes memory leaks and possible race condition
+  issues.
+
 # 1.0.0 beta 7 (2020-12-13)
 
 ## Features

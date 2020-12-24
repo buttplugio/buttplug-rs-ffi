@@ -1,4 +1,4 @@
-buttplug-rs-ffi is BSD licensed.
+buttplug-rs-ffi, buttplug-csharp, buttplug-js are BSD licensed.
 
     Copyright (c) 2016-2020, Nonpolynomial Labs, LLC
     All rights reserved.
