@@ -7,10 +7,6 @@
 [![Discord](https://img.shields.io/discord/353303527587708932.svg?logo=discord)](https://discord.buttplug.io)
 [![Twitter](https://img.shields.io/twitter/follow/buttplugio.svg?style=social&logo=twitter)](https://twitter.com/buttplugio)
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/buttplugio/buttplug-rs-ffi/master/img/buttplug-csharp.png">
-</p>
-
 Buttplug is a framework for hooking up hardware to interfaces, where hardware usually means sex
 toys, but could honestly be just about anything. Think of it as a userland HID manager for things
 that may not specifically be HID, but may go in your butt. 
