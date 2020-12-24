@@ -64,6 +64,13 @@ This repo comes with the necessary VS2019 solution and project files to build th
 
 Unity support for Buttplug is handled in the [Buttplug Unity Repo](https://github.com/buttplugio/buttplug-unity). It is recommended you use that package for Unity integration.
 
+## Support
+
+If you have questions, support is available via:
+
+- [Discord](https://discord.buttplug.io) - This is the best choice for support
+- [Mentions/DMs to @buttplugio on twitter](https://twitter.com/buttplugio)
+
 ## Contributing
 
 If you have issues or feature requests, please feel free to [file an issue](https://github.com/buttplugio/buttplug-rs-ffi/issues).

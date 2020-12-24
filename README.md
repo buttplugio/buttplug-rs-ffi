@@ -79,6 +79,13 @@ Our current plans are to expand to the following list of languages:
 
 If you have any languages you would like to see supported, please [file an issue](https://github.com/buttplugio/buttplug-rs-ffi/issues) and let us know.
 
+## Support
+
+If you have questions, support is available via:
+
+- [Discord](https://discord.buttplug.io) - This is the best choice for support
+- [Mentions/DMs to @buttplugio on twitter](https://twitter.com/buttplugio)
+
 ## Contributing
 
 If you would like to help provide language implementations for buttplug-rs-ffi, [please create an
