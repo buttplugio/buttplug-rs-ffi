@@ -56,15 +56,41 @@ Currently, Buttplug JS only supports usage on the web, either via packed web app
 
 ## Using Buttplug With Webpack
 
-Packing Buttplug in Webpack may require some extra work, as Buttplug JS involves WASM, which means asynchronous loading. This means you may need an async bootstrapper for loading the library. For instance, in some of the buttplug-js applications like Playground, our index.js just looks like this:
+Packing Buttplug in Webpack may require some extra work, as Buttplug JS involves WASM, which means asynchronous loading and asset finding.
+
+The first issue you may run into is with asset loading, as webpack can only be so smart about where the WASM blob is. If you don't set the `output.publicPath` webpack configuration, you'll possibly have issues with the WASM loader not being able to find the blob (resulting in 404 errors in your web console and your app not loading). You've got 2 choices here:
+
+* If you know where your application will reside on your server and that location will never change, set `output.publicPath` in your webpack configuration to match where your generated webpack files will be. For instance, if you have webpack building chunks to `dist`, your `output.publicPath` would be `/dist/`. 
+* To handle your application being at *any* path, add the following code block and make sure it is run _before_ running `buttplugInit()`. This is a hack that finds the URL the current JS file is being loaded from, and uses that to load the WASM blob.
 
 ```javascript
-import("./main").catch((e) => console.error("Error importing `main.ts`:", e));
+// If using typescript, uncomment this declare line
+declare var __webpack_public_path__: any;
+
+var scripts = document.getElementsByTagName( "script" );
+var lastScript = scripts[scripts.length - 1].src;
+__webpack_public_path__ = lastScript.substr(0, lastScript.lastIndexOf('/') + 1);
 ```
 
-This will asynchronously load the application up front, meaning our WASM blob will be loaded in the proper context.
+After setting up your loading, you'll need to call buttplugInit() and make sure it succeeds before calling into Buttplug:
+
+```javascript
+// This could also be awaited, just depends on your calling context.
+buttplugInit().then(() => console.log("Ready to set up buttplug calls!"));
+```
+
+This will asynchronously load the library, in a way that webpack shouldn't complain about.
 
 Note that this has only been tested in Webpack 4. Webpack 5 has a mechanism for automating asynchronous loading, but this has not been experimented with in buttplug-js yet. If you try this and have suggestions, [please file an issue and let us know](https://github.com/buttplugio/buttplug-rs-ffi/issues).
+
+If you are using Webpack 5, you may need to use Webpack 4 style WASM loading for the time being. Add the following to your webpack config:
+
+```javascript
+// Needed for webpack 5 only
+experiments.syncWebAssembly: true
+```
+
+If you still run into problems, [file an issue](https://github.com/buttplugio/buttplug-rs-ffi/issues) 
 
 ## Using Buttplug On The Web
 
