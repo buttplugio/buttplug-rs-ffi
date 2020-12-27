@@ -19,11 +19,19 @@ namespace Buttplug
     { 
         [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_add_log_handler(ButtplugLogCallback callback, string level, bool aUseJSON);
+
+        [DllImport("buttplug_rs_ffi")]
+        internal static extern void buttplug_activate_env_logger();
     }
 
     public class ButtplugFFILog
     {
         public static event EventHandler<string> LogMessage;
+
+        private static void ActivateEnvLogger()
+        {
+            ButtplugFFILogCalls.buttplug_activate_env_logger();
+        }
 
         private static void OnLogMessage(string aLogMessage)
         {
