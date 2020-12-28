@@ -1,3 +1,15 @@
+# 1.0.1 (2020-12-27)
+
+## Features
+
+- Update to buttplug-rs v1.0.1, with new device config format
+- Expose new env logger handler
+
+## Notes
+
+- Due to a mishandled test version 2 years about in Buttplug C#, v1.0.0 is taken. Therefore we're
+  moving straight to v1.0.1
+
 # 1.0.0 Beta 8 (2020-12-20)
 
 ## Bugfixes
