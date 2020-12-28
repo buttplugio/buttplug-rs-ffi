@@ -2,7 +2,7 @@
 
 ## Features
 
-- Rolling to Buttplug v1, which uses the new device config file format with file versions, etc.
+- Rolling to Buttplug v1.0.1, which uses the new device config file format with file versions, etc.
 
 # 1.0.0 Beta 5 (2020/12/13)
 
