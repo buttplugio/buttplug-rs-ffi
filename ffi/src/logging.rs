@@ -3,7 +3,7 @@ use buttplug::{
   util::async_manager
 };
 use std::{
-  ffi::{CString, CStr},
+  ffi::{CString},
   str::FromStr
 };
 #[cfg(not(feature = "wasm"))]
@@ -15,7 +15,7 @@ use wasm_bindgen::JsValue;
 #[cfg(feature = "wasm")]
 use tracing_wasm::WASMLayer;
 use async_channel::bounded;
-use tracing::{Level};
+//use tracing::{Level};
 use tracing_subscriber::filter::{EnvFilter, LevelFilter};
 use futures::StreamExt;
 
