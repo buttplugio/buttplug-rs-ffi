@@ -1,3 +1,10 @@
+# 1.0.0 (2020/12/27)
+
+## Features
+
+- Update to Buttplug v1, with new device config file format.
+- Change package name back to "buttplug"
+
 # 1.0.0 Beta 7 (2020/12/20)
 
 ## Bugfixes

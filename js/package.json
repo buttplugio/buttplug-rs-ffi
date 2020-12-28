@@ -1,10 +1,10 @@
 {
-  "name": "buttplug-wasm",
+  "name": "buttplug",
   "collaborators": [
     "Nonpolynomial, LLC <kyle@nonpolynomial.com>"
   ],
   "description": "Buttplug WASM library for web applications (Node/Web). Does not work for native node at the moment.",
-  "version": "1.0.0-beta7",
+  "version": "1.0.0",
   "license": "BSD-3-Clause",
   "homepage": "https://buttplug.io",
   "repository": {
@@ -15,12 +15,13 @@
     "url": "https://github.com/buttplugio/buttplug-rs-ffi/issues"
   },
   "scripts": {
-    "dev": "webpack-dev-server --hot --config webpack.base.js",
-    "build:publish": "yarn build:rust && yarn build:webpack",
-    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../wasm/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../wasm && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
+    "dev": "webpack-dev-server --hot --config webpack.base.js --env development",
+    "build:publish": "rimraf dist && yarn build:rust && yarn build:webpack && yarn build:webpack:production",
+    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
     "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
     "build:proto": "pbjs -t static-module -w commonjs -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
-    "build:webpack": "yarn build:main && webpack --progress --config webpack.base.js"
+    "build:webpack": "yarn build:main && webpack --progress --config webpack.base.js --env development",
+    "build:webpack:production": "webpack --progress --config webpack.base.js --env production"
   },
   "sideEffects": "false",
   "main": "./dist/module/index.js",
@@ -41,6 +42,7 @@
     "webpack": "^4",
     "webpack-cli": "^3",
     "webpack-dev-server": "^3.9.0",
+    "webpack-merge": "^5.7.3",
     "yarn": "^1.22.10"
   }
 }
