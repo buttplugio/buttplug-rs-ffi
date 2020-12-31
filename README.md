@@ -26,6 +26,17 @@ Finished FFI implementations available in this repo:
 - [C#](https://github.com/buttplugio/buttplug-rs-ffi/tree/master/csharp)
 - [Javascript/Typescript (Web Only)](https://github.com/buttplugio/buttplug-rs-ffi/tree/master/js)
 
+Implementations currently in the works:
+
+- Python
+- C/C++
+
+Implementations we'd like to see:
+
+- Java/Kotlin
+- Swift
+- Idris
+
 ## Implementation Details
 
 The Buttplug Rust FFI library exposes access to the Buttplug Client API of
