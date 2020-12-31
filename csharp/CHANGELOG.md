@@ -1,3 +1,10 @@
+# 1.0.2 (2020-12-29)
+
+## Bugfixes
+
+- Hold a reference to the LogCallback Delegate for the duration of the process lifetime, otherwise
+  we'll crash on callback setup for logging.
+
 # 1.0.1 (2020-12-27)
 
 ## Features
