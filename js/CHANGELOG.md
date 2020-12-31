@@ -1,3 +1,9 @@
+# 1.0.1 (2020/12/29)
+
+## Bugfixes
+
+- Add protobufjs to dependencies, otherwise typescript compilation files during type resolution.
+
 # 1.0.0 (2020/12/27)
 
 ## Features
