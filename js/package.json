@@ -26,13 +26,14 @@
   "sideEffects": "false",
   "main": "./dist/module/index.js",
   "types": "./dist/module/index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+    "protobufjs": "^6.10.2"    
+  },
   "devDependencies": {
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "fork-ts-checker-webpack-plugin": "^6.0.5",
     "html-loader": "^1.3.2",
-    "protobufjs": "^6.10.2",
     "rimraf": "^3.0.2",
     "ts-loader": "^8.0.11",
     "ts-node": "^9.1.0",
