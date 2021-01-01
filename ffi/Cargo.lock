@@ -349,9 +349,9 @@ checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
 
 [[package]]
 name = "buttplug"
-version = "1.0.1"
+version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56d47085dc4cfbda9cb9e5d54e6510d00f9c8406c517054f673efa8a93bdd040"
+checksum = "81a7cbf5e695531ae9f523c709e43239160e8658b5d7fb92365c9760e2d45586"
 dependencies = [
  "async-channel",
  "async-lock",
@@ -397,7 +397,7 @@ dependencies = [
 
 [[package]]
 name = "buttplug-rs-ffi"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "async-channel",
  "async-lock",

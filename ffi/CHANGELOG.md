@@ -1,3 +1,9 @@
+# 1.0.2 (2021/01/01)
+
+## Features
+
+- Rolling to Buttplug v1.0.3, fixing issues with BTLE device discovery and adding XInput rescanning.
+
 # 1.0.1 (2020/12/31)
 
 ## Features
