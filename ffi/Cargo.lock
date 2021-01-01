@@ -397,7 +397,7 @@ dependencies = [
 
 [[package]]
 name = "buttplug-rs-ffi"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "async-channel",
  "async-lock",

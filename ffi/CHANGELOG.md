@@ -1,3 +1,9 @@
+# 1.0.1 (2020/12/31)
+
+## Features
+
+- Rolling to Buttplug v1.0.2, which fixes race conditions with device scanning.
+
 # 1.0.0 (2020/12/27)
 
 ## Features
