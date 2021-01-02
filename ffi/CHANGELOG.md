@@ -1,3 +1,9 @@
+# 1.0.3 (2021/01/02)
+
+## Features
+
+- Rolling to Buttplug v1.0.4, w/ XInput disconnection events
+
 # 1.0.2 (2021/01/01)
 
 ## Features
