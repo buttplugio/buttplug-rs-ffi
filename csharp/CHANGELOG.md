@@ -2,6 +2,13 @@
 
 ## Bugfixes
 
+- Update to buttplug-rs v1.0.3 (via buttplug-rs-ffi v1.0.2, yay dependency trees), fixes btle device
+  scanning issues, added XInput rescanning
+
+# 1.0.3 (2020-12-31)
+
+## Bugfixes
+
 - Update to buttplug-rs v1.0.1, fixes device scanning race issue 
 
 # 1.0.2 (2020-12-29)
