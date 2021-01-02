@@ -1,4 +1,11 @@
-# 1.0.3 (2020-12-31)
+# 1.0.5 (2020-01-02)
+
+## Bugfixes
+
+- Update to buttplug-rs v1.0.4 (via buttplug-rs-ffi v1.0.3), fixes XInput devices not emitting
+  disconnected events.
+
+# 1.0.4 (2021-01-01)
 
 ## Bugfixes
 
