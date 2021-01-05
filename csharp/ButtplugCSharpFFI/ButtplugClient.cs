@@ -92,6 +92,7 @@ namespace Buttplug
         public async Task DisconnectAsync()
         {
             await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle);
+            _devices.Clear();
             Connected = false;
         }
 
@@ -112,6 +113,11 @@ namespace Buttplug
                 if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceAdded)
                 {
                     var device_added_message = server_message.Message.ServerMessage.DeviceAdded;
+                    if (_devices.ContainsKey(device_added_message.Index))
+                    {
+                        ErrorReceived.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi")));
+                        return;
+                    }
                     var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
                     var attribute_dict = new Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes>();
                     for (var i = 0; i < device_added_message.MessageAttributes.Count; ++i)
@@ -135,6 +141,7 @@ namespace Buttplug
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
                 {
                     Connected = false;
+                    _devices.Clear();
                     ServerDisconnect?.Invoke(this, null);
                 }
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Error)
