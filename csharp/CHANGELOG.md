@@ -1,3 +1,9 @@
+# 1.0.6 (2020-01-04)
+
+## Bugfixes
+
+- #45: Fix issue with disconnect/reconnect causing device index collisions.
+
 # 1.0.5 (2020-01-02)
 
 ## Bugfixes
