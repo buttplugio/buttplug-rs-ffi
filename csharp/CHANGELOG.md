@@ -1,3 +1,9 @@
+# 1.0.7 (2020-01-08)
+
+## Bugfixes
+
+- Fix issue with event emitters missing null conditionals, causing null throws if no handlers exist.
+
 # 1.0.6 (2020-01-04)
 
 ## Bugfixes
