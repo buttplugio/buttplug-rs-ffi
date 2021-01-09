@@ -115,7 +115,7 @@ namespace Buttplug
                     var device_added_message = server_message.Message.ServerMessage.DeviceAdded;
                     if (_devices.ContainsKey(device_added_message.Index))
                     {
-                        ErrorReceived.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi")));
+                        ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi")));
                         return;
                     }
                     var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
@@ -129,14 +129,14 @@ namespace Buttplug
                     }
                     var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict);
                     _devices.Add(device_added_message.Index, device);
-                    DeviceAdded.Invoke(this, new DeviceAddedEventArgs(device));
+                    DeviceAdded?.Invoke(this, new DeviceAddedEventArgs(device));
                 }
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceRemoved)
                 {
                     var device_removed_message = server_message.Message.ServerMessage.DeviceRemoved;
                     var device = _devices[device_removed_message.Index];
                     _devices.Remove(device_removed_message.Index);
-                    DeviceRemoved.Invoke(this, new DeviceRemovedEventArgs(device));
+                    DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
                 }
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
                 {
