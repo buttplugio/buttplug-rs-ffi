@@ -1,3 +1,9 @@
+# 1.0.2 (2021/01/10)
+
+## Features
+
+- Update to Buttplug-rs v1.0.5, with Libo and Prettylove support
+
 # 1.0.1 (2020/12/29)
 
 ## Bugfixes
