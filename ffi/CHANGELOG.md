@@ -1,3 +1,9 @@
+# 1.0.4 (2021/01/09)
+
+## Features
+
+- Rolling to Buttplug v1.0.5, w/ expanded PrettyLove/Libo/etc support
+
 # 1.0.3 (2021/01/02)
 
 ## Features
