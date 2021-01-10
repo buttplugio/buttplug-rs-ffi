@@ -1,3 +1,13 @@
+# 1.0.8 (2020-01-09)
+
+## Features
+
+- Update to buttplug-rs v1.0.5, with new hardware support for libo, prettylove, etc
+
+## Bugfixes
+
+- #47: Sending single commands should now trigger on all motors.
+
 # 1.0.7 (2020-01-08)
 
 ## Bugfixes
