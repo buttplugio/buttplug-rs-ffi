@@ -18,7 +18,7 @@ namespace Buttplug
 
         /// <summary>
         /// The device name, which usually contains the device brand and model.
-        /// </summary>        [NotNull]
+        /// </summary>
         public readonly string Name;
 
         /// <summary>
@@ -62,7 +62,20 @@ namespace Buttplug
 
         public Task SendVibrateCmd(double aSpeed)
         {
-            return SendVibrateCmd(new Dictionary<uint, double>() { { 0, aSpeed } });
+            // If the message is missing from our dict, we should still send anyways just to let the rust library throw.
+            var count = 1u;
+            if (AllowedMessages.ContainsKey(ServerMessage.Types.MessageAttributeType.VibrateCmd))
+            {
+                count = AllowedMessages[ServerMessage.Types.MessageAttributeType.VibrateCmd].FeatureCount;
+            }
+            // There is probably a cleaner, LINQyer way to do this but ugh don't care.
+            var commandDict = new Dictionary<uint, double>();
+            for (var i = 0u; i < count; ++i)
+            {
+                commandDict.Add(i, aSpeed);
+            }
+
+            return SendVibrateCmd(commandDict);
         }
 
         public Task SendVibrateCmd(IEnumerable<double> aCmds)
@@ -77,7 +90,19 @@ namespace Buttplug
 
         public Task SendRotateCmd(double aSpeed, bool aClockwise)
         {
-            return SendRotateCmd(new Dictionary<uint, (double, bool)>() { { 0, (aSpeed, aClockwise) } });
+            // If the message is missing from our dict, we should still send anyways just to let the rust library throw.
+            var count = 1u;
+            if (AllowedMessages.ContainsKey(ServerMessage.Types.MessageAttributeType.RotateCmd))
+            {
+                count = AllowedMessages[ServerMessage.Types.MessageAttributeType.RotateCmd].FeatureCount;
+            }
+            // There is probably a cleaner, LINQyer way to do this but ugh don't care.
+            var commandDict = new Dictionary<uint, (double, bool)>();
+            for (var i = 0u; i < count; ++i)
+            {
+                commandDict.Add(i, (aSpeed, aClockwise));
+            }
+            return SendRotateCmd(commandDict);
         }
 
         public Task SendRotateCmd(IEnumerable<(double, bool)> aCmds)
@@ -92,7 +117,19 @@ namespace Buttplug
 
         public Task SendLinearCmd(uint aDuration, double aPosition)
         {
-            return SendLinearCmd(new Dictionary<uint, (uint, double)>() { { 0, (aDuration, aPosition) } });
+            // If the message is missing from our dict, we should still send anyways just to let the rust library throw.
+            var count = 1u;
+            if (AllowedMessages.ContainsKey(ServerMessage.Types.MessageAttributeType.LinearCmd))
+            {
+                count = AllowedMessages[ServerMessage.Types.MessageAttributeType.LinearCmd].FeatureCount;
+            }
+            // There is probably a cleaner, LINQyer way to do this but ugh don't care.
+            var commandDict = new Dictionary<uint, (uint, double)>();
+            for (var i = 0u; i < count; ++i)
+            {
+                commandDict.Add(i, (aDuration, aPosition));
+            }
+            return SendLinearCmd(commandDict);
         }
 
         public Task SendLinearCmd(IEnumerable<(uint, double)> aCmds)
