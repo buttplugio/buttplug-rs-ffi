@@ -8,8 +8,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["buttplug/async-std-runtime", "buttplug/btleplug-manager", "buttplug/websockets", "buttplug/xinput-manager", "buttplug/serial-manager", "buttplug/lovense-dongle-manager"]
-wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures"]
+default = ["buttplug/async-std-runtime", "buttplug/btleplug-manager", "buttplug/websockets", "buttplug/xinput-manager", "buttplug/serial-manager", "buttplug/lovense-dongle-manager", "log-panics"]
+wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures", "console_error_panic_hook"]
 
 [dependencies]
 buttplug = { version = "1.0.5", default-features = false, features = ["client", "server", "serialize-json"] }
@@ -32,6 +32,8 @@ tracing-wasm = { version = "0.1.0", optional = true }
 async-trait = { version = "0.1.42", optional = true }
 wasm-bindgen-futures = { version = "0.4.19", optional = true }
 tokio = { version = "1.0.1", features = ["sync"] }
+log-panics = { version = "2.0.0", optional = true }
+console_error_panic_hook = { version = "0.1.6", optional = true }
 
 [build-dependencies]
 prost-build = "0.7.0"

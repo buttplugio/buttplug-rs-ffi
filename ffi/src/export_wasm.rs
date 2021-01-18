@@ -8,6 +8,7 @@ use super::{
 use tracing_subscriber::{Registry, EnvFilter, layer::SubscriberExt};
 use tracing_wasm::{WASMLayer, WASMLayerConfig};
 use wasm_bindgen::prelude::*;
+use console_error_panic_hook;
 
 #[no_mangle]
 #[wasm_bindgen]
@@ -15,6 +16,8 @@ pub fn buttplug_create_client(
   callback: &FFICallback,
   client_name: &str,
 ) -> *mut ButtplugFFIClient {
+  console_error_panic_hook::set_once();
+
   // If we were handed a wrong client name, just panic.
 
   Box::into_raw(Box::new(ButtplugFFIClient::new(client_name, Some(callback.clone()))))

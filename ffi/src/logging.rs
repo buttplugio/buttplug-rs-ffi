@@ -17,6 +17,8 @@ use tracing_wasm::WASMLayer;
 use tokio::sync::mpsc;
 //use tracing::{Level};
 use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+#[cfg(not(feature="wasm"))]
+use log_panics;
 
 // Uncomment this once single type filter lands in tracing.
 /*
@@ -50,6 +52,8 @@ pub type LogFFICallback = extern "C" fn(*const c_char);
 pub type LogFFICallback = js_sys::Function;
 
 pub fn buttplug_create_log_handler(callback: LogFFICallback, max_level: &str, use_json_formatting: bool) {
+  #[cfg(not(feature="wasm"))]
+  log_panics::init();
   let (sender, mut receiver) = mpsc::channel(256);
   async_manager::spawn(async move {
     while let Some(msg) = receiver.recv().await {
