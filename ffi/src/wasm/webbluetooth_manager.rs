@@ -10,7 +10,7 @@ use buttplug::{
   },
 };
 use futures::future;
-use js_sys::Array;
+use js_sys::{Array, Reflect};
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::BluetoothDevice;
 use wasm_bindgen::prelude::*;
@@ -24,7 +24,7 @@ impl DeviceCommunicationManagerCreator for WebBluetoothCommunicationManager {
     Self { sender }
   }
 }
-/*
+
 #[wasm_bindgen]
 extern "C" {
     // Use `js_namespace` here to bind `console.log(..)` instead of just
@@ -32,7 +32,7 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
 }
-*/
+
 impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
   fn name(&self) -> &'static str {
     "WebBluetoothCommunicationManager"
@@ -42,6 +42,21 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
     info!("WebBluetooth manager scanning");
     let sender_clone = self.sender.clone();
     spawn_local(async move {
+      // Build the filter block
+      match Reflect::get(&JsValue::from(web_sys::window().unwrap().navigator()), &JsValue::from("bluetooth")) {
+        Ok(val) => {
+          if val.is_undefined() {
+            log("WebBluetooth is not supported on this browser");
+            error!("WebBluetooth is not supported on this browser");
+            return;
+          }
+        }
+        Err(e) => {
+          error!("WebBluetooth is not supported on this browser");
+          return;
+        }
+      }
+      info!("WebBluetooth supported by browser, continuing with scan.");
       let config_manager = DeviceConfigurationManager::default();
       let mut options = web_sys::RequestDeviceOptions::new();
       let filters = Array::new();
@@ -66,7 +81,6 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
       }
       options.filters(&filters.into());
       options.optional_services(&optional_services.into());
-      // Build the filter block
       let nav = web_sys::window().unwrap().navigator();
       //nav.bluetooth().get_availability();
       //JsFuture::from(nav.bluetooth().request_device()).await;
@@ -83,10 +97,10 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
             error!("Device manager receiver dropped, cannot send device found message.");
             return;
           }
-          info!("GOT DEVICE");
+          info!("WebBluetooth device found.");
         }
         Err(e) => {
-          //log(&format!("Error while trying to start bluetooth scan: {:?}", e));
+          log(&format!("Error while trying to start bluetooth scan: {:?}", e));
           error!("Error while trying to start bluetooth scan: {:?}", e);
         }
       }
