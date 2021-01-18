@@ -1,3 +1,11 @@
+# 1.0.5 (2021/01/18)
+
+## Features
+
+- Roll to Buttplug v2, w/ cleaner event system and init handling
+- Add panic logging hooks for native and WASM
+- Add console error logging for WebBluetooth scanning.
+
 # 1.0.4 (2021/01/09)
 
 ## Features
