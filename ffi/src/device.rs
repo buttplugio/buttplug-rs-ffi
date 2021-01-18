@@ -24,9 +24,9 @@ pub struct ButtplugFFIDevice {
 }
 
 impl ButtplugFFIDevice {
-  pub fn new(device: ButtplugClientDevice, callback: Option<FFICallback>) -> Self {
+  pub fn new(device: Arc<ButtplugClientDevice>, callback: Option<FFICallback>) -> Self {
     Self {
-      device: Arc::new(device),
+      device: device,
       callback,
     }
   }

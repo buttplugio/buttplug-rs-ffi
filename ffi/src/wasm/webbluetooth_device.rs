@@ -1,6 +1,5 @@
-use async_channel::{bounded, Receiver, Sender};
+use tokio::sync::{mpsc, broadcast};
 use async_trait::async_trait;
-use broadcaster::BroadcastChannel;
 use buttplug::{
   core::{
     errors::{ButtplugDeviceError, ButtplugError},
@@ -9,23 +8,21 @@ use buttplug::{
   },
   device::{
     configuration_manager::{BluetoothLESpecifier, DeviceSpecifier, ProtocolDefinition},
-    BoundedDeviceEventBroadcaster,
     ButtplugDeviceEvent,
     ButtplugDeviceImplCreator,
     DeviceImpl,
+    DeviceImplInternal,
     DeviceReadCmd,
     DeviceSubscribeCmd,
     DeviceUnsubscribeCmd,
     DeviceWriteCmd,
     Endpoint,
   },
-  server::comm_managers::ButtplugDeviceSpecificError,
   util::future::{ButtplugFuture, ButtplugFutureStateShared},
 };
 use futures::future::{self, BoxFuture};
-use futures::StreamExt;
 use js_sys::Uint8Array;
-use std::collections::HashMap;
+use std::{fmt::{self, Debug}, collections::HashMap};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
@@ -40,8 +37,11 @@ use web_sys::{
 
 type WebBluetoothResultFuture = ButtplugFuture<Result<(), ButtplugError>>;
 
+#[derive(Debug, Clone)]
 pub enum WebBluetoothEvent {
-  Connected,
+  // This is the only way we have to get our endpoints back to device creation
+  // right now. My god this is a mess.
+  Connected(Vec<Endpoint>),
   Disconnected,
 }
 
@@ -67,9 +67,9 @@ pub enum WebBluetoothDeviceCommand {
 async fn run_webbluetooth_loop(
   device: BluetoothDevice,
   protocol: ProtocolDefinition,
-  device_local_event_sender: Sender<WebBluetoothEvent>,
-  device_external_event_sender: BoundedDeviceEventBroadcaster,
-  mut device_command_receiver: Receiver<WebBluetoothDeviceCommand>,
+  device_local_event_sender: mpsc::Sender<WebBluetoothEvent>,
+  device_external_event_sender: broadcast::Sender<ButtplugDeviceEvent>,
+  mut device_command_receiver: mpsc::Receiver<WebBluetoothDeviceCommand>,
 ) {
   //let device = self.device.take().unwrap();
   let mut char_map = HashMap::new();
@@ -115,10 +115,11 @@ async fn run_webbluetooth_loop(
   }
   //let web_btle_device = WebBluetoothDeviceImpl::new(device, char_map);
   info!("device created!");
+  let endpoints = char_map.keys().into_iter().cloned().collect();
   device_local_event_sender
-    .send(WebBluetoothEvent::Connected)
+    .send(WebBluetoothEvent::Connected(endpoints))
     .await;
-  while let Some(msg) = device_command_receiver.next().await {
+  while let Some(msg) = device_command_receiver.recv().await {
     match msg {
       WebBluetoothDeviceCommand::Write(write_cmd, waker) => {
         info!("Writing to endpoint {:?}", write_cmd.endpoint);
@@ -130,12 +131,13 @@ async fn run_webbluetooth_loop(
           waker.set_reply(Ok(()));
         });
       }
-      WebBluetoothDeviceCommand::Read(read, waker) => {}
+      WebBluetoothDeviceCommand::Read(_read, _waker) => {}
       WebBluetoothDeviceCommand::Subscribe(subscribe_cmd, waker) => {
         info!("Subscribing to endpoint {:?}", subscribe_cmd.endpoint);
         let chr = char_map.get(&subscribe_cmd.endpoint).unwrap().clone();
         let ep = subscribe_cmd.endpoint;
         let event_sender = device_external_event_sender.clone();
+        let id = device.id().clone();
         let onchange_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
           info!("GOT VALUE FROM SUBSCRIPTION");
           info!("{}", ep);
@@ -146,22 +148,9 @@ async fn run_webbluetooth_loop(
             Uint8Array::new_with_byte_offset(&JsValue::from(event_chr.value().unwrap().buffer()), 0);
           let value_vec = value.to_vec();
           info!("{:?}", value_vec);
-          // This block limits the lifetime of the channel sender.
-          // Since the compiler doesn't realize we move the sender in
-          // the spawn_local block, it'll complain that sender's
-          // lifetime lives across the channel await, which gets all
-          // angry because this will break FnMut requirements (since
-          // this can be called multiple times). So this limits the
-          // visible lifetime to before we start waiting for the reply
-          // from the event loop.
-          {
-            let send_clone = event_sender.clone();
-            spawn_local(async move {
-              send_clone
-                .send(&ButtplugDeviceEvent::Notification(ep, value_vec))
-                .await;
-            });
-          }
+          event_sender
+            .send(ButtplugDeviceEvent::Notification(id.clone(), ep, value_vec))
+            .unwrap();
         }) as Box<dyn FnMut(MessageEvent)>);
         // set message event handler on WebSocket
         chr.set_oncharacteristicvaluechanged(Some(onchange_callback.as_ref().unchecked_ref()));
@@ -172,7 +161,7 @@ async fn run_webbluetooth_loop(
           waker.set_reply(Ok(()));
         });
       }
-      WebBluetoothDeviceCommand::Unsubscribe(unsubscribe_cmd, waker) => {}
+      WebBluetoothDeviceCommand::Unsubscribe(_unsubscribe_cmd, _waker) => {}
     }
   }
 }
@@ -200,6 +189,14 @@ impl WebBluetoothDeviceImplCreator {
   }
 }
 
+impl Debug for WebBluetoothDeviceImplCreator {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_struct("WebBluetoothDeviceImplCreator")
+      .field("specifier", &self.specifier)
+      .finish()
+  }
+}
+
 #[async_trait]
 impl ButtplugDeviceImplCreator for WebBluetoothDeviceImplCreator {
   fn get_specifier(&self) -> DeviceSpecifier {
@@ -210,10 +207,12 @@ impl ButtplugDeviceImplCreator for WebBluetoothDeviceImplCreator {
   async fn try_create_device_impl(
     &mut self,
     protocol: ProtocolDefinition,
-  ) -> Result<Box<dyn DeviceImpl>, ButtplugError> {
-    let (sender, mut receiver) = bounded(256);
-    let (command_sender, command_receiver) = bounded(256);
-    let ble_device;
+  ) -> Result<DeviceImpl, ButtplugError> {
+    let (sender, mut receiver) = mpsc::channel(256);
+    let (command_sender, command_receiver) = mpsc::channel(256);
+    let name;
+    let address;
+    let event_sender;
     // This block limits the lifetime of device. Since the compiler doesn't
     // realize we move device in the spawn_local block, it'll complain that
     // device's lifetime lives across the channel await, which gets all
@@ -221,33 +220,37 @@ impl ButtplugDeviceImplCreator for WebBluetoothDeviceImplCreator {
     // before we start waiting for the reply from the event loop.
     {
       let device = self.device.take().unwrap();
-      let name = device.name().unwrap();
-      let address = device.id();
-      let receiver_clone = receiver.clone();
-      let event_receiver = BroadcastChannel::with_cap(256);
-      let event_receiver_clone = event_receiver.clone();
-      ble_device = Box::new(WebBluetoothDeviceImpl::new(
-        &name,
-        &address,
-        event_receiver,
-        receiver_clone,
-        command_sender,
-      ));
+      name = device.name().unwrap();
+      address = device.id();
+      let (es, _) = broadcast::channel(256);
+      event_sender = es;
+      let event_loop_fut = run_webbluetooth_loop(
+        device,
+        protocol,
+        sender,
+        event_sender.clone(),
+        command_receiver,
+      );
       spawn_local(async move {
-        run_webbluetooth_loop(
-          device,
-          protocol,
-          sender,
-          event_receiver_clone,
-          command_receiver,
-        )
-        .await;
+        event_loop_fut.await;
       });
     }
-    match receiver.next().await.unwrap() {
-      WebBluetoothEvent::Connected => {
+
+    match receiver.recv().await.unwrap() {
+      WebBluetoothEvent::Connected(endpoints) => {
         info!("Web Bluetooth device connected, returning device");
-        Ok(ble_device)
+
+        let device_impl = Box::new(WebBluetoothDeviceImpl::new(
+          event_sender,
+          receiver,
+          command_sender,
+        ));
+        Ok(DeviceImpl::new(
+          &name,
+          &address,
+          &endpoints,
+          device_impl
+        ))
       }
       WebBluetoothEvent::Disconnected => Err(
         ButtplugDeviceError::DeviceCommunicationError(
@@ -259,15 +262,11 @@ impl ButtplugDeviceImplCreator for WebBluetoothDeviceImplCreator {
   }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct WebBluetoothDeviceImpl {
-  device_command_sender: Sender<WebBluetoothDeviceCommand>,
-  device_event_receiver: Receiver<WebBluetoothEvent>,
-  event_receiver: BoundedDeviceEventBroadcaster,
-  address: String,
-  // device: BluetoothDevice,
-  // characteristics: HashMap<Endpoint, BluetoothRemoteGattCharacteristic>,
-  name: String,
+  device_command_sender: mpsc::Sender<WebBluetoothDeviceCommand>,
+  device_event_receiver: mpsc::Receiver<WebBluetoothEvent>,
+  event_sender: broadcast::Sender<ButtplugDeviceEvent>,
 }
 
 unsafe impl Send for WebBluetoothDeviceImpl {
@@ -277,46 +276,31 @@ unsafe impl Sync for WebBluetoothDeviceImpl {
 
 impl WebBluetoothDeviceImpl {
   pub fn new(
-    name: &str,
-    address: &str,
-    event_receiver: BoundedDeviceEventBroadcaster,
-    device_event_receiver: Receiver<WebBluetoothEvent>,
-    device_command_sender: Sender<WebBluetoothDeviceCommand>,
+    event_sender: broadcast::Sender<ButtplugDeviceEvent>,
+    device_event_receiver: mpsc::Receiver<WebBluetoothEvent>,
+    device_command_sender: mpsc::Sender<WebBluetoothDeviceCommand>,
   ) -> Self {
     Self {
-      event_receiver,
-      address: address.to_owned(),
-      name: name.to_owned(),
+      event_sender,
       device_event_receiver,
       device_command_sender,
     }
   }
 }
 
-impl DeviceImpl for WebBluetoothDeviceImpl {
-  fn name(&self) -> &str {
-    &self.name
-  }
-
-  fn address(&self) -> &str {
-    &self.address
+impl DeviceImplInternal for WebBluetoothDeviceImpl {
+  fn event_stream(&self) -> broadcast::Receiver<ButtplugDeviceEvent> {
+    self.event_sender.subscribe()
   }
 
   fn connected(&self) -> bool {
+    // TODO This obviously is not correct but we don't really use connected
+    // anywhere?!
     true
-  }
-
-  fn endpoints(&self) -> Vec<Endpoint> {
-    vec![]
-    //self.characteristics.keys().cloned().collect()
   }
 
   fn disconnect(&self) -> ButtplugResultFuture {
     Box::pin(future::ready(Ok(())))
-  }
-
-  fn get_event_receiver(&self) -> BoundedDeviceEventBroadcaster {
-    self.event_receiver.clone()
   }
 
   fn read_value(

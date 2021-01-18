@@ -324,6 +324,9 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
         &callback,
       );
     }
+    ButtplugClientEvent::ServerConnect => {
+      
+    }
     ButtplugClientEvent::ServerDisconnect => {
       let disconnect_msg = FFIServerMessage {
         id: 0,

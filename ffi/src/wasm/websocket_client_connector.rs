@@ -7,7 +7,7 @@
 
 //! Handling of websockets using async-tungstenite
 
-use async_channel::bounded;
+use tokio::sync::{mpsc, Mutex};
 use buttplug::{
   connector::{
     transport::{
@@ -23,10 +23,8 @@ use buttplug::{
   core::messages::serializer::ButtplugSerializedMessage,
   util::async_manager,
 };
-use futures::{future, SinkExt, StreamExt};
+use futures::future;
 use std::sync::Arc;
-use async_channel::Sender;
-use async_lock::Mutex;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
@@ -36,7 +34,7 @@ use web_sys::{self, ErrorEvent, MessageEvent, WebSocket};
 pub struct ButtplugBrowserWebsocketClientTransport {
   /// Address of the server we'll connect to.
   address: String,
-  disconnect_sender: Arc<Mutex<Sender<ButtplugTransportOutgoingMessage>>>
+  disconnect_sender: Arc<Mutex<mpsc::Sender<ButtplugTransportOutgoingMessage>>>
 }
 
 impl ButtplugBrowserWebsocketClientTransport {
@@ -46,7 +44,7 @@ impl ButtplugBrowserWebsocketClientTransport {
   /// server. Address should be the full URL of the server, i.e.
   /// "ws://127.0.0.1:12345"
   pub fn new(address: &str) -> Self {
-    let (unused_sender, _) = bounded(256);
+    let (unused_sender, _) = mpsc::channel(256);
     Self {
       address: address.to_owned(),
       disconnect_sender: Arc::new(Mutex::new(unused_sender))
@@ -56,15 +54,19 @@ impl ButtplugBrowserWebsocketClientTransport {
 
 impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
   fn connect(&self) -> ButtplugConnectorTransportConnectResult {
-    let (request_sender, request_receiver) = bounded(256);
-    let (response_sender, response_receiver) = bounded(256);
+    let (request_sender, request_receiver) = mpsc::channel(256);
+    // We never try to use this twice, but due to the FnMut guarantees needed by
+    // our closure, we have to act like we can anyways. There's probably an
+    // easier way around this but I'm not sure what it is.
+    let request_receiver = Arc::new(Mutex::new(request_receiver));
+    let (response_sender, response_receiver) = mpsc::channel(256);
     // Could also do this with a future but eh.
-    let (connect_sender, mut connect_receiver) = bounded(1);
+    let (connect_sender, mut connect_receiver) = mpsc::channel(1);
     // Probably a rusty-er way to do this but eh.
     let ws;
     match WebSocket::new(&self.address) {
       Ok(websocket) => ws = websocket,
-      Err(e) => return Box::pin(future::ready(Err(ButtplugConnectorError::ConnectorGenericError("Could not connect to websocket, possibly due to URL issue.".to_owned()))))
+      Err(e) => return Box::pin(future::ready(Err(ButtplugConnectorError::ConnectorGenericError(format!("Could not connect to websocket, possibly due to URL issue: {:?}", e)))))
     }
     let response_sender_clone = response_sender.clone();
     let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
@@ -98,12 +100,12 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       let recvr_clone = request_receiver.clone();
       let wscs = ws_sender_clone.clone();
       spawn_local(async move {
-        while let Ok(msg) = recvr_clone.recv().await {
+        while let Some(msg) = recvr_clone.lock().await.recv().await {
           match msg {
             ButtplugTransportOutgoingMessage::Message(out_msg) => {
               match out_msg {
                 ButtplugSerializedMessage::Text(text) => wscs.send_with_str(&text).unwrap(),
-                ButtplugSerializedMessage::Binary(bin) => {
+                ButtplugSerializedMessage::Binary(_bin) => {
                   // TOOD Make this an error?
                 }
               }
@@ -125,7 +127,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
     onopen_callback.forget();
 
     let failure_sender = connect_sender.clone();
-    let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
+    let onerror_callback = Closure::wrap(Box::new(move |_: ErrorEvent| {
       let fsc = failure_sender.clone();
       async_manager::spawn(async move {
         fsc.send(false).await;
@@ -137,7 +139,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
     let disconnect_sender = self.disconnect_sender.clone();
     Box::pin(async move{
       *disconnect_sender.lock().await = request_sender.clone();
-      if connect_receiver.next().await.unwrap() {
+      if connect_receiver.recv().await.unwrap() {
         Ok((request_sender, response_receiver))
       } else {
         Err(ButtplugConnectorError::ConnectorGenericError("Could not connect to websocket, possibly due to server issue.".to_owned()))

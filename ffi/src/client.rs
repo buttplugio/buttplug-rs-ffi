@@ -8,15 +8,13 @@ use super::{
   }
 };
 use std::sync::Arc;
-use async_lock::RwLock;
 use buttplug::{
   core::messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer},
-  client::{ButtplugClient, ButtplugClientEvent, device::ButtplugClientDevice},
-  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugConnectorError, ButtplugRemoteClientConnector},
+  client::ButtplugClient,
+  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugRemoteClientConnector},
   server::ButtplugServerOptions,
   util::async_manager
 };
-use dashmap::DashMap;
 #[cfg(feature = "wasm")]
 use super::wasm::{
   webbluetooth_manager::WebBluetoothCommunicationManager,
@@ -41,10 +39,8 @@ use futures::StreamExt;
 use prost::Message;
 
 pub struct ButtplugFFIClient {
-  name: String,
   callback: Option<FFICallback>,
-  client: Arc<RwLock<Option<ButtplugClient>>>,
-  devices: Arc<DashMap<u32, ButtplugClientDevice>>
+  client: Arc<ButtplugClient>,
 }
 
 impl Drop for ButtplugFFIClient {
@@ -56,17 +52,15 @@ impl Drop for ButtplugFFIClient {
 impl ButtplugFFIClient {
   pub fn new(name: &str, callback: Option<FFICallback>) -> Self {
     Self {
-      name: name.to_owned(),
       callback,
-      client: Arc::new(RwLock::new(None)),
-      devices: Arc::new(DashMap::new())
+      client: Arc::new(ButtplugClient::new(name)),
     }
   }
 
   pub fn get_device(&self, device_index: u32) -> Option<ButtplugFFIDevice> {
-    if self.devices.contains_key(&device_index) {
-      let device = self.devices.get(&device_index).unwrap();
-      Some(ButtplugFFIDevice::new(device.value().clone(), self.callback.clone()))
+    let devices = self.client.devices();
+    if let Some(device) = devices.iter().find(|device| device.index() == device_index) {
+      Some(ButtplugFFIDevice::new(device.clone(), self.callback.clone()))
     } else {
       error!("Device id {} not available.", device_index);
       None
@@ -89,31 +83,17 @@ impl ButtplugFFIClient {
 
   fn connect<T>(&self, client_msg_id: u32, connector: T) 
   where T: ButtplugConnector<ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage>  + 'static {
-    info!("Making client with name {}, id {}", self.name, client_msg_id);
+    info!("Connected client with id {}", client_msg_id);
     let client = self.client.clone();
-    let client_name = self.name.clone();
     let callback = self.callback.clone();
-    let device_map = self.devices.clone();
 
     async_manager::spawn(async move {
-      match ButtplugClient::connect(&client_name, connector).await {
-        Ok((bp_client, mut event_stream)) => {
-          *(client.write().await) = Some(bp_client);
+      match client.connect(connector).await {
+        Ok(()) => {
           let event_callback = callback.clone();
+          let mut event_stream = client.event_stream();
           async_manager::spawn(async move {
             while let Some(e) = event_stream.next().await {
-              match &e {
-                ButtplugClientEvent::DeviceAdded(device) => {
-                  device_map.insert(device.index(), device.clone());
-                },
-                ButtplugClientEvent::DeviceRemoved(device) => {
-                  device_map.remove(&device.index());
-                }
-                // Events will be forwarded to the client in send_event, so we
-                // can ignore them here unless they specifically need to modify
-                // the FFI client somehow.
-                _ => {}
-              };
               send_event(e, event_callback.clone());
             }
           }).unwrap();
@@ -190,11 +170,7 @@ impl ButtplugFFIClient {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
-      if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(msg_id, &usable_client.disconnect().await, &callback);
-      } else {
-        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
-      }
+      return_client_result(msg_id, &client.disconnect().await, &callback);
     }).unwrap();
   }
 
@@ -202,11 +178,7 @@ impl ButtplugFFIClient {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
-      if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(msg_id, &usable_client.start_scanning().await, &callback);
-      } else {
-        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
-      }
+      return_client_result(msg_id, &client.start_scanning().await, &callback);
     }).unwrap();
   }
 
@@ -214,11 +186,7 @@ impl ButtplugFFIClient {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
-      if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(msg_id, &usable_client.stop_scanning().await, &callback);
-      } else {
-        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
-      }
+      return_client_result(msg_id, &client.stop_scanning().await, &callback);
     }).unwrap();
   }
 
@@ -226,11 +194,7 @@ impl ButtplugFFIClient {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
-      if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(msg_id, &usable_client.ping().await, &callback);
-      } else {
-        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
-      }
+      return_client_result(msg_id, &client.ping().await, &callback);
     }).unwrap();
   }
 
@@ -238,11 +202,7 @@ impl ButtplugFFIClient {
     let client = self.client.clone();
     let callback = self.callback.clone();
     async_manager::spawn(async move {
-      if let Some(usable_client) = &(*client.read().await) {
-        return_client_result(msg_id, &usable_client.stop_all_devices().await, &callback);
-      } else {
-        return_error(msg_id, &ButtplugConnectorError::ConnectorNotConnected.into(), &callback)
-      }
+      return_client_result(msg_id, &client.stop_all_devices().await, &callback);
     }).unwrap();
   }
 }

@@ -1,5 +1,5 @@
 use super::webbluetooth_device::WebBluetoothDeviceImplCreator;
-use async_channel::Sender;
+use tokio::sync::mpsc::Sender;
 use buttplug::{
   core::ButtplugResultFuture,
   device::configuration_manager::DeviceConfigurationManager,
@@ -13,6 +13,7 @@ use futures::future;
 use js_sys::Array;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::BluetoothDevice;
+use wasm_bindgen::prelude::*;
 
 pub struct WebBluetoothCommunicationManager {
   sender: Sender<DeviceCommunicationEvent>,
@@ -23,7 +24,15 @@ impl DeviceCommunicationManagerCreator for WebBluetoothCommunicationManager {
     Self { sender }
   }
 }
-
+/*
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+*/
 impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
   fn name(&self) -> &'static str {
     "WebBluetoothCommunicationManager"
@@ -76,7 +85,10 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
           }
           info!("GOT DEVICE");
         }
-        Err(e) => error!("DEVICE ERROR: {:?}", e),
+        Err(e) => {
+          //log(&format!("Error while trying to start bluetooth scan: {:?}", e));
+          error!("Error while trying to start bluetooth scan: {:?}", e);
+        }
       }
     });
     Box::pin(future::ready(Ok(())))
