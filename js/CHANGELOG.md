@@ -1,3 +1,12 @@
+# 1.0.3 (2021/01/18)
+
+## Features
+
+- Update to Buttplug-rs v2.0.0
+  - Lovense Ferri support
+  - Init/Event API cleanup
+- Panic messages/stacks now emitted on WASM panic
+
 # 1.0.2 (2021/01/10)
 
 ## Features
