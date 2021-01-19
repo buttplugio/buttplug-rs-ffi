@@ -2,7 +2,7 @@
 
 ## Features
 
-- Roll to Buttplug v2, w/ cleaner event system and init handling
+- Roll to Buttplug v2.0.1, w/ cleaner event system and init handling
 - Add panic logging hooks for native and WASM
 - Add console error logging for WebBluetooth scanning.
 
