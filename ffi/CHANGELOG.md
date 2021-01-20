@@ -1,3 +1,9 @@
+# 1.0.6 (2021/01/19)
+
+## Features
+
+- Roll to Buttplug v2.0.2, fixes some scanning lockup issues with the lovense dongle.
+
 # 1.0.5 (2021/01/18)
 
 ## Features
