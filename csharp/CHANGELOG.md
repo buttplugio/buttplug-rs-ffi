@@ -1,3 +1,10 @@
+# 1.0.9 (2020-01-19)
+
+## Features
+
+- Update to buttplug-rs v2.0.2, hardware support for Lovense Ferri, lots of internal cleanup,
+  lovense dongle fixes.
+
 # 1.0.8 (2020-01-09)
 
 ## Features
