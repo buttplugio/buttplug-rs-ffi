@@ -1,3 +1,10 @@
+# 1.0.7 (2021/01/21)
+
+## Features
+
+- Roll to Buttplug v2.0.3, fixes type constraints on client device message types so we don't panic
+  when getting deprecated message type attributes.
+
 # 1.0.6 (2021/01/19)
 
 ## Features
