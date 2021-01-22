@@ -1,3 +1,10 @@
+# 1.0.4 (2021/01/21)
+
+## Features
+
+- Update to Buttplug-rs v2.0.3
+  - Fixes issues with Strokers/rotators not showing up due to invalid message attributes.
+
 # 1.0.3 (2021/01/18)
 
 ## Features
