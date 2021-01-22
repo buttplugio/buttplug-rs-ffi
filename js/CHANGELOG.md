@@ -1,3 +1,9 @@
+# 1.0.5 (2021/01/22)
+
+## Bugfixes
+
+- #49: Fix issue with incorrect type check on linear commands.
+
 # 1.0.4 (2021/01/21)
 
 ## Features
