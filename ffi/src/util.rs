@@ -10,8 +10,8 @@ use super::{
   FFICallback,
 };
 use buttplug::{
-  client::{ButtplugClientError, ButtplugClientEvent},
-  core::{errors::ButtplugError, messages::ButtplugDeviceMessageType},
+  client::{ButtplugClientError, ButtplugClientEvent, ButtplugClientDeviceMessageType},
+  core::{errors::ButtplugError},
   device::Endpoint,
 };
 use prost::Message;
@@ -106,25 +106,19 @@ pub fn return_ok(id: u32, callback: &Option<FFICallback>) {
 }
 
 // TODO Should probably make this a macro
-impl TryFrom<ButtplugDeviceMessageType> for MessageAttributeType {
-  type Error = ();
-
-  fn try_from(msg_type: ButtplugDeviceMessageType) -> Result<Self, ()> {
+impl From<ButtplugClientDeviceMessageType> for MessageAttributeType {
+  fn from(msg_type: ButtplugClientDeviceMessageType) -> Self {
     match msg_type {
-      ButtplugDeviceMessageType::VibrateCmd => Ok(MessageAttributeType::VibrateCmd),
-      ButtplugDeviceMessageType::LinearCmd => Ok(MessageAttributeType::LinearCmd),
-      ButtplugDeviceMessageType::RotateCmd => Ok(MessageAttributeType::RotateCmd),
-      ButtplugDeviceMessageType::StopDeviceCmd => Ok(MessageAttributeType::StopDeviceCmd),
-      ButtplugDeviceMessageType::RawReadCmd => Ok(MessageAttributeType::RawReadCmd),
-      ButtplugDeviceMessageType::RawWriteCmd => Ok(MessageAttributeType::RawWriteCmd),
-      ButtplugDeviceMessageType::RSSILevelCmd => Ok(MessageAttributeType::RssiLevelCmd),
-      ButtplugDeviceMessageType::BatteryLevelCmd => Ok(MessageAttributeType::BatteryLevelCmd),
-      ButtplugDeviceMessageType::RawSubscribeCmd => Ok(MessageAttributeType::RawSubscribeCmd),
-      ButtplugDeviceMessageType::RawUnsubscribeCmd => Ok(MessageAttributeType::RawUnsubscribeCmd),
-      _ => {
-        error!("Command not convertible: {:?}", msg_type);
-        Err(())
-      }
+      ButtplugClientDeviceMessageType::VibrateCmd => MessageAttributeType::VibrateCmd,
+      ButtplugClientDeviceMessageType::LinearCmd => MessageAttributeType::LinearCmd,
+      ButtplugClientDeviceMessageType::RotateCmd => MessageAttributeType::RotateCmd,
+      ButtplugClientDeviceMessageType::StopDeviceCmd => MessageAttributeType::StopDeviceCmd,
+      ButtplugClientDeviceMessageType::RawReadCmd => MessageAttributeType::RawReadCmd,
+      ButtplugClientDeviceMessageType::RawWriteCmd => MessageAttributeType::RawWriteCmd,
+      ButtplugClientDeviceMessageType::RSSILevelCmd => MessageAttributeType::RssiLevelCmd,
+      ButtplugClientDeviceMessageType::BatteryLevelCmd => MessageAttributeType::BatteryLevelCmd,
+      ButtplugClientDeviceMessageType::RawSubscribeCmd => MessageAttributeType::RawSubscribeCmd,
+      ButtplugClientDeviceMessageType::RawUnsubscribeCmd => MessageAttributeType::RawUnsubscribeCmd,
     }
   }
 }
@@ -243,7 +237,7 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       for (message_type, message_attrs) in &device.allowed_messages {
         // If we can't convert, this means we don't support the message type in
         // the FFI layer. Good way to deprecate messages.
-        let attr_type: ButtplugDeviceMessageType = if let Ok(attr) = message_type.clone().try_into() {
+        let attr_type: ButtplugClientDeviceMessageType = if let Ok(attr) = message_type.clone().try_into() {
           attr
         } else {
           continue;
