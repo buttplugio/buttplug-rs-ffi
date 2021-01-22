@@ -184,7 +184,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async linear(position: number | VectorCmd[], duration: number | undefined): Promise<void> {
-    this.checkAllowedMessageType(ButtplugDeviceMessageType.RotateCmd);
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.LinearCmd);
     let msgVectors: Buttplug.DeviceMessage.LinearComponent[];
     if (typeof (position) === "number" && duration !== undefined) {
       // We can skip the check here since we're building the command array ourselves.
@@ -207,6 +207,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async batteryLevel(): Promise<number> {
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.BatteryLevelCmd);
     let batteryMsg = await batteryLevel(this._sorter, this._devicePtr);
     if (batteryMsg.message?.deviceEvent?.batteryLevelReading) {
       let reading = batteryMsg.message?.deviceEvent?.batteryLevelReading;
@@ -216,6 +217,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rssiLevel(): Promise<number> {
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RSSILevelCmd);
     let rssiMsg = await rssiLevel(this._sorter, this._devicePtr);
     if (rssiMsg.message?.deviceEvent?.rssiLevelReading) {
       return rssiMsg.message?.deviceEvent?.rssiLevelReading.reading!;
@@ -224,6 +226,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rawRead(endpoint: Buttplug.Endpoint, expectedLength: number, timeout: number): Promise<Uint8Array> {
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RawReadCmd);
     let readingMsg = await rawRead(this._sorter, this._devicePtr, endpoint, expectedLength, timeout);
     if (readingMsg.message?.deviceEvent?.rawReading) {
       return readingMsg.message.deviceEvent.rawReading.data!;
@@ -232,14 +235,17 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rawWrite(endpoint: Buttplug.Endpoint, data: Uint8Array, writeWithResponse: boolean): Promise<void> {
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RawWriteCmd);
     await rawWrite(this._sorter, this._devicePtr, endpoint, data, writeWithResponse);
   }
 
   public async rawSubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RawSubscribeCmd);
     await rawSubscribe(this._sorter, this._devicePtr, endpoint);
   }
 
   public async rawUnsubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
+    this.checkAllowedMessageType(ButtplugDeviceMessageType.RawUnsubscribeCmd);
     await rawUnsubscribe(this._sorter, this._devicePtr, endpoint);
   }
 
