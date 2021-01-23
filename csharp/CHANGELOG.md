@@ -1,3 +1,10 @@
+# 1.0.10 (2020-01-22)
+
+## Bugfixes
+
+- Update to buttplug-rs v2.0.3, fixing some message compat issues and restoring access to some
+  stroking and rotating devices.
+
 # 1.0.9 (2020-01-19)
 
 ## Features
