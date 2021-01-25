@@ -1,3 +1,9 @@
+# 1.0.9 (2021/01/24)
+
+## Bugfixes
+
+- Roll to Buttplug 2.0.5, fixes issue with mishandled serialization in DeviceMessageInfo
+
 # 1.0.8 (2021/01/24)
 
 ## Bugfixes
