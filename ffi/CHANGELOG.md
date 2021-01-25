@@ -1,13 +1,19 @@
+# 1.0.8 (2021/01/24)
+
+## Bugfixes
+
+- Roll to Buttplug v2.0.4, fixes issues with WASM delays and XInput device misaddressing
+
 # 1.0.7 (2021/01/21)
 
-## Features
+## Bugfixes
 
 - Roll to Buttplug v2.0.3, fixes type constraints on client device message types so we don't panic
   when getting deprecated message type attributes.
 
 # 1.0.6 (2021/01/19)
 
-## Features
+## Bugfixes
 
 - Roll to Buttplug v2.0.2, fixes some scanning lockup issues with the lovense dongle.
 
