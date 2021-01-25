@@ -19,9 +19,13 @@ let buttplug_activate_env_logger = must_run_init_1;
 let buttplug_free_device = must_run_init_1;
 let buttplug_create_device = must_run_init_2;
 let buttplug_parse_device_message = must_run_init_2;
+let buttplug_has_init_run = false;
 
 export async function buttplugInit() {
-  console.log("trying to load new path?!");
+  if (buttplug_has_init_run) {
+    console.log("buttplugInit function has already run successfully. This only needs to be run once, but doesn't affect anything (other than printing this message) if called again.");
+    return;
+  }
   let index = await import(/* webpackPrefetch: 1 */ "./buttplug-rs-ffi/buttplug_rs_ffi").catch((e) => {
     console.log(e);
     return Promise.reject(e);
@@ -34,6 +38,7 @@ export async function buttplugInit() {
   buttplug_free_device = index.buttplug_free_device;
   buttplug_create_device = index.buttplug_create_device;
   buttplug_parse_device_message = index.buttplug_parse_device_message;
+  buttplug_has_init_run = true;
 }
 
 function sendClientMessage(sorter: ButtplugMessageSorter, clientPtr: number, message: Buttplug.ClientMessage): Promise<Buttplug.ButtplugFFIServerMessage> {
