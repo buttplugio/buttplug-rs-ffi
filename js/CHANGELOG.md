@@ -1,3 +1,9 @@
+# 1.0.7 (2020/01/24)
+
+## Bugfixes
+
+- Update to buttplug-rs v2.0.5, fixes issue with DeviceMessageInfo deserialization
+
 # 1.0.6 (2020/01/24)
 
 ## Bugfixes
