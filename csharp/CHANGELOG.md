@@ -1,3 +1,10 @@
+# 1.0.11 (2020-01-24)
+
+## Bugfixes
+
+- Update to buttplug-rs v2.0.5, fixes issues with XInput misaddressing, and DeviceMessageInfo
+  serialization issues.
+
 # 1.0.10 (2020-01-22)
 
 ## Bugfixes

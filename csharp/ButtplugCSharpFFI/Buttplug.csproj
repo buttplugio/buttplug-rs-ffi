@@ -5,7 +5,7 @@
     <Title>Buttplug</Title>
     <AssemblyName>Buttplug</AssemblyName>
     <Summary>Buttplug Sex Toy Control Library</Summary>
-    <Version>1.0.10</Version>
+    <Version>1.0.11</Version>
     <Authors>Nonpolynomial, LLC</Authors>
     <RepositoryUrl>https://github.com/buttplugio/buttplug-rs-ffi</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -51,7 +51,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="ButtplugRustFFI" Version="1.0.7" />
+    <PackageReference Include="ButtplugRustFFI" Version="1.0.9" />
     <PackageReference Include="Google.Protobuf" Version="3.14.0" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
