@@ -1,3 +1,13 @@
+# 1.0.6 (2020/01/24)
+
+## Bugfixes
+
+- Print message and bail early if buttplugInit is called again after successful load.
+  - This most likely exited quietly without breaking anything before, but now it's at least spewing
+    some status too.
+- Update to buttplug-rs v2.0.4, fixing issues with native timers being compiled instead of WASM
+  timers.
+
 # 1.0.5 (2021/01/22)
 
 ## Bugfixes
