@@ -1,3 +1,9 @@
+# 1.0.12 (2020-02-06)
+
+## Features
+
+- Update to buttplug-rs v2.1.1, more error handling/bugfixes, Lovense/Nobra device handling
+
 # 1.0.11 (2020-01-24)
 
 ## Bugfixes
