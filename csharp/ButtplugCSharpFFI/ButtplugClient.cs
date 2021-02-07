@@ -134,6 +134,10 @@ namespace Buttplug
                 else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceRemoved)
                 {
                     var device_removed_message = server_message.Message.ServerMessage.DeviceRemoved;
+                    if (!_devices.ContainsKey(device_removed_message.Index)) {
+                        // Device was removed from our dict before we could remove it ourselves.
+                        return;
+                    }
                     var device = _devices[device_removed_message.Index];
                     _devices.Remove(device_removed_message.Index);
                     DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
