@@ -1,3 +1,9 @@
+# 1.0.10 (2021/02/06)
+
+## Features
+
+- Roll to Buttplug 2.1.1, lots more error handling and tests, adds diamo and nobra support
+
 # 1.0.9 (2021/01/24)
 
 ## Bugfixes
