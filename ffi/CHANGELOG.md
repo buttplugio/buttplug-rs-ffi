@@ -1,3 +1,9 @@
+# 1.0.11 (2021/02/07)
+
+## Bugfixes
+
+- Fix issue with StopAllDevices not running due to Id conflict in in-process instances
+
 # 1.0.10 (2021/02/06)
 
 ## Features
