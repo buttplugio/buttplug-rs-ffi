@@ -1,3 +1,9 @@
+# 1.0.13 (2020-02-07)
+
+## Bugfixes
+
+- Update to butptlug-rs v2.1.2, fix issue where StopDeviceCmd may not work in in-process instances
+
 # 1.0.12 (2020-02-06)
 
 ## Features
