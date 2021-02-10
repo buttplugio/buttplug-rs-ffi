@@ -113,6 +113,19 @@ async fn run_webbluetooth_loop(
       char_map.insert(chr_name.clone(), char);
     }
   }
+  {
+    let event_sender = device_external_event_sender.clone();
+    let id = device.id().clone();
+    let ondisconnected_callback = Closure::wrap(Box::new(move |e: Event| {
+      info!("device disconnected!");
+      event_sender
+        .send(ButtplugDeviceEvent::Removed(id.clone()))
+        .unwrap();
+    }) as Box<dyn FnMut(Event)>);
+    // set disconnection event handler on BluetoothDevice
+    device.set_ongattserverdisconnected(Some(ondisconnected_callback.as_ref().unchecked_ref()));
+    ondisconnected_callback.forget();
+  }
   //let web_btle_device = WebBluetoothDeviceImpl::new(device, char_map);
   info!("device created!");
   let endpoints = char_map.keys().into_iter().cloned().collect();
@@ -164,6 +177,7 @@ async fn run_webbluetooth_loop(
       WebBluetoothDeviceCommand::Unsubscribe(_unsubscribe_cmd, _waker) => {}
     }
   }
+  debug!("run_webbluetooth_loop exited!");
 }
 
 pub struct WebBluetoothDeviceImplCreator {
