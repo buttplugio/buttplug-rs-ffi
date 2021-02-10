@@ -84,7 +84,7 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
       let nav = web_sys::window().unwrap().navigator();
       //nav.bluetooth().get_availability();
       //JsFuture::from(nav.bluetooth().request_device()).await;
-      match JsFuture::from(nav.bluetooth().request_device_with_options(&options)).await {
+      match JsFuture::from(nav.bluetooth().unwrap().request_device(&options)).await {
         Ok(device) => {
           let device_creator = Box::new(WebBluetoothDeviceImplCreator::new(BluetoothDevice::from(
             device,
