@@ -90,6 +90,15 @@ If you are using Webpack 5, you may need to use Webpack 4 style WASM loading for
 experiments.syncWebAssembly: true
 ```
 
+If you're seeing MIME issues (i.e. "unknown type" when trying load your app), you may need to set the MIME type in the Webpack configuration file. Add the following block to your rules object:
+
+```javascript
+{
+    test: /\.wasm$/,
+    type: "webassembly/experimental"
+}
+```
+
 If you still run into problems, [file an issue](https://github.com/buttplugio/buttplug-rs-ffi/issues) 
 
 ## Using Buttplug On The Web
