@@ -1,10 +1,18 @@
-# 1.0.7 (2020/01/24)
+# v1.0.8 (2020/02/10)
+
+## Features
+
+- Update to buttplug-rs v2.1.3, lots more tests/fixes, Lovense Diamo support
+- Update to buttplug-rs-ffi core v1.0.12, fixes disconnect issues in WebBluetooth, updates
+  connector API for buttplug-rs v2.1.x API
+
+# v1.0.7 (2020/01/24)
 
 ## Bugfixes
 
 - Update to buttplug-rs v2.0.5, fixes issue with DeviceMessageInfo deserialization
 
-# 1.0.6 (2020/01/24)
+# v1.0.6 (2020/01/24)
 
 ## Bugfixes
 
@@ -14,20 +22,20 @@
 - Update to buttplug-rs v2.0.4, fixing issues with native timers being compiled instead of WASM
   timers.
 
-# 1.0.5 (2021/01/22)
+# v1.0.5 (2021/01/22)
 
 ## Bugfixes
 
 - #49: Fix issue with incorrect type check on linear commands.
 
-# 1.0.4 (2021/01/21)
+# v1.0.4 (2021/01/21)
 
 ## Features
 
 - Update to Buttplug-rs v2.0.3
   - Fixes issues with Strokers/rotators not showing up due to invalid message attributes.
 
-# 1.0.3 (2021/01/18)
+# v1.0.3 (2021/01/18)
 
 ## Features
 
@@ -36,38 +44,38 @@
   - Init/Event API cleanup
 - Panic messages/stacks now emitted on WASM panic
 
-# 1.0.2 (2021/01/10)
+# v1.0.2 (2021/01/10)
 
 ## Features
 
 - Update to Buttplug-rs v1.0.5, with Libo and Prettylove support
 
-# 1.0.1 (2020/12/29)
+# v1.0.1 (2020/12/29)
 
 ## Bugfixes
 
 - Add protobufjs to dependencies, otherwise typescript compilation files during type resolution.
 
-# 1.0.0 (2020/12/27)
+# v1.0.0 (2020/12/27)
 
 ## Features
 
 - Update to Buttplug v1, with new device config file format.
 - Change package name back to "buttplug"
 
-# 1.0.0 Beta 7 (2020/12/20)
+# v1.0.0 Beta 7 (2020/12/20)
 
 ## Bugfixes
 
 - Fix browser websockets not throwing errors on invalid URLs or connection errors.
 
-# 1.0.0 Beta 6 (2020/12/20)
+# v1.0.0 Beta 6 (2020/12/20)
 
 ## Bugfixes
 
 - Fix webpack build/load strategies for static (CDN loadable) web package.
 
-# 1.0.0 Beta 5 (2020/12/19)
+# v1.0.0 Beta 5 (2020/12/19)
 
 ## Features
 
@@ -75,7 +83,7 @@
   FFI layers.
 - Added log output capabilities (console only at the moment).
 
-# 1.0.0 Beta 4 (2020/12/05)
+# v1.0.0 Beta 4 (2020/12/05)
 
 ## Features
 
@@ -83,7 +91,7 @@
   verbose enums, but this is good enough.
 - Add stop() method to devices.
 
-# 1.0.0 Beta 3 (2020/12/04)
+# v1.0.0 Beta 3 (2020/12/04)
 
 ## API Changes
 
