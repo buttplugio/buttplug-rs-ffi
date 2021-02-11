@@ -7,15 +7,13 @@
 
 //! Handling of websockets using async-tungstenite
 
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{mpsc, Mutex, Notify};
 use buttplug::{
   connector::{
     transport::{
       ButtplugConnectorTransport,
-      ButtplugConnectorTransportConnectResult,
       ButtplugConnectorTransportSpecificError,
       ButtplugTransportIncomingMessage,
-      ButtplugTransportOutgoingMessage,
     },
     ButtplugConnectorError,
     ButtplugConnectorResultFuture,
@@ -23,7 +21,7 @@ use buttplug::{
   core::messages::serializer::ButtplugSerializedMessage,
   util::async_manager,
 };
-use futures::future;
+use futures::{future::{self, BoxFuture}, FutureExt, select};
 use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -34,7 +32,7 @@ use web_sys::{self, ErrorEvent, MessageEvent, WebSocket};
 pub struct ButtplugBrowserWebsocketClientTransport {
   /// Address of the server we'll connect to.
   address: String,
-  disconnect_sender: Arc<Mutex<mpsc::Sender<ButtplugTransportOutgoingMessage>>>
+  disconnect_notifier: Arc<Notify>
 }
 
 impl ButtplugBrowserWebsocketClientTransport {
@@ -44,22 +42,23 @@ impl ButtplugBrowserWebsocketClientTransport {
   /// server. Address should be the full URL of the server, i.e.
   /// "ws://127.0.0.1:12345"
   pub fn new(address: &str) -> Self {
-    let (unused_sender, _) = mpsc::channel(256);
     Self {
       address: address.to_owned(),
-      disconnect_sender: Arc::new(Mutex::new(unused_sender))
+      disconnect_notifier: Arc::new(Notify::new())
     }
   }
 }
 
 impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
-  fn connect(&self) -> ButtplugConnectorTransportConnectResult {
-    let (request_sender, request_receiver) = mpsc::channel(256);
+  fn connect(
+    &self,
+    mut outgoing_receiver: mpsc::Receiver<ButtplugSerializedMessage>,
+    incoming_sender: mpsc::Sender<ButtplugTransportIncomingMessage>,
+  ) -> BoxFuture<'static, Result<(), ButtplugConnectorError>> {
     // We never try to use this twice, but due to the FnMut guarantees needed by
     // our closure, we have to act like we can anyways. There's probably an
     // easier way around this but I'm not sure what it is.
-    let request_receiver = Arc::new(Mutex::new(request_receiver));
-    let (response_sender, response_receiver) = mpsc::channel(256);
+    let outgoing_receiver = Arc::new(Mutex::new(outgoing_receiver));
     // Could also do this with a future but eh.
     let (connect_sender, mut connect_receiver) = mpsc::channel(1);
     // Probably a rusty-er way to do this but eh.
@@ -68,7 +67,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       Ok(websocket) => ws = websocket,
       Err(e) => return Box::pin(future::ready(Err(ButtplugConnectorError::ConnectorGenericError(format!("Could not connect to websocket, possibly due to URL issue: {:?}", e)))))
     }
-    let response_sender_clone = response_sender.clone();
+    let response_sender_clone = incoming_sender.clone();
     let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
       if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
         let str: String = txt.into();
@@ -96,27 +95,36 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
 
     let success_sender = connect_sender.clone();
     let ws_sender_clone = ws.clone();
+    let disconnect_notifier = self.disconnect_notifier.clone();
     let onopen_callback = Closure::wrap(Box::new(move |_| {
-      let recvr_clone = request_receiver.clone();
+      let recvr_clone = outgoing_receiver.clone();
       let wscs = ws_sender_clone.clone();
+      let notifier = disconnect_notifier.clone();
       spawn_local(async move {
-        while let Some(msg) = recvr_clone.lock().await.recv().await {
-          match msg {
-            ButtplugTransportOutgoingMessage::Message(out_msg) => {
-              match out_msg {
-                ButtplugSerializedMessage::Text(text) => wscs.send_with_str(&text).unwrap(),
-                ButtplugSerializedMessage::Binary(_bin) => {
-                  // TOOD Make this an error?
+        let mut recvr = recvr_clone.lock().await;
+        loop {
+          select! {
+            incoming = recvr.recv().fuse() => {
+              if let Some(event) = incoming {
+                match event {
+                  ButtplugSerializedMessage::Text(text) => wscs.send_with_str(&text).unwrap(),
+                  ButtplugSerializedMessage::Binary(_bin) => {
+                    // TOOD Make this an error?
+                  }
                 }
+              } else {
+                info!("Connector client disappeared, ");
+                break;  
               }
             }
-            ButtplugTransportOutgoingMessage::Close => {
-              wscs.close();
-              return;
+            _ = notifier.notified().fuse() => {
+              info!("Received disconnect signal, disconnecting websocket");
+              break;
             }
-          };
-          // TODO see what happens when we try to send to a remote that's closed connection.
+          }
         }
+        wscs.close();
+        // TODO see what happens when we try to send to a remote that's closed connection.
       });
       let ssc = success_sender.clone();
       async_manager::spawn(async move {
@@ -136,11 +144,10 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
     onerror_callback.forget();
 
-    let disconnect_sender = self.disconnect_sender.clone();
+
     Box::pin(async move{
-      *disconnect_sender.lock().await = request_sender.clone();
       if connect_receiver.recv().await.unwrap() {
-        Ok((request_sender, response_receiver))
+        Ok(())
       } else {
         Err(ButtplugConnectorError::ConnectorGenericError("Could not connect to websocket, possibly due to server issue.".to_owned()))
       }
@@ -148,20 +155,10 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
   }
 
   fn disconnect(self) -> ButtplugConnectorResultFuture {
-    let disconnect_sender = self.disconnect_sender.clone();
+    let disconnect_notifier = self.disconnect_notifier.clone();
     Box::pin(async move {
-      // If we can't send the message, we have no loop, so we're not connected.
-      if disconnect_sender
-        .lock()
-        .await
-        .send(ButtplugTransportOutgoingMessage::Close)
-        .await
-        .is_err()
-      {
-        Err(ButtplugConnectorError::ConnectorNotConnected)
-      } else {
-        Ok(())
-      }
+      disconnect_notifier.notify_waiters();
+      Ok(())
     })
   }
 }
