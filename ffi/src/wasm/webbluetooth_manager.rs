@@ -43,18 +43,11 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
     let sender_clone = self.sender.clone();
     spawn_local(async move {
       // Build the filter block
-      match Reflect::get(&JsValue::from(web_sys::window().unwrap().navigator()), &JsValue::from("bluetooth")) {
-        Ok(val) => {
-          if val.is_undefined() {
-            log("WebBluetooth is not supported on this browser");
-            error!("WebBluetooth is not supported on this browser");
-            return;
-          }
-        }
-        Err(e) => {
-          error!("WebBluetooth is not supported on this browser");
-          return;
-        }
+      let nav = web_sys::window().unwrap().navigator();
+      if nav.bluetooth().is_none() {
+        log("WebBluetooth is not supported on this browser");
+        error!("WebBluetooth is not supported on this browser");
+        return;
       }
       info!("WebBluetooth supported by browser, continuing with scan.");
       let config_manager = DeviceConfigurationManager::default();
