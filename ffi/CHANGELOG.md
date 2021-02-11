@@ -1,3 +1,11 @@
+# 1.0.12 (2021/02/10)
+
+## Bugfixes
+
+- Fix issue with not being able to set devices to full (1.0) power (via buttplug-rs v2.1.3)
+- Bring WASM websocket connector API to v2.1 API
+- #54: Fix disconnect handler in WebBluetooth to actually handle disconnects
+
 # 1.0.11 (2021/02/07)
 
 ## Bugfixes
