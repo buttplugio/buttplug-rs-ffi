@@ -1,8 +1,14 @@
+# 1.0.14 (2020-02-13)
+
+## Bugfixes
+
+- Update to buttplug-rs v2.1.3, fix issues with max speed causing errors/crashes
+
 # 1.0.13 (2020-02-07)
 
 ## Bugfixes
 
-- Update to butptlug-rs v2.1.2, fix issue where StopDeviceCmd may not work in in-process instances
+- Update to buttplug-rs v2.1.2, fix issue where StopDeviceCmd may not work in in-process instances
 
 # 1.0.12 (2020-02-06)
 
