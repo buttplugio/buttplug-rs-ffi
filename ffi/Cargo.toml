@@ -1,6 +1,6 @@
 [package]
 name = "buttplug-rs-ffi"
-version = "1.0.12"
+version = "1.0.13"
 description = "FFI Layer for buttplug-rs. Used by other languages for implementing buttplug-rs bindings."
 authors = ["Kyle Machulis <kyle@nonpolynomial.com>"]
 edition = "2018"
@@ -12,7 +12,7 @@ default = ["buttplug/async-std-runtime", "buttplug/btleplug-manager", "buttplug/
 wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures", "console_error_panic_hook"]
 
 [dependencies]
-buttplug = { version = "2.1.3", default-features = false, features = ["client", "server", "serialize-json"] }
+buttplug = { version = "2.1.4", default-features = false, features = ["client", "server", "serialize-json"] }
 # buttplug = { path = "../../buttplug-rs/buttplug", default-features = false, features = ["client", "server", "serialize-json"] }
 async-std = "1.9.0"
 tracing-subscriber = "0.2.15"
