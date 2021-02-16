@@ -1,3 +1,15 @@
+# 1.0.15 (2021-02-15)
+
+## Features
+
+- Add hardware support
+  - The Handy
+
+## Bugfixes
+
+- Fix issue with Lovense Serial Dongle timing
+- Fix LoveAi Dolp compat
+
 # 1.0.14 (2020-02-13)
 
 ## Bugfixes
