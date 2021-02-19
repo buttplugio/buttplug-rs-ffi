@@ -51,9 +51,17 @@ impl Drop for ButtplugFFIClient {
 
 impl ButtplugFFIClient {
   pub fn new(name: &str, callback: Option<FFICallback>) -> Self {
+    let client = Arc::new(ButtplugClient::new(name));
+    let event_callback = callback.clone();
+    let mut event_stream = client.event_stream();
+    async_manager::spawn(async move {
+      while let Some(e) = event_stream.next().await {
+        send_event(e, event_callback.clone());
+      }
+    }).unwrap();
     Self {
       callback,
-      client: Arc::new(ButtplugClient::new(name)),
+      client
     }
   }
 
@@ -86,17 +94,9 @@ impl ButtplugFFIClient {
     info!("Connected client with id {}", client_msg_id);
     let client = self.client.clone();
     let callback = self.callback.clone();
-
     async_manager::spawn(async move {
       match client.connect(connector).await {
         Ok(()) => {
-          let event_callback = callback.clone();
-          let mut event_stream = client.event_stream();
-          async_manager::spawn(async move {
-            while let Some(e) = event_stream.next().await {
-              send_event(e, event_callback.clone());
-            }
-          }).unwrap();
           return_ok(client_msg_id, &callback);    
         },
         Err(e) => {
