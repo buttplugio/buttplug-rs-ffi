@@ -1,7 +1,16 @@
+# 1.0.16 (2021-02-20)
+
+## Bugfixes
+
+- Update to buttplug-rs v2.1.5, fixes issues with connection status races and some devices panicing
+  on disconnect while running initialize()
+- Fix issue in FFI where multiple reconnects on the same client can cause multiple events to be sent
+
 # 1.0.15 (2021-02-15)
 
 ## Features
 
+- Update to buttplug-rs v2.1.4
 - Add hardware support
   - The Handy
 
