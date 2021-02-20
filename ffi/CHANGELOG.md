@@ -1,3 +1,12 @@
+# 1.0.14 (2021/02/20)
+
+## Bugfixes
+
+- Update to buttplug-rs 2.1.5, fixes race condition in connect, as well as panic during some device
+  disconnections
+- #56: Make sure we only register for client events in the Core FFI once, otherwise repeated devices
+  can cause faults in upper layer FFI logic.
+
 # 1.0.13 (2021/02/13)
 
 ## Features
