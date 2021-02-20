@@ -233,7 +233,7 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
     ButtplugClientEvent::DeviceAdded(device) => {
       // TODO This should probably be its own fn but I didn't wanna screw with builder lifetime.
       let mut attrs_vec = vec![];
-      info!("{:?}", device.allowed_messages);
+      info!("FFI got device added message: {}", device.name);
       for (message_type, message_attrs) in &device.allowed_messages {
         // If we can't convert, this means we don't support the message type in
         // the FFI layer. Good way to deprecate messages.
