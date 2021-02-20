@@ -1,4 +1,11 @@
-# v1.0.8 (2020/02/10)
+# v1.0.9 (2021/02/20)
+
+## Bugfixes
+
+- Update to buttplug-rs v2.1.5. The Handy support, client connect race bugfixes, device
+  disconnection panic bugfixes.
+
+# v1.0.8 (2021/02/10)
 
 ## Features
 
@@ -6,13 +13,13 @@
 - Update to buttplug-rs-ffi core v1.0.12, fixes disconnect issues in WebBluetooth, updates
   connector API for buttplug-rs v2.1.x API
 
-# v1.0.7 (2020/01/24)
+# v1.0.7 (2021/01/24)
 
 ## Bugfixes
 
 - Update to buttplug-rs v2.0.5, fixes issue with DeviceMessageInfo deserialization
 
-# v1.0.6 (2020/01/24)
+# v1.0.6 (2021/01/24)
 
 ## Bugfixes
 
