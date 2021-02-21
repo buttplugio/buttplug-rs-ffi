@@ -4,7 +4,7 @@
     "Nonpolynomial, LLC <kyle@nonpolynomial.com>"
   ],
   "description": "Buttplug WASM library for web applications (Node/Web). Does not work for native node at the moment.",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "license": "BSD-3-Clause",
   "homepage": "https://buttplug.io",
   "repository": {

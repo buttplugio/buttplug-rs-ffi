@@ -1,3 +1,10 @@
+# v1.0.12 (2021/02/20)
+
+## Bugfixes
+
+- Actually build the project before publishing this time. This is why I have CI. Why am I hand
+  publish the project? (Because I am lazy. So lazy.)
+
 # v1.0.11 (2021/02/20)
 
 ## Bugfixes
