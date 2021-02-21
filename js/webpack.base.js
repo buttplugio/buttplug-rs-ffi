@@ -20,7 +20,6 @@ const base = {
     path: path.resolve('./dist/web'),
     filename: 'buttplug.js',
     libraryTarget: 'umd',
-    publicPath: "/",
     library: {
       root: "Buttplug",
       amd: "buttplug-amd",

@@ -1,3 +1,9 @@
+# v1.0.11 (2021/02/20)
+
+## Bugfixes
+
+- Remove publicpath setting in CDN bundler.
+
 # v1.0.10 (2021/02/20)
 
 ## Bugfixes
