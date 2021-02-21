@@ -1,3 +1,10 @@
+# v1.0.10 (2021/02/20)
+
+## Bugfixes
+
+- Implement characteristic read in WebBluetooth WASM
+  - Allows us to use the Handy on the web
+
 # v1.0.9 (2021/02/20)
 
 ## Bugfixes
