@@ -60,7 +60,6 @@ features = [
   "BinaryType",
   "Blob",
   "console",
-  # "DataView",
   "ErrorEvent",
   "Event",
   "FileReader",

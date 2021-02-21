@@ -21,8 +21,8 @@ use buttplug::{
   util::future::{ButtplugFuture, ButtplugFutureStateShared},
 };
 use futures::future::{self, BoxFuture};
-use js_sys::Uint8Array;
-use std::{fmt::{self, Debug}, collections::HashMap};
+use js_sys::{Uint8Array, DataView};
+use std::{fmt::{self, Debug}, convert::TryFrom, collections::HashMap};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
@@ -36,6 +36,7 @@ use web_sys::{
 };
 
 type WebBluetoothResultFuture = ButtplugFuture<Result<(), ButtplugError>>;
+type WebBluetoothReadResultFuture = ButtplugFuture<Result<RawReading, ButtplugError>>;
 
 #[derive(Debug, Clone)]
 pub enum WebBluetoothEvent {
@@ -52,7 +53,7 @@ pub enum WebBluetoothDeviceCommand {
   ),
   Read(
     DeviceReadCmd,
-    ButtplugFutureStateShared<Result<(), ButtplugError>>,
+    ButtplugFutureStateShared<Result<RawReading, ButtplugError>>,
   ),
   Subscribe(
     DeviceSubscribeCmd,
@@ -135,7 +136,7 @@ async fn run_webbluetooth_loop(
   while let Some(msg) = device_command_receiver.recv().await {
     match msg {
       WebBluetoothDeviceCommand::Write(write_cmd, waker) => {
-        info!("Writing to endpoint {:?}", write_cmd.endpoint);
+        debug!("Writing to endpoint {:?}", write_cmd.endpoint);
         let chr = char_map.get(&write_cmd.endpoint).unwrap().clone();
         spawn_local(async move {
           JsFuture::from(chr.write_value_with_u8_array(&mut write_cmd.data.clone()))
@@ -144,23 +145,33 @@ async fn run_webbluetooth_loop(
           waker.set_reply(Ok(()));
         });
       }
-      WebBluetoothDeviceCommand::Read(_read, _waker) => {}
+      WebBluetoothDeviceCommand::Read(read_cmd, waker) => {
+        debug!("Writing to endpoint {:?}", read_cmd.endpoint);
+        let chr = char_map.get(&read_cmd.endpoint).unwrap().clone();
+        spawn_local(async move {
+          let read_value = JsFuture::from(chr.read_value())
+            .await
+            .unwrap();
+          let data_view = DataView::try_from(read_value).unwrap();
+          let mut body = vec![0; data_view.byte_length() as usize];
+          Uint8Array::new(&data_view).copy_to(&mut body[..]);
+          let reading = RawReading::new(0, read_cmd.endpoint, body);
+          waker.set_reply(Ok(reading));
+        });
+      }
       WebBluetoothDeviceCommand::Subscribe(subscribe_cmd, waker) => {
-        info!("Subscribing to endpoint {:?}", subscribe_cmd.endpoint);
+        debug!("Subscribing to endpoint {:?}", subscribe_cmd.endpoint);
         let chr = char_map.get(&subscribe_cmd.endpoint).unwrap().clone();
         let ep = subscribe_cmd.endpoint;
         let event_sender = device_external_event_sender.clone();
         let id = device.id().clone();
         let onchange_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
-          info!("GOT VALUE FROM SUBSCRIPTION");
-          info!("{}", ep);
-
           let event_chr: BluetoothRemoteGattCharacteristic =
             BluetoothRemoteGattCharacteristic::from(JsValue::from(e.target().unwrap()));
           let value =
             Uint8Array::new_with_byte_offset(&JsValue::from(event_chr.value().unwrap().buffer()), 0);
           let value_vec = value.to_vec();
-          info!("{:?}", value_vec);
+          debug!("Subscription notification from {}: {:?}", ep, value_vec);
           event_sender
             .send(ButtplugDeviceEvent::Notification(id.clone(), ep, value_vec))
             .unwrap();
@@ -170,7 +181,7 @@ async fn run_webbluetooth_loop(
         onchange_callback.forget();
         spawn_local(async move {
           JsFuture::from(chr.start_notifications()).await.unwrap();
-          info!("Endpoint subscribed");
+          debug!("Endpoint subscribed");
           waker.set_reply(Ok(()));
         });
       }
@@ -319,15 +330,22 @@ impl DeviceImplInternal for WebBluetoothDeviceImpl {
 
   fn read_value(
     &self,
-    _msg: DeviceReadCmd,
+    msg: DeviceReadCmd,
   ) -> BoxFuture<'static, Result<RawReading, ButtplugError>> {
-    panic!("IMPLEMENT READ FOR WEBBLUETOOTH WASM");
+    let sender = self.device_command_sender.clone();
+    Box::pin(async move {
+      let fut = WebBluetoothReadResultFuture::default();
+      let waker = fut.get_state_clone();
+      sender
+        .send(WebBluetoothDeviceCommand::Read(msg, waker))
+        .await;
+      fut.await
+    })
   }
 
   fn write_value(&self, msg: DeviceWriteCmd) -> ButtplugResultFuture {
     let sender = self.device_command_sender.clone();
     Box::pin(async move {
-      info!("Got write call");
       let fut = WebBluetoothResultFuture::default();
       let waker = fut.get_state_clone();
       sender
