@@ -98,79 +98,86 @@ namespace Buttplug
 
         public void SorterCallback(UIntPtr buf, int buf_length)
         {
-            Span<byte> byteArray;
-            unsafe
+            // Run the response in the context of the C# executor, not the Rust
+            // thread. This means that if something goes wrong we at least
+            // aren't blocking a rust executor thread.
+            Task.Run(() =>
             {
-                byteArray = new Span<byte>(buf.ToPointer(), buf_length);
-            }
-            var server_message = ButtplugFFIServerMessage.Parser.ParseFrom(byteArray.ToArray());
-            if (server_message.Id > 0)
-            {
-                _messageSorter.CheckMessage(server_message);
-            }
-            else if (server_message.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.ServerMessage)
-            {
-                if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceAdded)
+                Span<byte> byteArray;
+                unsafe
                 {
-                    var device_added_message = server_message.Message.ServerMessage.DeviceAdded;
-                    if (_devices.ContainsKey(device_added_message.Index))
+                    byteArray = new Span<byte>(buf.ToPointer(), buf_length);
+                }
+                var server_message = ButtplugFFIServerMessage.Parser.ParseFrom(byteArray.ToArray());
+                if (server_message.Id > 0)
+                {
+                    _messageSorter.CheckMessage(server_message);
+                }
+                else if (server_message.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.ServerMessage)
+                {
+                    if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceAdded)
                     {
-                        ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi")));
-                        return;
+                        var device_added_message = server_message.Message.ServerMessage.DeviceAdded;
+                        if (_devices.ContainsKey(device_added_message.Index))
+                        {
+                            ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi")));
+                            return;
+                        }
+                        var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
+                        var attribute_dict = new Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes>();
+                        for (var i = 0; i < device_added_message.MessageAttributes.Count; ++i)
+                        {
+                            var attributes = device_added_message.MessageAttributes[i];
+                            var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.StepCount.ToArray(),
+                                attributes.Endpoints.ToArray(), attributes.MaxDuration.ToArray(), null, null);
+                            attribute_dict.Add(attributes.MessageType, device_message_attributes);
+                        }
+                        var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict);
+                        _devices.Add(device_added_message.Index, device);
+                        DeviceAdded?.Invoke(this, new DeviceAddedEventArgs(device));
                     }
-                    var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
-                    var attribute_dict = new Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes>();
-                    for (var i = 0; i < device_added_message.MessageAttributes.Count; ++i)
+                    else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceRemoved)
                     {
-                        var attributes = device_added_message.MessageAttributes[i];
-                        var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.StepCount.ToArray(),
-                            attributes.Endpoints.ToArray(), attributes.MaxDuration.ToArray(), null, null);
-                        attribute_dict.Add(attributes.MessageType, device_message_attributes);
+                        var device_removed_message = server_message.Message.ServerMessage.DeviceRemoved;
+                        if (!_devices.ContainsKey(device_removed_message.Index))
+                        {
+                            // Device was removed from our dict before we could remove it ourselves.
+                            return;
+                        }
+                        var device = _devices[device_removed_message.Index];
+                        _devices.Remove(device_removed_message.Index);
+                        DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
                     }
-                    var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict);
-                    _devices.Add(device_added_message.Index, device);
-                    DeviceAdded?.Invoke(this, new DeviceAddedEventArgs(device));
-                }
-                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceRemoved)
-                {
-                    var device_removed_message = server_message.Message.ServerMessage.DeviceRemoved;
-                    if (!_devices.ContainsKey(device_removed_message.Index)) {
-                        // Device was removed from our dict before we could remove it ourselves.
-                        return;
-                    }
-                    var device = _devices[device_removed_message.Index];
-                    _devices.Remove(device_removed_message.Index);
-                    DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
-                }
-                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
-                {
-                    Connected = false;
-                    _devices.Clear();
-                    ServerDisconnect?.Invoke(this, null);
-                }
-                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Error)
-                {
-                    var errorMsg = server_message.Message.ServerMessage.Error;
-                    var error = ButtplugException.FromError(errorMsg);
-                    if (error is ButtplugPingException)
+                    else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
                     {
-                        PingTimeout?.Invoke(this, null);
+                        Connected = false;
+                        _devices.Clear();
+                        ServerDisconnect?.Invoke(this, null);
                     }
-                    ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(error));
+                    else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Error)
+                    {
+                        var errorMsg = server_message.Message.ServerMessage.Error;
+                        var error = ButtplugException.FromError(errorMsg);
+                        if (error is ButtplugPingException)
+                        {
+                            PingTimeout?.Invoke(this, null);
+                        }
+                        ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(error));
+                    }
+                    else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.ScanningFinished)
+                    {
+                        ScanningFinished?.Invoke(this, null);
+                    }
+                    else
+                    {
+                        // We should probably do something here with unhandled events, but I'm not particularly sure what. I miss pattern matching. :(
+                    }
                 }
-                else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.ScanningFinished)
-                {
-                    ScanningFinished?.Invoke(this, null);
-                } 
                 else
                 {
                     // We should probably do something here with unhandled events, but I'm not particularly sure what. I miss pattern matching. :(
                 }
-            } 
-            else
-            {
-                // We should probably do something here with unhandled events, but I'm not particularly sure what. I miss pattern matching. :(
-            }
+            });
         }
 
         public async Task StartScanningAsync()
