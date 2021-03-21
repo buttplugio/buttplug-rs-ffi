@@ -144,9 +144,16 @@ namespace Buttplug
                             // Device was removed from our dict before we could remove it ourselves.
                             return;
                         }
-                        var device = _devices[device_removed_message.Index];
-                        _devices.Remove(device_removed_message.Index);
-                        DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
+                        try
+                        {
+                            var device = _devices[device_removed_message.Index];
+                            _devices.Remove(device_removed_message.Index);
+                            DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException($"Cannot remove device index {device_removed_message.Index}, device not found.")));
+                        }
                     }
                     else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.Disconnect)
                     {
