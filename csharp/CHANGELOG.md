@@ -1,3 +1,16 @@
+# 1.0.17 (2021-03-21)
+
+## Features
+
+- #53: Nuget package now contains both .net standard and .net framework 4.7 builds
+- #37: Added IsScanning status to client
+- Update to buttplug-rs 2.1.7, Lovense Desire Egg support, new btleplug version
+
+## Bugfixes
+
+- #58 / #61: Sorter callback now processes future results on C#/.Net executor, and catches errors on
+  possible races.
+
 # 1.0.16 (2021-02-20)
 
 ## Bugfixes
