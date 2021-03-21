@@ -1,3 +1,9 @@
+# v1.0.14 (2021/03/21)
+
+## Bugfixes
+
+- Actually fix #60 and #51
+
 # v1.0.13 (2021/03/21)
 
 ## Features
