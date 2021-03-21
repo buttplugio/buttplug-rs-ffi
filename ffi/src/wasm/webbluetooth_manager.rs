@@ -88,15 +88,18 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
             .is_err()
           {
             error!("Device manager receiver dropped, cannot send device found message.");
-            return;
+          } else {
+            info!("WebBluetooth device found.");
           }
-          info!("WebBluetooth device found.");
         }
         Err(e) => {
           log(&format!("Error while trying to start bluetooth scan: {:?}", e));
           error!("Error while trying to start bluetooth scan: {:?}", e);
         }
-      }
+      };
+      let _ = sender_clone
+        .send(DeviceCommunicationEvent::ScanningFinished)
+        .await;
     });
     Box::pin(future::ready(Ok(())))
   }
