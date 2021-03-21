@@ -1,6 +1,6 @@
 [package]
 name = "buttplug-rs-ffi"
-version = "1.0.14"
+version = "1.0.15"
 description = "FFI Layer for buttplug-rs. Used by other languages for implementing buttplug-rs bindings."
 authors = ["Kyle Machulis <kyle@nonpolynomial.com>"]
 edition = "2018"

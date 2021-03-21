@@ -1,3 +1,10 @@
+# 1.0.15 (2021/03/21)
+
+## Bugfixes
+
+- Update to buttplug-rs 2.1.7, new btleplug version, Lovense Desire Egg support
+- Fix issues with scanning status in WASM WebBluetooth Device Comm Manager
+
 # 1.0.14 (2021/02/20)
 
 ## Bugfixes
