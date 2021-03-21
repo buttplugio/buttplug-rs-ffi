@@ -1,3 +1,15 @@
+# v1.0.13 (2021/03/21)
+
+## Features
+
+- Update to buttplug-rs v2.1.7, adds Lovehoney Desire Egg support
+
+## Bugfixes
+
+- #60: Expose Buttplug.Endpoint type publicly so Raw commands are usable
+- #59: Client device vibrate() call should take an array of numbers
+- #51: Fix ScanningFinished emission for WebBluetooth
+
 # v1.0.12 (2021/02/20)
 
 ## Bugfixes
