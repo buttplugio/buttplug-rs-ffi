@@ -74,16 +74,16 @@ export class ButtplugClient extends EventEmitter {
     if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
-    await startScanning(this._sorter, this._clientPtr!);
     this._isScanning = true;
+    await startScanning(this._sorter, this._clientPtr!);
   }
 
   public stopScanning = async () => {
     if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
-    await stopScanning(this._sorter, this._clientPtr!);
     this._isScanning = false;
+    await stopScanning(this._sorter, this._clientPtr!);
   }
 
   public stopAllDevices = async () => {
