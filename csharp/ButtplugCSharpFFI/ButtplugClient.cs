@@ -98,17 +98,20 @@ namespace Buttplug
 
         public void SorterCallback(UIntPtr buf, int buf_length)
         {
+            // Process the data BEFORE we throw to the C# executor, otherwise
+            // Rust will clean up the memory and we'll have nothing to read
+            // from, meaning a null message at best and a crash at worst.
+            Span<byte> byteArray;
+            unsafe
+            {
+                byteArray = new Span<byte>(buf.ToPointer(), buf_length);
+            }
+            var server_message = ButtplugFFIServerMessage.Parser.ParseFrom(byteArray.ToArray());
             // Run the response in the context of the C# executor, not the Rust
             // thread. This means that if something goes wrong we at least
             // aren't blocking a rust executor thread.
             Task.Run(() =>
             {
-                Span<byte> byteArray;
-                unsafe
-                {
-                    byteArray = new Span<byte>(buf.ToPointer(), buf_length);
-                }
-                var server_message = ButtplugFFIServerMessage.Parser.ParseFrom(byteArray.ToArray());
                 if (server_message.Id > 0)
                 {
                     _messageSorter.CheckMessage(server_message);
