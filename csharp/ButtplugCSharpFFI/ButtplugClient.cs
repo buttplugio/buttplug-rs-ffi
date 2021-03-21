@@ -49,6 +49,8 @@ namespace Buttplug
         /// Event fired when a server disconnect has occured.
         /// </summary>
         public event EventHandler ServerDisconnect;
+         
+        public bool IsScanning { get; private set; }
 
         /// <summary>
         /// Stores information about devices currently connected to the server.
@@ -176,6 +178,7 @@ namespace Buttplug
                     }
                     else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.ScanningFinished)
                     {
+                        IsScanning = false;
                         ScanningFinished?.Invoke(this, null);
                     }
                     else
@@ -192,11 +195,13 @@ namespace Buttplug
 
         public async Task StartScanningAsync()
         {
+            IsScanning = true;
             await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle);
         }
 
         public async Task StopScanningAsync()
         {
+            IsScanning = false;
             await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle);
         }
 
