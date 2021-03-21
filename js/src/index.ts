@@ -14,4 +14,4 @@ export * from "./ffi";
 export * from "./sorter";
 
 import { Buttplug } from "./buttplug_ffi";
-export type Endpoint = Buttplug.Endpoint;
+export import Endpoint = Buttplug.Endpoint;
