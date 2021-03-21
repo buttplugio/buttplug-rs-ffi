@@ -139,7 +139,7 @@ export class ButtplugClientDevice extends EventEmitter {
     }
   }
 
-  public async vibrate(speeds: number | VibrationCmd[]): Promise<void> {
+  public async vibrate(speeds: number | Array<VibrationCmd | number>): Promise<void> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.VibrateCmd);
     let msgSpeeds: Buttplug.DeviceMessage.VibrateComponent[];
     if (typeof (speeds) === "number") {
@@ -149,13 +149,18 @@ export class ButtplugClientDevice extends EventEmitter {
         index: i,
         speed: speeds,
       }));
+    } else if (Array.isArray(speeds) && speeds.every(x => typeof(x) === "number")) {
+      msgSpeeds = speeds.map((x, index) => Buttplug.DeviceMessage.VibrateComponent.create({
+        index: index,
+        speed: x as number
+      }));
     } else if (Array.isArray(speeds) && speeds.every(x => x instanceof VibrationCmd)) {
       msgSpeeds = (speeds as VibrationCmd[]).map(x => Buttplug.DeviceMessage.VibrateComponent.create({
         index: x.Index,
         speed: x.Speed
       }));
     } else {
-      throw new ButtplugDeviceError("vibrate can only take numbers or arrays of numbers.");
+      throw new ButtplugDeviceError("vibrate can only take numbers or arrays of numbers or VibrationCmds.");
     }
     await vibrate(this._sorter, this._devicePtr, msgSpeeds);
   }
