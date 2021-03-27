@@ -3,6 +3,8 @@ package io.buttplug.ffi;
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 import jnr.ffi.annotations.Delegate;
+import jnr.ffi.annotations.In;
+import jnr.ffi.annotations.Out;
 import jnr.ffi.types.int32_t;
 import jnr.ffi.types.u_int32_t;
 
@@ -13,7 +15,7 @@ public class ButtplugFFI {
     // type FFICallback = extern "C" fn(*const u8, u32);
     @FunctionalInterface
     private interface FFICallback {
-        @Delegate void callback(ByteBuffer ptr, @u_int32_t int len);
+        @Delegate void callback(@In ByteBuffer ptr, @u_int32_t int len);
     }
 
     // this is the "clean" interface wrapped by FFICallback
@@ -34,11 +36,13 @@ public class ButtplugFFI {
         // NOTE: ButtplugFFIClient
         Pointer buttplug_create_client(FFICallback callback, String client_name);
         void buttplug_free_client(Pointer client);
-        void buttplug_parse_client_message(Pointer client, byte[] buf, @int32_t int buf_len);
+        // TODO: consider @Pinned
+        void buttplug_parse_client_message(Pointer client, @Out byte[] buf, @int32_t int buf_len);
 
         // NOTE: ButtplugFFIDevice
         Pointer buttplug_create_device(Pointer client, @u_int32_t int index);
-        void buttplug_parse_device_message(Pointer device, byte[] buf, @int32_t int buf_len);
+        // TODO: Consider @Pinned
+        void buttplug_parse_device_message(Pointer device, @Out byte[] buf, @int32_t int buf_len);
         void buttplug_free_device(Pointer device);
 
         void buttplug_activate_env_logger();
