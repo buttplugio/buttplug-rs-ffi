@@ -1,6 +1,8 @@
 syntax = "proto3";
 package Buttplug;
 
+option java_package = "io.buttplug.protos";
+
 enum Endpoint {
   Command = 0;
   Firmware = 1;
