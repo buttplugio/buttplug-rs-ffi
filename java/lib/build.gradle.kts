@@ -6,14 +6,25 @@
  * User Manual available at https://docs.gradle.org/6.8.3/userguide/building_java_projects.html
  */
 
+import com.google.protobuf.gradle.*
+
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    id("com.google.protobuf") version "0.8.8"
 }
 
 repositories {
-    // Use JCenter for resolving dependencies.
-    jcenter()
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir("../../protobuf_schemas")
+        }
+    }
 }
 
 dependencies {
@@ -25,12 +36,13 @@ dependencies {
 
     // ffi
     implementation("com.github.jnr:jnr-ffi:2.2.2")
+    implementation("com.google.protobuf:protobuf-java:3.6.1")
+}
 
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api("org.apache.commons:commons-math3:3.6.1")
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    //implementation("com.google.guava:guava:29.0-jre")
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.6.1"
+    }
 }
 
 tasks.test {
