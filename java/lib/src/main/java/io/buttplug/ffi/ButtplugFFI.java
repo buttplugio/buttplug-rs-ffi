@@ -52,7 +52,7 @@ public class ButtplugFFI {
     private final LibButtplug buttplug;
 
     public ButtplugFFI() {
-        this.buttplug = LibraryLoader.create(LibButtplug.class).load("TODO");
+        this.buttplug = LibraryLoader.create(LibButtplug.class).load("buttplug_rs_ffi");
     }
 
     public ButtplugFFIClient create_client(CreateClientCallback callback, String client_name) {

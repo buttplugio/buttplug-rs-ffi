@@ -11,6 +11,7 @@ import com.google.protobuf.gradle.*
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    `idea`
     id("com.google.protobuf") version "0.8.8"
 }
 
