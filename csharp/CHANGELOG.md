@@ -1,3 +1,10 @@
+# 1.0.18 (2021-04-04)
+
+## Bugfixes
+
+- Update to buttplug-rs 2.1.9, fixes Lovense battery read issues, should reduce bluetooth disconnect
+  panics on windows, cleans up some error log messages that aren't actually errors.
+
 # 1.0.17 (2021-03-21)
 
 ## Features
