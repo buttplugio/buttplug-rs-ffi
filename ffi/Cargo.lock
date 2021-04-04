@@ -404,7 +404,7 @@ dependencies = [
 
 [[package]]
 name = "buttplug-rs-ffi"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "async-lock",

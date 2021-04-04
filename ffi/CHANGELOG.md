@@ -1,3 +1,10 @@
+# 1.0.16 (2021/04/04)
+
+## Bugfixes
+
+- Update to buttplug-rs 2.1.9, fixes issues with lovense battery read reliability, windows device
+  connections, cleans up some log messages.
+
 # 1.0.15 (2021/03/21)
 
 ## Bugfixes
