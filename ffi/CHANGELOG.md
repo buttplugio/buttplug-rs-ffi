@@ -1,3 +1,13 @@
+# 1.0.17 (2021/04/11)
+
+## Features
+
+- Update to buttplug-rs v3.0.0
+  - Most changes here are internal, in relation to moving to the tokio runtime and splitting between
+    tokio/wasm-bindgen.
+  - No external API changes, though we will now bringup and shutdown runtimes with client
+    creation/drops.
+
 # 1.0.16 (2021/04/04)
 
 ## Bugfixes
