@@ -37,10 +37,13 @@ use buttplug::{
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use futures::StreamExt;
 use prost::Message;
+use tokio::runtime::Runtime;
 
 pub struct ButtplugFFIClient {
   callback: Option<FFICallback>,
   client: Arc<ButtplugClient>,
+  #[cfg(not(feature = "wasm"))]
+  runtime: Arc<Runtime>
 }
 
 impl Drop for ButtplugFFIClient {
@@ -54,6 +57,10 @@ impl ButtplugFFIClient {
     let client = Arc::new(ButtplugClient::new(name));
     let event_callback = callback.clone();
     let mut event_stream = client.event_stream();
+    #[cfg(not(feature = "wasm"))]
+    let runtime = Arc::new(Runtime::new().unwrap());
+    #[cfg(not(feature = "wasm"))]
+    let _guard = runtime.enter();
     async_manager::spawn(async move {
       while let Some(e) = event_stream.next().await {
         send_event(e, event_callback.clone());
@@ -61,14 +68,20 @@ impl ButtplugFFIClient {
     }).unwrap();
     Self {
       callback,
-      client
+      client,
+      #[cfg(not(feature = "wasm"))]
+      runtime
     }
   }
 
   pub fn get_device(&self, device_index: u32) -> Option<ButtplugFFIDevice> {
     let devices = self.client.devices();
     if let Some(device) = devices.iter().find(|device| device.index() == device_index) {
-      Some(ButtplugFFIDevice::new(device.clone(), self.callback.clone()))
+      #[cfg(not(feature = "wasm"))]
+      return Some(ButtplugFFIDevice::new(self.runtime.clone(), device.clone(), self.callback.clone()));
+
+      #[cfg(feature = "wasm")]
+      return Some(ButtplugFFIDevice::new(device.clone(), self.callback.clone()));
     } else {
       error!("Device id {} not available.", device_index);
       None
@@ -76,6 +89,8 @@ impl ButtplugFFIClient {
   }
 
   pub fn parse_message(&self, msg_ptr: &[u8]) {
+    #[cfg(not(feature = "wasm"))]
+    let _guard = self.runtime.enter();
     let client_msg = ClientMessage::decode(msg_ptr).unwrap();
     let msg_id = client_msg.id;
     match client_msg.message.unwrap().msg.unwrap() {
@@ -97,7 +112,7 @@ impl ButtplugFFIClient {
     async_manager::spawn(async move {
       match client.connect(connector).await {
         Ok(()) => {
-          return_ok(client_msg_id, &callback);    
+          return_ok(client_msg_id, &callback);
         },
         Err(e) => {
           return_error(client_msg_id, &e, &callback);

@@ -17,13 +17,27 @@ use buttplug::{
 };
 use prost::Message;
 use std::{sync::Arc, collections::HashMap, iter::FromIterator};
+#[cfg(not(feature = "wasm"))]
+use tokio::runtime::Runtime;
 
 pub struct ButtplugFFIDevice {
   callback: Option<FFICallback>,
-  device: Arc<ButtplugClientDevice>,
+  device: Arc<ButtplugClientDevice>, 
+  #[cfg(not(feature = "wasm"))]
+  runtime: Arc<Runtime>,
 }
 
 impl ButtplugFFIDevice {
+  #[cfg(not(feature = "wasm"))]
+  pub fn new(runtime: Arc<Runtime>, device: Arc<ButtplugClientDevice>, callback: Option<FFICallback>) -> Self {
+    Self {
+      runtime,
+      device: device,
+      callback,
+    }
+  }
+
+  #[cfg(feature = "wasm")]
   pub fn new(device: Arc<ButtplugClientDevice>, callback: Option<FFICallback>) -> Self {
     Self {
       device: device,
@@ -32,6 +46,8 @@ impl ButtplugFFIDevice {
   }
 
   pub fn parse_message(&self, msg_ptr: &[u8]) {
+    #[cfg(not(feature = "wasm"))]
+    let _guard = self.runtime.enter();
     let device_msg = DeviceMessage::decode(msg_ptr).unwrap();
     let msg_id = device_msg.id;
     match device_msg.message.unwrap().msg.unwrap() {
