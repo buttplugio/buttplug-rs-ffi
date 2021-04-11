@@ -48,7 +48,7 @@ impl ButtplugFFIDevice {
     };
   }
 
-  pub fn send_vibrate_cmd(&self, id: u32, msg: VibrateCmd) {
+  fn send_vibrate_cmd(&self, id: u32, msg: VibrateCmd) {
     let callback = self.callback.clone();
     let params = VibrateCommand::SpeedMap(
       msg
@@ -64,7 +64,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_rotate_cmd(&self, id: u32, rotate_msg: RotateCmd) {
+  fn send_rotate_cmd(&self, id: u32, rotate_msg: RotateCmd) {
     let callback = self.callback.clone();
     let params = RotateCommand::RotateMap(
       HashMap::from_iter(rotate_msg
@@ -79,7 +79,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_linear_cmd(&self, id: u32, linear_msg: LinearCmd) {
+  fn send_linear_cmd(&self, id: u32, linear_msg: LinearCmd) {
     let callback = self.callback.clone();
     let params = LinearCommand::LinearMap(
       HashMap::from_iter(
@@ -95,7 +95,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_stop_device_cmd(&self, id: u32, _msg: StopDeviceCmd) {
+  fn send_stop_device_cmd(&self, id: u32, _msg: StopDeviceCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -104,7 +104,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_raw_read_cmd(&self, id: u32, msg: RawReadCmd) {
+  fn send_raw_read_cmd(&self, id: u32, msg: RawReadCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -133,7 +133,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_raw_write_cmd(&self, id: u32, msg: RawWriteCmd) {
+  fn send_raw_write_cmd(&self, id: u32, msg: RawWriteCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -142,7 +142,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_raw_subscribe_cmd(&self, id: u32, msg: RawSubscribeCmd) {
+  fn send_raw_subscribe_cmd(&self, id: u32, msg: RawSubscribeCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -151,7 +151,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_raw_unsubscribe_cmd(&self, id: u32, msg: RawUnsubscribeCmd) {
+  fn send_raw_unsubscribe_cmd(&self, id: u32, msg: RawUnsubscribeCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -160,7 +160,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_battery_level_cmd(&self, id: u32, _msg: BatteryLevelCmd) {
+  fn send_battery_level_cmd(&self, id: u32, _msg: BatteryLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
@@ -188,7 +188,7 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 
-  pub fn send_rssi_level_cmd(&self, id: u32, _msg: RssiLevelCmd) {
+  fn send_rssi_level_cmd(&self, id: u32, _msg: RssiLevelCmd) {
     let callback = self.callback.clone();
     let device = self.device.clone();
     async_manager::spawn(async move {
