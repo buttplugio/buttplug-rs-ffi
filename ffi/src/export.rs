@@ -1,15 +1,38 @@
 use super::{
-  client::ButtplugFFIClient, 
+  client::ButtplugFFIClient,
   device::ButtplugFFIDevice, 
   FFICallback,
-  logging::{buttplug_create_log_handler, LogFFICallback}
+  logging::{LogFFICallback, ButtplugFFILogHandle}
 };
 use libc::c_char;
 use std::{
   ffi::CStr,
-  slice
+  slice,
+  sync::{Arc, Weak, Mutex}
 };
 use tracing_subscriber;
+use tokio::runtime::Runtime;
+
+lazy_static! {
+  static ref RUNTIME: Mutex<Weak<tokio::runtime::Runtime>> = Mutex::new(Weak::new());
+}
+
+fn get_or_create_runtime() -> Arc<Runtime> {
+  // See if we have a runtime. If so, copy and pass to the client. Otherwise,
+  // spin one up, sending it to the client while also storing it in our static
+  // Weak<> just in case someone tries to create multiple clients.
+  let mut static_runtime = RUNTIME.lock().unwrap();
+  match static_runtime.upgrade() {
+    Some(rt) => {
+      rt
+    },
+    None => {
+      let new_runtime = Arc::new(tokio::runtime::Runtime::new().unwrap());
+      *static_runtime = Arc::downgrade(&new_runtime);
+      new_runtime
+    }
+  }
+}
 
 #[no_mangle]
 pub extern "C" fn buttplug_create_client(
@@ -29,7 +52,7 @@ pub extern "C" fn buttplug_create_client(
     error!("NULL CALLBACK SPECIFIED. NO MESSAGES WILL BE RETURNED, NOR WILL EVENTS BE EMITTED.");
   }
 
-  Box::into_raw(Box::new(ButtplugFFIClient::new(&client_name, callback)))
+  Box::into_raw(Box::new(ButtplugFFIClient::new(get_or_create_runtime(), &client_name, callback)))
 }
 
 #[no_mangle]
@@ -108,14 +131,22 @@ pub extern "C" fn buttplug_activate_env_logger() {
 }
 
 #[no_mangle]
-pub extern "C" fn buttplug_add_log_handler(callback: LogFFICallback, max_level: *const c_char, use_json: bool) {
+pub extern "C" fn buttplug_create_log_handle(callback: LogFFICallback, max_level: *const c_char, use_json: bool) -> *mut ButtplugFFILogHandle {
   let max_level_cstr = unsafe {
     assert!(!max_level.is_null());
 
     CStr::from_ptr(max_level)
   };
-
   // If we were handed a wrong client name, just panic.
   let max_level_str = max_level_cstr.to_str().unwrap();
-  buttplug_create_log_handler(callback, max_level_str, use_json);
+  Box::into_raw(Box::new(ButtplugFFILogHandle::new(get_or_create_runtime(), callback, max_level_str, use_json)))
+}
+
+#[no_mangle]
+pub extern "C" fn buttplug_free_log_handle(log_ptr: *mut ButtplugFFILogHandle) {
+  if !log_ptr.is_null() {
+    unsafe {
+      Box::from_raw(log_ptr);
+    }
+  }
 }

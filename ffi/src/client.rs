@@ -9,11 +9,9 @@ use super::{
 };
 use std::sync::Arc;
 use buttplug::{
-  core::messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer},
-  client::ButtplugClient,
-  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugRemoteClientConnector},
-  server::ButtplugServerOptions,
-  util::async_manager
+  client::ButtplugClient, connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugRemoteClientConnector}, 
+  core::{messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer}}, 
+  server::ButtplugServerOptions, util::async_manager
 };
 #[cfg(feature = "wasm")]
 use super::wasm::{
@@ -43,22 +41,25 @@ pub struct ButtplugFFIClient {
   callback: Option<FFICallback>,
   client: Arc<ButtplugClient>,
   #[cfg(not(feature = "wasm"))]
-  runtime: Arc<Runtime>
+  runtime: Arc<Runtime>,
 }
 
 impl Drop for ButtplugFFIClient {
   fn drop(&mut self) {
+    let _guard = self.runtime.enter();
     info!("DROPPED RUST FFI CLIENT");
   }
 }
 
 impl ButtplugFFIClient {
-  pub fn new(name: &str, callback: Option<FFICallback>) -> Self {
+  pub fn new(
+    #[cfg(not(feature = "wasm"))]
+    runtime: Arc<tokio::runtime::Runtime>,
+    name: &str, 
+    callback: Option<FFICallback>) -> Self {
     let client = Arc::new(ButtplugClient::new(name));
     let event_callback = callback.clone();
     let mut event_stream = client.event_stream();
-    #[cfg(not(feature = "wasm"))]
-    let runtime = Arc::new(Runtime::new().unwrap());
     #[cfg(not(feature = "wasm"))]
     let _guard = runtime.enter();
     async_manager::spawn(async move {
@@ -70,7 +71,7 @@ impl ButtplugFFIClient {
       callback,
       client,
       #[cfg(not(feature = "wasm"))]
-      runtime
+      runtime,
     }
   }
 
@@ -104,8 +105,8 @@ impl ButtplugFFIClient {
     }
   }
 
-  fn connect<T>(&self, client_msg_id: u32, connector: T) 
-  where T: ButtplugConnector<ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage>  + 'static {
+  fn connect<C>(&self, client_msg_id: u32, connector: C) 
+  where C: ButtplugConnector<ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage>  + 'static {
     info!("Connected client with id {}", client_msg_id);
     let client = self.client.clone();
     let callback = self.callback.clone();
