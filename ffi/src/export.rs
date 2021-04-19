@@ -37,7 +37,7 @@ fn get_or_create_runtime() -> Arc<Runtime> {
 }
 
 #[no_mangle]
-pub extern "C" fn buttplug_create_client(
+pub extern "C" fn buttplug_create_protobuf_client(
   client_name_ptr: *const c_char,
   callback: FFICallback,
   callback_context: FFICallbackContext
@@ -64,7 +64,7 @@ pub extern "C" fn buttplug_free_client(ptr: *mut ButtplugFFIClient) {
 }
 
 #[no_mangle]
-pub extern "C" fn buttplug_parse_client_message(
+pub extern "C" fn buttplug_client_protobuf_message(
   client_ptr: *mut ButtplugFFIClient,
   buf: *const u8,
   buf_len: i32,
@@ -99,7 +99,7 @@ pub extern "C" fn buttplug_create_device(
 }
 
 #[no_mangle]
-pub extern "C" fn buttplug_parse_device_message(
+pub extern "C" fn buttplug_device_protobuf_message(
   device_ptr: *mut ButtplugFFIDevice,
   buf: *const u8,
   buf_len: i32,

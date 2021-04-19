@@ -13,7 +13,7 @@ use console_error_panic_hook;
 
 #[no_mangle]
 #[wasm_bindgen]
-pub fn buttplug_create_client(
+pub fn buttplug_create_protobuf_client(
   client_name: &str,
   callback: &FFICallback,
   callback_context: u32
@@ -37,7 +37,7 @@ pub fn buttplug_free_client(ptr: *mut ButtplugFFIClient) {
 
 #[no_mangle]
 #[wasm_bindgen]
-pub fn buttplug_parse_client_message(
+pub fn buttplug_client_protobuf_message(
   client_ptr: *mut ButtplugFFIClient,
   buf: &[u8],
   callback: FFICallback,
@@ -69,7 +69,7 @@ pub fn buttplug_create_device(
 
 #[no_mangle]
 #[wasm_bindgen]
-pub fn buttplug_parse_device_message(
+pub fn buttplug_device_protobuf_message(
   device_ptr: *mut ButtplugFFIDevice,
   buf: &[u8],
   callback: FFICallback,

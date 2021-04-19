@@ -18,15 +18,15 @@ function must_run_init_3(a: any | undefined, b: any | undefined, c: any | undefi
 function must_run_init_4(a: any | undefined, b: any | undefined, c: any | undefined, d: any | undefined): any {
   throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
 }
-// import { buttplug_create_client, buttplug_free_client, buttplug_parse_client_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_parse_device_message } from "./buttplug-rs-ffi/buttplug_rs_ffi";
+// import { buttplug_create_protobuf_client, buttplug_free_client, buttplug_client_protobuf_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_device_protobuf_message } from "./buttplug-rs-ffi/buttplug_rs_ffi";
 
-let buttplug_create_client = must_run_init_3;
+let buttplug_create_protobuf_client = must_run_init_3;
 let buttplug_free_client = must_run_init_1;
-let buttplug_parse_client_message = must_run_init_4;
+let buttplug_client_protobuf_message = must_run_init_4;
 let buttplug_activate_env_logger = must_run_init_1;
 let buttplug_free_device = must_run_init_1;
 let buttplug_create_device = must_run_init_2;
-let buttplug_parse_device_message = must_run_init_4;
+let buttplug_device_protobuf_message = must_run_init_4;
 let buttplug_has_init_run = false;
 
 export async function buttplugInit() {
@@ -38,20 +38,20 @@ export async function buttplugInit() {
     console.log(e);
     return Promise.reject(e);
   });
-  buttplug_create_client = index.buttplug_create_client;
+  buttplug_create_protobuf_client = index.buttplug_create_protobuf_client;
   buttplug_free_client = index.buttplug_free_client;
-  buttplug_parse_client_message = index.buttplug_parse_client_message;
+  buttplug_client_protobuf_message = index.buttplug_client_protobuf_message;
   buttplug_activate_env_logger = index.buttplug_activate_env_logger;
   buttplug_free_device = index.buttplug_free_device;
   buttplug_create_device = index.buttplug_create_device;
-  buttplug_parse_device_message = index.buttplug_parse_device_message;
+  buttplug_device_protobuf_message = index.buttplug_device_protobuf_message;
   buttplug_has_init_run = true;
 }
 
 function sendClientMessage(sorter: ButtplugMessageSorter, clientPtr: number, message: Buttplug.ClientMessage, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
   let promise = sorter.PrepareOutgoingMessage(message);
   let buffer = Buffer.from(Buttplug.ClientMessage.encode(message).finish())
-  buttplug_parse_client_message(clientPtr, buffer, callback, 0);
+  buttplug_client_protobuf_message(clientPtr, buffer, callback, 0);
   return promise;
 }
 
@@ -126,7 +126,7 @@ export function stopAllDevices(sorter: ButtplugMessageSorter, clientPtr: number,
 function sendDeviceMessage(sorter: ButtplugMessageSorter, devicePtr: number, message: Buttplug.DeviceMessage, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
   let promise = sorter.PrepareOutgoingMessage(message);
   let buffer = Buffer.from(Buttplug.DeviceMessage.encode(message).finish())
-  buttplug_parse_device_message(devicePtr, buffer, callback, 0);
+  buttplug_device_protobuf_message(devicePtr, buffer, callback, 0);
   return promise;
 }
 
@@ -252,7 +252,7 @@ export function rawUnsubscribe(sorter: ButtplugMessageSorter, devicePtr: number,
 }
 
 export function createClientPtr(eventCallback: Function, clientName: string): number {
-  return buttplug_create_client(clientName, eventCallback, 0);
+  return buttplug_create_protobuf_client(clientName, eventCallback, 0);
 }
 
 export function createDevicePtr(clientPtr: number, deviceIndex: number): number | null {
