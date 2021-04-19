@@ -54,9 +54,9 @@ export class ButtplugClient extends EventEmitter {
       throw new ButtplugClientConnectorError("Client already connected.");
     }
     if (options instanceof ButtplugEmbeddedConnectorOptions) {
-      await connectEmbedded(this._sorter, this._clientPtr!, options);
+      await connectEmbedded(this._sorter, this._clientPtr!, options, this.sorterCallback);
     } else if (options instanceof ButtplugWebsocketConnectorOptions) {
-      await connectWebsocket(this._sorter, this._clientPtr!, options);
+      await connectWebsocket(this._sorter, this._clientPtr!, options, this.sorterCallback);
     } else {
       throw new ButtplugClientConnectorError("Invalid connector type.");
     }
@@ -67,7 +67,7 @@ export class ButtplugClient extends EventEmitter {
     if (!this._clientPtr) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
-    await disconnect(this._sorter, this._clientPtr);
+    await disconnect(this._sorter, this._clientPtr, this.sorterCallback);
   }
 
   public startScanning = async () => {
@@ -75,7 +75,7 @@ export class ButtplugClient extends EventEmitter {
       throw new ButtplugClientConnectorError("Not connected.");
     }
     this._isScanning = true;
-    await startScanning(this._sorter, this._clientPtr!);
+    await startScanning(this._sorter, this._clientPtr!, this.sorterCallback);
   }
 
   public stopScanning = async () => {
@@ -83,14 +83,14 @@ export class ButtplugClient extends EventEmitter {
       throw new ButtplugClientConnectorError("Not connected.");
     }
     this._isScanning = false;
-    await stopScanning(this._sorter, this._clientPtr!);
+    await stopScanning(this._sorter, this._clientPtr!, this.sorterCallback);
   }
 
   public stopAllDevices = async () => {
     if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
-    await stopAllDevices(this._sorter, this._clientPtr!);
+    await stopAllDevices(this._sorter, this._clientPtr!, this.sorterCallback);
   }
 
   protected CheckConnector() {
@@ -108,7 +108,7 @@ export class ButtplugClient extends EventEmitter {
     if (msg.message?.serverMessage?.deviceAdded) {
       const addedMsg = msg.message?.serverMessage?.deviceAdded;
       const devicePtr = createDevicePtr(this._clientPtr!, addedMsg.index!);
-      const device = new ButtplugClientDevice(devicePtr!, this._sorter, addedMsg.index!, addedMsg.name!, addedMsg.messageAttributes!);
+      const device = new ButtplugClientDevice(devicePtr!, this._sorter, this.sorterCallback, addedMsg.index!, addedMsg.name!, addedMsg.messageAttributes!);
       this._devices.set(addedMsg.index!, device);
       this.emit("deviceadded", device);
       return;

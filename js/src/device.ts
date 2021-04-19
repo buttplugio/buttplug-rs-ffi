@@ -83,6 +83,7 @@ export class ButtplugClientDevice extends EventEmitter {
   private _devicePtr: number;
   private _messageAttributes: Map<ButtplugDeviceMessageType, MessageAttributes> = new Map();
   private _sorter: ButtplugMessageSorter;
+  private _sorterCallback: Function;
 
   /**
    * Return the name of the device.
@@ -113,6 +114,7 @@ export class ButtplugClientDevice extends EventEmitter {
   constructor(
     devicePtr: number,
     sorter: ButtplugMessageSorter,
+    sorter_callback: Function,
     index: number,
     name: string,
     allowedMsgsObj: Buttplug.ServerMessage.IMessageAttributes[]) {
@@ -121,6 +123,7 @@ export class ButtplugClientDevice extends EventEmitter {
     this._sorter = sorter;
     this._index = index;
     this._name = name;
+    this._sorterCallback = sorter_callback;
     for (let attributes of allowedMsgsObj) {
       this._messageAttributes.set(attributes.messageType!, new MessageAttributes(attributes));
     }
@@ -162,7 +165,7 @@ export class ButtplugClientDevice extends EventEmitter {
     } else {
       throw new ButtplugDeviceError("vibrate can only take numbers or arrays of numbers or VibrationCmds.");
     }
-    await vibrate(this._sorter, this._devicePtr, msgSpeeds);
+    await vibrate(this._sorter, this._devicePtr, msgSpeeds, this._sorterCallback);
   }
 
   public async rotate(speeds: number | RotationCmd[], clockwise: boolean | undefined): Promise<void> {
@@ -185,7 +188,7 @@ export class ButtplugClientDevice extends EventEmitter {
     } else {
       throw new ButtplugDeviceError("rotate can only take number/boolean or arrays of RotateCmds.");
     }
-    await rotate(this._sorter, this._devicePtr, msgRotations);
+    await rotate(this._sorter, this._devicePtr, msgRotations, this._sorterCallback);
   }
 
   public async linear(position: number | VectorCmd[], duration: number | undefined): Promise<void> {
@@ -208,12 +211,12 @@ export class ButtplugClientDevice extends EventEmitter {
     } else {
       throw new ButtplugDeviceError("linear can only take number/number or arrays of VectorCmds.");
     }
-    await linear(this._sorter, this._devicePtr, msgVectors);
+    await linear(this._sorter, this._devicePtr, msgVectors, this._sorterCallback);
   }
 
   public async batteryLevel(): Promise<number> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.BatteryLevelCmd);
-    let batteryMsg = await batteryLevel(this._sorter, this._devicePtr);
+    let batteryMsg = await batteryLevel(this._sorter, this._devicePtr, this._sorterCallback);
     if (batteryMsg.message?.deviceEvent?.batteryLevelReading) {
       let reading = batteryMsg.message?.deviceEvent?.batteryLevelReading;
       return reading.reading!;
@@ -223,7 +226,7 @@ export class ButtplugClientDevice extends EventEmitter {
 
   public async rssiLevel(): Promise<number> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RSSILevelCmd);
-    let rssiMsg = await rssiLevel(this._sorter, this._devicePtr);
+    let rssiMsg = await rssiLevel(this._sorter, this._devicePtr, this._sorterCallback);
     if (rssiMsg.message?.deviceEvent?.rssiLevelReading) {
       return rssiMsg.message?.deviceEvent?.rssiLevelReading.reading!;
     }
@@ -232,7 +235,7 @@ export class ButtplugClientDevice extends EventEmitter {
 
   public async rawRead(endpoint: Buttplug.Endpoint, expectedLength: number, timeout: number): Promise<Uint8Array> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawReadCmd);
-    let readingMsg = await rawRead(this._sorter, this._devicePtr, endpoint, expectedLength, timeout);
+    let readingMsg = await rawRead(this._sorter, this._devicePtr, endpoint, expectedLength, timeout, this._sorterCallback);
     if (readingMsg.message?.deviceEvent?.rawReading) {
       return readingMsg.message.deviceEvent.rawReading.data!;
     }
@@ -241,21 +244,21 @@ export class ButtplugClientDevice extends EventEmitter {
 
   public async rawWrite(endpoint: Buttplug.Endpoint, data: Uint8Array, writeWithResponse: boolean): Promise<void> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawWriteCmd);
-    await rawWrite(this._sorter, this._devicePtr, endpoint, data, writeWithResponse);
+    await rawWrite(this._sorter, this._devicePtr, endpoint, data, writeWithResponse, this._sorterCallback);
   }
 
   public async rawSubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawSubscribeCmd);
-    await rawSubscribe(this._sorter, this._devicePtr, endpoint);
+    await rawSubscribe(this._sorter, this._devicePtr, endpoint, this._sorterCallback);
   }
 
   public async rawUnsubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawUnsubscribeCmd);
-    await rawUnsubscribe(this._sorter, this._devicePtr, endpoint);
+    await rawUnsubscribe(this._sorter, this._devicePtr, endpoint, this._sorterCallback);
   }
 
   public async stop(): Promise<void> {
-    await stopDevice(this._sorter, this._devicePtr);
+    await stopDevice(this._sorter, this._devicePtr, this._sorterCallback);
   }
 
   public emitDisconnected() {
