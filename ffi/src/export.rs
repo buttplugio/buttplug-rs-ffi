@@ -1,4 +1,6 @@
 use super::{
+  FFICallbackContext,
+  FFICallbackContextWrapper,
   client::ButtplugFFIClient,
   device::ButtplugFFIDevice, 
   FFICallback,
@@ -36,8 +38,9 @@ fn get_or_create_runtime() -> Arc<Runtime> {
 
 #[no_mangle]
 pub extern "C" fn buttplug_create_client(
-  callback: Option<FFICallback>,
   client_name_ptr: *const c_char,
+  callback: FFICallback,
+  callback_context: FFICallbackContext
 ) -> *mut ButtplugFFIClient {
   let c_str = unsafe {
     assert!(!client_name_ptr.is_null());
@@ -48,11 +51,7 @@ pub extern "C" fn buttplug_create_client(
   // If we were handed a wrong client name, just panic.
   let client_name = c_str.to_str().unwrap();
 
-  if callback.is_none() {
-    error!("NULL CALLBACK SPECIFIED. NO MESSAGES WILL BE RETURNED, NOR WILL EVENTS BE EMITTED.");
-  }
-
-  Box::into_raw(Box::new(ButtplugFFIClient::new(get_or_create_runtime(), &client_name, callback)))
+  Box::into_raw(Box::new(ButtplugFFIClient::new(get_or_create_runtime(), &client_name, callback, callback_context)))
 }
 
 #[no_mangle]
@@ -69,6 +68,8 @@ pub extern "C" fn buttplug_parse_client_message(
   client_ptr: *mut ButtplugFFIClient,
   buf: *const u8,
   buf_len: i32,
+  callback: FFICallback,
+  callback_context: FFICallbackContext
 ) {
   let client = unsafe {
     assert!(!client_ptr.is_null());
@@ -78,7 +79,7 @@ pub extern "C" fn buttplug_parse_client_message(
   unsafe {
     msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
   }
-  client.parse_message(msg_ptr);
+  client.parse_message(msg_ptr, callback, FFICallbackContextWrapper(callback_context));
 }
 
 #[no_mangle]
@@ -102,6 +103,8 @@ pub extern "C" fn buttplug_parse_device_message(
   device_ptr: *mut ButtplugFFIDevice,
   buf: *const u8,
   buf_len: i32,
+  callback: FFICallback,
+  callback_context: FFICallbackContext
 ) {
   let device = unsafe {
     assert!(!device_ptr.is_null());
@@ -111,7 +114,7 @@ pub extern "C" fn buttplug_parse_device_message(
   unsafe {
     msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
   }
-  device.parse_message(msg_ptr);
+  device.parse_message(msg_ptr, callback, FFICallbackContextWrapper(callback_context));
 }
 
 #[no_mangle]

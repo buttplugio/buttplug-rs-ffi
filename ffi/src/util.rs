@@ -8,6 +8,7 @@ use super::{
 
   },
   FFICallback,
+  FFICallbackContextWrapper
 };
 use buttplug::{
   client::{ButtplugClientError, ButtplugClientEvent, ButtplugClientDeviceMessageType},
@@ -19,40 +20,41 @@ use prost::Message;
 use wasm_bindgen::prelude::*;
 #[cfg(feature = "wasm")]
 use js_sys::Uint8Array;
-use std::convert::{TryFrom, TryInto};
-use std::error::Error;
+use std::{
+  convert::{TryFrom, TryInto},
+  error::Error,
+};
 
-pub fn send_server_message(message: &FFIServerMessage, callback: &Option<FFICallback>) {
-  if callback.is_none() {
-    return;
-  }
+pub fn send_server_message(message: &FFIServerMessage, callback: &FFICallback, callback_context: FFICallbackContextWrapper) {
   let mut buf = vec![];
   message.encode(&mut buf).unwrap();
   #[cfg(not(feature = "wasm"))]
-  callback.unwrap()(buf.as_ptr(), buf.len() as u32);
+  callback(callback_context.0, buf.as_ptr(), buf.len() as u32);
   #[cfg(feature = "wasm")]
   {
     let this = JsValue::null();
     let uint8buf = unsafe { Uint8Array::new(&Uint8Array::view(&buf)) };
-    callback.clone().unwrap().call1(&this, &JsValue::from(uint8buf));
+    callback.call1(&this, &JsValue::from(uint8buf));
   }
 }
 
 pub fn return_client_result(
   id: u32,
   result: &Result<(), ButtplugClientError>,
-  callback: &Option<FFICallback>,
+  callback: &FFICallback,
+  callback_context: FFICallbackContextWrapper
 ) {
   match result {
-    Ok(_) => return_ok(id, callback),
-    Err(error) => return_error(id, error, callback),
+    Ok(_) => return_ok(id, callback, callback_context),
+    Err(error) => return_error(id, error, callback, callback_context),
   };
 }
 
 pub fn return_error(
   id: u32, 
   error: &ButtplugClientError, 
-  callback: &Option<FFICallback>
+  callback: &FFICallback,
+  callback_context: FFICallbackContextWrapper
 ) {
   let error_args = match error {
     ButtplugClientError::ButtplugConnectorError(conn_err) => OutgoingError {
@@ -87,10 +89,11 @@ pub fn return_error(
   send_server_message(
     &error_msg,
     callback,
+    callback_context
   );
 }
 
-pub fn return_ok(id: u32, callback: &Option<FFICallback>) {
+pub fn return_ok(id: u32, callback: &FFICallback, callback_context: FFICallbackContextWrapper) {
   let ok_msg = FFIServerMessage {
     id,
     message: Some(buttplug_ffi_server_message::FfiMessage {
@@ -102,6 +105,7 @@ pub fn return_ok(id: u32, callback: &Option<FFICallback>) {
   send_server_message(
     &ok_msg,
     callback,
+    callback_context
   );
 }
 
@@ -228,7 +232,7 @@ impl From<&Endpoint> for SerializedEndpoint {
   }
 }
 
-pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
+pub fn send_event(event: ButtplugClientEvent, callback: &FFICallback, callback_context: FFICallbackContextWrapper) {
   match event {
     ButtplugClientEvent::DeviceAdded(device) => {
       // TODO This should probably be its own fn but I didn't wanna screw with builder lifetime.
@@ -281,7 +285,8 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       };
       send_server_message(
         &device_added_msg,
-        &callback,
+        callback,
+        callback_context
       );
     }
     ButtplugClientEvent::DeviceRemoved(device) => {
@@ -297,11 +302,12 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       };
       send_server_message(
         &device_removed_msg,
-        &callback,
+        callback,
+        callback_context
       );
     }
     ButtplugClientEvent::Error(error) => {
-      return_error(0, &ButtplugClientError::ButtplugError(error), &callback)
+      return_error(0, &ButtplugClientError::ButtplugError(error), callback, callback_context)
     }
     ButtplugClientEvent::ScanningFinished => {
       let scanning_finished_msg = FFIServerMessage {
@@ -315,7 +321,8 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       };
       send_server_message(
         &scanning_finished_msg,
-        &callback,
+        callback,
+        callback_context
       );
     }
     ButtplugClientEvent::ServerConnect => {
@@ -333,11 +340,12 @@ pub fn send_event(event: ButtplugClientEvent, callback: Option<FFICallback>) {
       };
       send_server_message(
         &disconnect_msg,
-        &callback,
+        callback,
+        callback_context
       );
     }
     ButtplugClientEvent::PingTimeout => {
-      return_error(0, &ButtplugClientError::ButtplugError(ButtplugError::ButtplugPingError(buttplug::core::errors::ButtplugPingError::PingedOut)), &callback)
+      return_error(0, &ButtplugClientError::ButtplugError(ButtplugError::ButtplugPingError(buttplug::core::errors::ButtplugPingError::PingedOut)), callback, callback_context)
     }
   }
 }

@@ -2,8 +2,9 @@ use super::{
   client::ButtplugFFIClient, 
   device::ButtplugFFIDevice, 
   FFICallback,
+  FFICallbackContextWrapper,
   wasm_types::c_char,
-  logging::{buttplug_create_log_handler, LogFFICallback}
+  logging::{LogFFICallback}
 };
 use tracing_subscriber::{Registry, EnvFilter, layer::SubscriberExt};
 use tracing_wasm::{WASMLayer, WASMLayerConfig};
@@ -13,14 +14,15 @@ use console_error_panic_hook;
 #[no_mangle]
 #[wasm_bindgen]
 pub fn buttplug_create_client(
-  callback: &FFICallback,
   client_name: &str,
+  callback: &FFICallback,
+  callback_context: u32
 ) -> *mut ButtplugFFIClient {
   console_error_panic_hook::set_once();
 
   // If we were handed a wrong client name, just panic.
 
-  Box::into_raw(Box::new(ButtplugFFIClient::new(client_name, Some(callback.clone()))))
+  Box::into_raw(Box::new(ButtplugFFIClient::new(client_name, callback.clone(), callback_context)))
 }
 
 #[no_mangle]
@@ -37,13 +39,15 @@ pub fn buttplug_free_client(ptr: *mut ButtplugFFIClient) {
 #[wasm_bindgen]
 pub fn buttplug_parse_client_message(
   client_ptr: *mut ButtplugFFIClient,
-  buf: &[u8]
+  buf: &[u8],
+  callback: FFICallback,
+  callback_context: u32
 ) {
   let client = unsafe {
     assert!(!client_ptr.is_null());
     &mut *client_ptr
   };
-  client.parse_message(buf);
+  client.parse_message(buf, callback, FFICallbackContextWrapper(callback_context));
 }
 
 #[no_mangle]
@@ -67,13 +71,15 @@ pub fn buttplug_create_device(
 #[wasm_bindgen]
 pub fn buttplug_parse_device_message(
   device_ptr: *mut ButtplugFFIDevice,
-  buf: &[u8]
+  buf: &[u8],
+  callback: FFICallback,
+  callback_context: u32,
 ) {
   let device = unsafe {
     assert!(!device_ptr.is_null());
     &mut *device_ptr
   };
-  device.parse_message(buf);
+  device.parse_message(buf, callback, FFICallbackContextWrapper(callback_context));
 }
 
 #[no_mangle]

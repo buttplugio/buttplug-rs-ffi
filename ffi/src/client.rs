@@ -1,5 +1,7 @@
 use super::{
   FFICallback,
+  FFICallbackContext,
+  FFICallbackContextWrapper,
   device::ButtplugFFIDevice,
   util::{return_client_result, return_ok, return_error, send_event},
   pbufs::{
@@ -57,19 +59,21 @@ impl ButtplugFFIClient {
     #[cfg(not(feature = "wasm"))]
     runtime: Arc<tokio::runtime::Runtime>,
     name: &str, 
-    callback: Option<FFICallback>) -> Self {
+    event_callback: FFICallback,
+    event_callback_context: FFICallbackContext) -> Self {
     let client = Arc::new(ButtplugClient::new(name));
-    let event_callback = callback.clone();
+    let event_callback = event_callback.clone();
+    let context_wrapper = FFICallbackContextWrapper(event_callback_context);
+    let context_wrapper_clone = context_wrapper.clone();
     let mut event_stream = client.event_stream();
     #[cfg(not(feature = "wasm"))]
     let _guard = runtime.enter();
     async_manager::spawn(async move {
       while let Some(e) = event_stream.next().await {
-        send_event(e, event_callback.clone());
+        send_event(e, &event_callback, context_wrapper_clone);
       }
     }).unwrap();
     Self {
-      callback,
       client,
       #[cfg(not(feature = "wasm"))]
       runtime,
@@ -80,50 +84,49 @@ impl ButtplugFFIClient {
     let devices = self.client.devices();
     if let Some(device) = devices.iter().find(|device| device.index() == device_index) {
       #[cfg(not(feature = "wasm"))]
-      return Some(ButtplugFFIDevice::new(self.runtime.clone(), device.clone(), self.callback.clone()));
+      return Some(ButtplugFFIDevice::new(self.runtime.clone(), device.clone()));
 
       #[cfg(feature = "wasm")]
-      return Some(ButtplugFFIDevice::new(device.clone(), self.callback.clone()));
+      return Some(ButtplugFFIDevice::new(device.clone()));
     } else {
       error!("Device id {} not available.", device_index);
       None
     }
   }
 
-  pub fn parse_message(&self, msg_ptr: &[u8]) {
+  pub fn parse_message(&self, msg_ptr: &[u8], callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     #[cfg(not(feature = "wasm"))]
     let _guard = self.runtime.enter();
     let client_msg = ClientMessage::decode(msg_ptr).unwrap();
     let msg_id = client_msg.id;
     match client_msg.message.unwrap().msg.unwrap() {
-      ClientMessageType::ConnectLocal(connect_local_msg) => self.connect_local(msg_id, &connect_local_msg),
-      ClientMessageType::ConnectWebsocket(connect_websocket_msg) => self.connect_websocket(msg_id, &connect_websocket_msg),
-      ClientMessageType::StartScanning(_) => self.start_scanning(msg_id),
-      ClientMessageType::StopScanning(_) => self.stop_scanning(msg_id),
-      ClientMessageType::StopAllDevices(_) => self.stop_all_devices(msg_id),
-      ClientMessageType::Disconnect(_) => self.disconnect(msg_id),
-      ClientMessageType::Ping(_) => self.ping(msg_id),
+      ClientMessageType::ConnectLocal(connect_local_msg) => self.connect_local(msg_id, &connect_local_msg, callback, callback_context),
+      ClientMessageType::ConnectWebsocket(connect_websocket_msg) => self.connect_websocket(msg_id, &connect_websocket_msg, callback, callback_context),
+      ClientMessageType::StartScanning(_) => self.start_scanning(msg_id, callback, callback_context),
+      ClientMessageType::StopScanning(_) => self.stop_scanning(msg_id, callback, callback_context),
+      ClientMessageType::StopAllDevices(_) => self.stop_all_devices(msg_id, callback, callback_context),
+      ClientMessageType::Disconnect(_) => self.disconnect(msg_id, callback, callback_context),
+      ClientMessageType::Ping(_) => self.ping(msg_id, callback, callback_context),
     }
   }
 
-  fn connect<C>(&self, client_msg_id: u32, connector: C) 
+  fn connect<C>(&self, client_msg_id: u32, connector: C, callback: FFICallback, callback_context: FFICallbackContextWrapper) 
   where C: ButtplugConnector<ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage>  + 'static {
     info!("Connected client with id {}", client_msg_id);
     let client = self.client.clone();
-    let callback = self.callback.clone();
     async_manager::spawn(async move {
       match client.connect(connector).await {
         Ok(()) => {
-          return_ok(client_msg_id, &callback);
+          return_ok(client_msg_id, &callback, callback_context);
         },
         Err(e) => {
-          return_error(client_msg_id, &e, &callback);
+          return_error(client_msg_id, &e, &callback, callback_context);
         }
       }
     }).unwrap();
   }
 
-  fn connect_local(&self, msg_id: u32, connect_local_msg: &ConnectLocal) {
+  fn connect_local(&self, msg_id: u32, connect_local_msg: &ConnectLocal, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let mut options = ButtplugServerOptions::default();
     options.name = connect_local_msg.server_name.clone();
     options.max_ping_time = connect_local_msg.max_ping_time.into();
@@ -155,11 +158,11 @@ impl ButtplugFFIClient {
     {
       connector.server_ref().add_comm_manager::<WebBluetoothCommunicationManager>().unwrap(); 
     }
-    self.connect(msg_id, connector);
+    self.connect(msg_id, connector, callback, callback_context);
   }
 
   #[cfg(not(feature = "wasm"))]
-  fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket) {
+  fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let connector: ButtplugRemoteClientConnector<_, ButtplugClientJSONSerializer> = if connect_websocket_msg.address.contains("wss://") {
       let transport = ButtplugWebsocketClientTransport::new_secure_connector(&connect_websocket_msg.address, connect_websocket_msg.bypass_cert_verification);
       ButtplugRemoteClientConnector::new(transport)
@@ -167,11 +170,11 @@ impl ButtplugFFIClient {
       let transport = ButtplugWebsocketClientTransport::new_insecure_connector(&connect_websocket_msg.address);
       ButtplugRemoteClientConnector::new(transport)
     };
-    self.connect(msg_id, connector);
+    self.connect(msg_id, connector, callback, callback_context);
   }
 
   #[cfg(feature = "wasm")]
-  fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket) {
+  fn connect_websocket(&self, msg_id: u32, connect_websocket_msg: &ConnectWebsocket, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let connector = ButtplugRemoteClientConnector::<
         ButtplugBrowserWebsocketClientTransport,
         ButtplugClientJSONSerializer,
@@ -180,46 +183,41 @@ impl ButtplugFFIClient {
           &connect_websocket_msg.address,
         ),
       );
-    self.connect(msg_id, connector);
+    self.connect(msg_id, connector, callback, callback_context);
   }
 
-  fn disconnect(&self, msg_id: u32) {
+  fn disconnect(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
-    let callback = self.callback.clone();
     async_manager::spawn(async move {
-      return_client_result(msg_id, &client.disconnect().await, &callback);
+      return_client_result(msg_id, &client.disconnect().await, &callback, callback_context);
     }).unwrap();
   }
 
-  fn start_scanning(&self, msg_id: u32) {
+  fn start_scanning(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
-    let callback = self.callback.clone();
     async_manager::spawn(async move {
-      return_client_result(msg_id, &client.start_scanning().await, &callback);
+      return_client_result(msg_id, &client.start_scanning().await, &callback, callback_context);
     }).unwrap();
   }
 
-  fn stop_scanning(&self, msg_id: u32) {
+  fn stop_scanning(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
-    let callback = self.callback.clone();
     async_manager::spawn(async move {
-      return_client_result(msg_id, &client.stop_scanning().await, &callback);
+      return_client_result(msg_id, &client.stop_scanning().await, &callback, callback_context);
     }).unwrap();
   }
 
-  fn ping(&self, msg_id: u32) {
+  fn ping(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
-    let callback = self.callback.clone();
     async_manager::spawn(async move {
-      return_client_result(msg_id, &client.ping().await, &callback);
+      return_client_result(msg_id, &client.ping().await, &callback, callback_context);
     }).unwrap();
   }
 
-  fn stop_all_devices(&self, msg_id: u32) {
+  fn stop_all_devices(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
-    let callback = self.callback.clone();
     async_manager::spawn(async move {
-      return_client_result(msg_id, &client.stop_all_devices().await, &callback);
+      return_client_result(msg_id, &client.stop_all_devices().await, &callback, callback_context);
     }).unwrap();
   }
 }
