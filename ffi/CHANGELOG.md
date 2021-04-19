@@ -1,3 +1,13 @@
+# 2.0.0 (2021/04/18)
+
+## Features
+
+- Change API to use per-call callbacks, with context passed from outside
+  - Should clear up issues with Unity linking in IL2CPP, as well as just making the FFI suck less to
+    use.
+- Update to buttplug-rs v3.0.1
+  - Fixes issues with lovense battery reading and WASM dependencies
+
 # 1.0.17 (2021/04/11)
 
 ## Features

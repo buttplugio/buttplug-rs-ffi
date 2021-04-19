@@ -390,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "buttplug-rs-ffi"
-version = "1.0.17"
+version = "2.0.0"
 dependencies = [
  "anyhow",
  "async-lock",
