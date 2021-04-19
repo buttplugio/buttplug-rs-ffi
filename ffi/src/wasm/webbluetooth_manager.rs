@@ -79,11 +79,19 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
       //JsFuture::from(nav.bluetooth().request_device()).await;
       match JsFuture::from(nav.bluetooth().unwrap().request_device(&options)).await {
         Ok(device) => {
-          let device_creator = Box::new(WebBluetoothDeviceImplCreator::new(BluetoothDevice::from(
-            device,
-          )));
+          let bt_device = BluetoothDevice::from(device);
+          if bt_device.name().is_none() {
+            return;
+          }
+          let name = bt_device.name().unwrap();
+          let address = bt_device.id();
+          let device_creator = Box::new(WebBluetoothDeviceImplCreator::new(bt_device));
           if sender_clone
-            .send(DeviceCommunicationEvent::DeviceFound(device_creator))
+            .send(DeviceCommunicationEvent::DeviceFound {
+              name,
+              address,
+              creator: device_creator
+            })
             .await
             .is_err()
           {
