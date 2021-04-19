@@ -30,6 +30,9 @@ namespace Buttplug
 
         private ButtplugFFIDeviceHandle Handle;
 
+        private ButtplugCallback SorterCallback;
+        private IntPtr SorterCallbackCtx;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtplugClientDevice"/> class, using
         /// discrete parameters.
@@ -41,13 +44,17 @@ namespace Buttplug
             ButtplugFFIDeviceHandle aHandle,
             uint aIndex,
             string aName,
-            Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes> aAllowedMessages)
+            Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes> aAllowedMessages,
+            ButtplugCallback aCallback,
+            IntPtr aCallbackCtx)
         {
             Sorter = aSorter;
             Handle = aHandle;
             Index = aIndex;
             Name = aName;
             AllowedMessages = aAllowedMessages;
+            SorterCallback = aCallback;
+            SorterCallbackCtx = aCallbackCtx;
         }
 
         public void Dispose()
@@ -85,7 +92,7 @@ namespace Buttplug
 
         public Task SendVibrateCmd(Dictionary<uint, double> aCmds)
         {
-            return ButtplugFFI.SendVibrateCmd(Sorter, Handle, Index, aCmds);
+            return ButtplugFFI.SendVibrateCmd(Sorter, Handle, Index, aCmds, SorterCallback, SorterCallbackCtx);
         }
 
         public Task SendRotateCmd(double aSpeed, bool aClockwise)
@@ -112,7 +119,7 @@ namespace Buttplug
 
         public Task SendRotateCmd(Dictionary<uint, (double, bool)> aCmds)
         {
-            return ButtplugFFI.SendRotateCmd(Sorter, Handle, Index, aCmds);
+            return ButtplugFFI.SendRotateCmd(Sorter, Handle, Index, aCmds, SorterCallback, SorterCallbackCtx);
         }
 
         public Task SendLinearCmd(uint aDuration, double aPosition)
@@ -139,12 +146,12 @@ namespace Buttplug
 
         public Task SendLinearCmd(Dictionary<uint, (uint, double)> aCmds)
         {
-            return ButtplugFFI.SendLinearCmd(Sorter, Handle, Index, aCmds);
+            return ButtplugFFI.SendLinearCmd(Sorter, Handle, Index, aCmds, SorterCallback, SorterCallbackCtx);
         }
 
         public async Task<double> SendBatteryLevelCmd()
         {
-            var reading = await ButtplugFFI.SendBatteryLevelCmd(Sorter, Handle, Index);
+            var reading = await ButtplugFFI.SendBatteryLevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx);
             if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.BatteryLevelReading)
             {
                 return reading.Message.DeviceEvent.BatteryLevelReading.Reading;
@@ -154,7 +161,7 @@ namespace Buttplug
 
         public async Task<int> SendRSSIBatteryLevelCmd()
         {
-            var reading = await ButtplugFFI.SendRSSILevelCmd(Sorter, Handle, Index);
+            var reading = await ButtplugFFI.SendRSSILevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx);
             if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RssiLevelReading)
             {
                 return reading.Message.DeviceEvent.RssiLevelReading.Reading;
@@ -164,7 +171,7 @@ namespace Buttplug
 
         public async Task<byte[]> SendRawReadCmd(Endpoint aEndpoint, uint aExpectedLength, uint aTimeout)
         {
-            var reading = await ButtplugFFI.SendRawReadCmd(Sorter, Handle, Index, aEndpoint, aExpectedLength, aTimeout);
+            var reading = await ButtplugFFI.SendRawReadCmd(Sorter, Handle, Index, aEndpoint, aExpectedLength, aTimeout, SorterCallback, SorterCallbackCtx);
             if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RawReading)
             {
                 return reading.Message.DeviceEvent.RawReading.Data.ToArray();
@@ -174,23 +181,23 @@ namespace Buttplug
 
         public Task SendRawWriteCmd(Endpoint aEndpoint, byte[] aData, bool aWriteWithResponse)
         {
-            return ButtplugFFI.SendRawWriteCmd(Sorter, Handle, Index, aEndpoint, aData, aWriteWithResponse);
+            return ButtplugFFI.SendRawWriteCmd(Sorter, Handle, Index, aEndpoint, aData, aWriteWithResponse, SorterCallback, SorterCallbackCtx);
         }
 
         public Task SendRawSubscribeCmd(Endpoint aEndpoint)
         {
-            return ButtplugFFI.SendRawSubscribeCmd(Sorter, Handle, Index, aEndpoint);
+            return ButtplugFFI.SendRawSubscribeCmd(Sorter, Handle, Index, aEndpoint, SorterCallback, SorterCallbackCtx);
         }
 
         public Task SendRawUnsubscribeCmd(Endpoint aEndpoint)
         {
-            return ButtplugFFI.SendRawUnsubscribeCmd(Sorter, Handle, Index, aEndpoint);
+            return ButtplugFFI.SendRawUnsubscribeCmd(Sorter, Handle, Index, aEndpoint, SorterCallback, SorterCallbackCtx);
         }
 
         public Task SendStopDeviceCmd()
         {
             // Every message should support this, but it doesn't hurt to check
-            return ButtplugFFI.SendStopDeviceCmd(Sorter, Handle, Index);
+            return ButtplugFFI.SendStopDeviceCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx);
         }
 
     }

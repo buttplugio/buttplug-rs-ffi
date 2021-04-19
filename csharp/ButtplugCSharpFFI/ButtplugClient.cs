@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Buttplug
 {
     public class ButtplugClient : IDisposable
     {
+        static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
+        static uint _clientCounter = 1;
+
         /// <summary>
         /// Name of the client, used for server UI/permissions.
         /// </summary>
@@ -62,18 +66,36 @@ namespace Buttplug
 
         private ButtplugCallback SorterCallbackDelegate;
 
-        public ButtplugClient(string aClientName)
+        // To detect redundant calls
+        private bool _disposed = false;
+
+        private GCHandle _indexHandle;
+
+        public ButtplugClient(string aClientName): this(aClientName, StaticSorterCallback)
+        {
+        }
+
+        protected ButtplugClient(string aClientName, ButtplugCallback aCallback)
         {
             Name = aClientName;
-            SorterCallbackDelegate = SorterCallback;
-            _clientHandle = ButtplugFFI.SendCreateClient(aClientName, SorterCallbackDelegate);
+            SorterCallbackDelegate = aCallback;
+            var context = new WeakReference(this);
+            var clientIndex = _clientCounter;
+            // Since we can pass the handle, I don't *think* this needs to be pinned?
+            _indexHandle = GCHandle.Alloc(clientIndex);
+            _clientStorage.Add(_clientCounter, context);
+            _clientHandle = ButtplugFFI.SendCreateClient(aClientName, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
         }
+
+        ~ButtplugClient() => Dispose(false);
+
         public async Task ConnectAsync(ButtplugEmbeddedConnectorOptions aConnector)
         {
             if (aConnector == null)
             {
                 aConnector = new ButtplugEmbeddedConnectorOptions();
             }
+
             await ButtplugFFI.SendConnectLocal(
                 _messageSorter,
                 _clientHandle,
@@ -82,24 +104,40 @@ namespace Buttplug
                 aConnector.AllowRawMessages,
                 aConnector.DeviceConfigJSON,
                 aConnector.UserDeviceConfigJSON,
-                aConnector.DeviceCommunicationManagerTypes);
+                aConnector.DeviceCommunicationManagerTypes,
+                SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            Connected = true;
+
         }
 
         public async Task ConnectAsync(ButtplugWebsocketConnectorOptions aConnector)
         {
-            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false);
+            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
             Connected = true;
         }
 
         public async Task DisconnectAsync()
         {
-            await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle);
+            await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
             _devices.Clear();
             Connected = false;
         }
-
-        public void SorterCallback(UIntPtr buf, int buf_length)
+        
+        static protected void StaticSorterCallback(IntPtr ctx, IntPtr buf, int buf_length)
         {
+            GCHandle indexHandle = GCHandle.FromIntPtr(ctx);
+            uint index = (uint)indexHandle.Target;
+
+            var client = _clientStorage[index];
+            if (client.IsAlive)
+            {
+                ((ButtplugClient)client.Target).SorterCallbackHandler(buf, buf_length);
+            }
+        }
+
+        protected void SorterCallbackHandler(IntPtr buf, int buf_length)
+        {
+            
             // Process the data BEFORE we throw to the C# executor, otherwise
             // Rust will clean up the memory and we'll have nothing to read
             // from, meaning a null message at best and a crash at worst.
@@ -137,7 +175,7 @@ namespace Buttplug
                                 attributes.Endpoints.ToArray(), attributes.MaxDuration.ToArray(), null, null);
                             attribute_dict.Add(attributes.MessageType, device_message_attributes);
                         }
-                        var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict);
+                        var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
                         _devices.Add(device_added_message.Index, device);
                         DeviceAdded?.Invoke(this, new DeviceAddedEventArgs(device));
                     }
@@ -196,27 +234,48 @@ namespace Buttplug
         public async Task StartScanningAsync()
         {
             IsScanning = true;
-            await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle);
+            await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
         }
 
         public async Task StopScanningAsync()
         {
             IsScanning = false;
-            await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle);
+            await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
         }
 
         public async Task StopAllDevicesAsync()
         {
-            await ButtplugFFI.SendStopAllDevices(_messageSorter, _clientHandle);
+            await ButtplugFFI.SendStopAllDevices(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
         }
         public async Task PingAsync()
         {
-            await ButtplugFFI.SendPing(_messageSorter, _clientHandle);
+            await ButtplugFFI.SendPing(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
         }
 
         public void Dispose()
         {
-            _clientHandle.Dispose();
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                // Dispose managed state (managed objects).
+                _clientStorage.Remove((uint)_indexHandle.Target);
+                _indexHandle.Free();
+                _clientHandle?.Dispose();
+            }
+
+            _disposed = true;
         }
     }
 }
