@@ -35,10 +35,10 @@ use buttplug::{
 use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
 use futures::StreamExt;
 use prost::Message;
+#[cfg(not(feature = "wasm"))]
 use tokio::runtime::Runtime;
 
 pub struct ButtplugFFIClient {
-  callback: Option<FFICallback>,
   client: Arc<ButtplugClient>,
   #[cfg(not(feature = "wasm"))]
   runtime: Arc<Runtime>,
@@ -46,6 +46,7 @@ pub struct ButtplugFFIClient {
 
 impl Drop for ButtplugFFIClient {
   fn drop(&mut self) {
+    #[cfg(not(feature = "wasm"))]
     let _guard = self.runtime.enter();
     info!("DROPPED RUST FFI CLIENT");
   }
