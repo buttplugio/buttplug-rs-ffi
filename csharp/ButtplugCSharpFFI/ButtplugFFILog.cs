@@ -5,7 +5,7 @@ namespace Buttplug
 {
     
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    delegate void ButtplugLogCallback(string aLogMsg);
+    delegate void ButtplugLogCallback(IntPtr ctx, string aLogMsg);
 
     public enum ButtplugLogLevel
     {
@@ -20,7 +20,7 @@ namespace Buttplug
     internal class ButtplugFFILogCalls
     {
         [DllImport("buttplug_rs_ffi")]
-        internal static extern ButtplugFFILogHandle buttplug_create_log_handle(ButtplugLogCallback callback, string level, bool aUseJSON);
+        internal static extern ButtplugFFILogHandle buttplug_create_log_handle(ButtplugLogCallback callback, IntPtr ctx, string level, bool aUseJSON);
 
         [DllImport("buttplug_rs_ffi")]
         internal static extern void buttplug_free_log_handle(IntPtr log_handle);
@@ -64,7 +64,7 @@ namespace Buttplug
             ButtplugFFILogCalls.buttplug_activate_env_logger();
         }
 
-        private static void OnLogMessage(string aLogMessage)
+        private static void OnLogMessage(IntPtr ctx, string aLogMessage)
         {
             LogMessage?.Invoke(null, aLogMessage);
         }
@@ -77,7 +77,7 @@ namespace Buttplug
                 {
                     throw new InvalidOperationException("Cannot set logging options twice (this is a bug, will be fixed at some point, see https://github.com/buttplugio/buttplug-rs-ffi/issues/23).");
                 }
-                LogHandle = ButtplugFFILogCalls.buttplug_create_log_handle(LogCallback, aMaxLevel.ToString(), aUseJSON);
+                LogHandle = ButtplugFFILogCalls.buttplug_create_log_handle(LogCallback, IntPtr.Zero, aMaxLevel.ToString(), aUseJSON);
                 LogHandleSet = true;
             }
             else

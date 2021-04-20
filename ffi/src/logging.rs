@@ -1,3 +1,4 @@
+use super::{FFICallbackContext, FFICallbackContextWrapper};
 use buttplug::{
   util::logging::ChannelWriter,
   util::async_manager
@@ -8,7 +9,7 @@ use std::{
   sync::Arc,
 };
 #[cfg(not(feature = "wasm"))]
-use libc::c_char;
+use libc::{c_char};
 #[cfg(feature = "wasm")]
 use super::wasm_types::c_char;
 #[cfg(feature = "wasm")]
@@ -23,7 +24,7 @@ use tracing_subscriber::filter::{EnvFilter, LevelFilter};
 use log_panics;
 
 #[cfg(not(feature="wasm"))]
-pub type LogFFICallback = extern "C" fn(*const c_char);
+pub type LogFFICallback = extern "C" fn(FFICallbackContext, *const c_char);
 
 #[cfg(feature = "wasm")]
 pub type LogFFICallback = js_sys::Function;
@@ -36,6 +37,7 @@ impl ButtplugFFILogHandle {
   pub fn new(
     runtime: Arc<Runtime>,
     callback: LogFFICallback,
+    ctx: FFICallbackContext,
     max_level: &str,
     use_json_formatting: bool,
   ) -> Self {
@@ -43,6 +45,7 @@ impl ButtplugFFILogHandle {
     log_panics::init();
     #[cfg(not(feature = "wasm"))]
     let _runtime_guard = runtime.enter();
+    let wrapper = FFICallbackContextWrapper(ctx);
     let (sender, mut receiver) = mpsc::channel(256);
     // Spin up the new task. We don't actually get any messages on it until we
     // create the new logger, at which point we'll also drop the old task.
@@ -51,7 +54,7 @@ impl ButtplugFFILogHandle {
         #[cfg(not(feature = "wasm"))]
         {
           let str = CString::new(msg).expect("Issue with conversion of log message.");
-          callback(str.as_ptr());
+          callback(wrapper.0, str.as_ptr());
         }
         #[cfg(feature = "wasm")]
         {

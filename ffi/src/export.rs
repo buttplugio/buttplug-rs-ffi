@@ -134,7 +134,7 @@ pub extern "C" fn buttplug_activate_env_logger() {
 }
 
 #[no_mangle]
-pub extern "C" fn buttplug_create_log_handle(callback: LogFFICallback, max_level: *const c_char, use_json: bool) -> *mut ButtplugFFILogHandle {
+pub extern "C" fn buttplug_create_log_handle(callback: LogFFICallback, ctx: FFICallbackContext, max_level: *const c_char, use_json: bool) -> *mut ButtplugFFILogHandle {
   let max_level_cstr = unsafe {
     assert!(!max_level.is_null());
 
@@ -142,7 +142,7 @@ pub extern "C" fn buttplug_create_log_handle(callback: LogFFICallback, max_level
   };
   // If we were handed a wrong client name, just panic.
   let max_level_str = max_level_cstr.to_str().unwrap();
-  Box::into_raw(Box::new(ButtplugFFILogHandle::new(get_or_create_runtime(), callback, max_level_str, use_json)))
+  Box::into_raw(Box::new(ButtplugFFILogHandle::new(get_or_create_runtime(), callback, ctx, max_level_str, use_json)))
 }
 
 #[no_mangle]
