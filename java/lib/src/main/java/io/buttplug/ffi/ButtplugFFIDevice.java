@@ -1,5 +1,6 @@
 package io.buttplug.ffi;
 
+import io.buttplug.protos.ButtplugRsFfi.DeviceMessage;
 import jnr.ffi.Pointer;
 
 import java.nio.ByteBuffer;
@@ -19,12 +20,13 @@ class ButtplugFFIDevice implements AutoCloseable {
     }
 
     // TODO: fail-safe on garbage collection before client is freed?
+    // TODO: what about pending callbacks?
     @Override
-    public void close() throws Exception {
+    public void close() {
         buttplug.buttplug_free_device(pointer);
     }
 
-    CompletableFuture<byte[]> send_protobuf_message(byte[] buf, ButtplugFFI.ProtobufSystemCallback callback) {
+    CompletableFuture<byte[]> send_protobuf_message(DeviceMessage message) {
         CompletableFuture<byte[]> future = new CompletableFuture<>();
 
         ButtplugFFI.FFICallback cb = new ButtplugFFI.FFICallback() {
@@ -42,7 +44,12 @@ class ButtplugFFIDevice implements AutoCloseable {
                 }
             }
         };
+
+        byte[] buf = message.toByteArray();
+
         pending_callbacks.add(cb);
+        // TODO: pass a static callback and make use of ctx
+        //  so that there only needs to be a few generated native stubs (in theory?)
         buttplug.buttplug_device_protobuf_message(pointer, buf, buf.length, cb, null);
 
         return future;

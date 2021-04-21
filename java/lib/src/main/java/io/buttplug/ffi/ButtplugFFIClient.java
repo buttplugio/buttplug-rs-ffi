@@ -1,5 +1,6 @@
 package io.buttplug.ffi;
 
+import io.buttplug.protos.ButtplugRsFfi.ClientMessage;
 import jnr.ffi.Pointer;
 
 import java.nio.ByteBuffer;
@@ -22,6 +23,7 @@ public class ButtplugFFIClient implements AutoCloseable {
     }
 
     // TODO: fail-safe on garbage collection before client is freed?
+    // TODO: what about pending callbacks?
     @Override
     public void close() {
         buttplug.buttplug_free_client(pointer);
@@ -30,7 +32,7 @@ public class ButtplugFFIClient implements AutoCloseable {
     }
 
     // todo: future vs callback?
-    CompletableFuture<byte[]> send_protobuf_message(byte[] buf) {
+    CompletableFuture<byte[]> send_protobuf_message(ClientMessage message) {
         CompletableFuture<byte[]> future = new CompletableFuture<>();
 
         // TODO: hold weak instead of strong reference to future in callback?
@@ -50,8 +52,12 @@ public class ButtplugFFIClient implements AutoCloseable {
             }
         };
 
+        byte[] buf = message.toByteArray();
+
         // hold onto a reference to the callback until it's been called
         pending_callbacks.add(cb);
+        // TODO: pass a static callback and make use of ctx
+        //  so that there only needs to be a few generated native stubs (in theory?)
         buttplug.buttplug_client_protobuf_message(pointer, buf, buf.length, cb, null);
 
         return future;
