@@ -1,22 +1,21 @@
 package io.buttplug.ffi;
 
-import io.buttplug.protos.ButtplugRsFfi.DeviceMessage;
+import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 
-import java.nio.ByteBuffer;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 class ButtplugFFIDevice implements AutoCloseable {
     private final ButtplugFFI.LibButtplug buttplug;
     private final Pointer pointer;
-    // callback references used to preserve callbacks until they have been called.
-    private final Set<ButtplugFFI.FFICallback> pending_callbacks = ConcurrentHashMap.newKeySet();
+    public final int index;
 
-    ButtplugFFIDevice(ButtplugFFI.LibButtplug buttplug, Pointer pointer) {
+    private final FFICallbackFactory factory = new FFICallbackFactory();
+
+    ButtplugFFIDevice(ButtplugFFI.LibButtplug buttplug, Pointer pointer, int index) {
         this.buttplug = buttplug;
         this.pointer = pointer;
+        this.index = index;
     }
 
     // TODO: fail-safe on garbage collection before client is freed?
@@ -26,32 +25,32 @@ class ButtplugFFIDevice implements AutoCloseable {
         buttplug.buttplug_free_device(pointer);
     }
 
-    CompletableFuture<byte[]> send_protobuf_message(DeviceMessage message) {
-        CompletableFuture<byte[]> future = new CompletableFuture<>();
+    // TODO: split out Error, Ok, and DeviceEvent to make things easier?
+    private CompletableFuture<ButtplugFFIServerMessage.FFIMessage> send_protobuf_message(DeviceMessage.FFIMessage message) {
+        CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
+        ButtplugFFI.FFICallback cb = factory.create(future);
 
-        ButtplugFFI.FFICallback cb = new ButtplugFFI.FFICallback() {
-            @Override
-            public void callback(Pointer ctx, ByteBuffer ptr, int len) {
-                try {
-                    byte[] buf = new byte[len];
-                    ptr.get(buf);
-                    future.complete(buf);
-                } catch (Throwable ex) {
-                    future.completeExceptionally(ex);
-                } finally {
-                    // we're done, don't need to hold onto a reference anymore.
-                    pending_callbacks.remove(this);
-                }
-            }
-        };
+        byte[] buf = DeviceMessage.newBuilder()
+                // TODO: Index was already unused, ID will more or less be unused given the new context stuff
+                .setId(0xDEADBEEF)
+                .setIndex(index)
+                .setMessage(message)
+                .build()
+                .toByteArray();
 
-        byte[] buf = message.toByteArray();
-
-        pending_callbacks.add(cb);
         // TODO: pass a static callback and make use of ctx
         //  so that there only needs to be a few generated native stubs (in theory?)
         buttplug.buttplug_device_protobuf_message(pointer, buf, buf.length, cb, null);
 
         return future;
+    }
+
+    public CompletableFuture<Void> send_stop_device_cmd() {
+        DeviceMessage.FFIMessage message = DeviceMessage.FFIMessage.newBuilder()
+                .setStopDeviceCmd(DeviceMessage.StopDeviceCmd.getDefaultInstance())
+                .build();
+
+        return send_protobuf_message(message)
+                .thenAccept(ButtplugProtoUtil::to_result);
     }
 }

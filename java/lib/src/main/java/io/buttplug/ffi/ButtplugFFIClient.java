@@ -1,20 +1,17 @@
 package io.buttplug.ffi;
 
-import io.buttplug.protos.ButtplugRsFfi.ClientMessage;
+import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 
-import java.nio.ByteBuffer;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ButtplugFFIClient implements AutoCloseable {
     private final ButtplugFFI.LibButtplug buttplug;
     private Pointer pointer;
     // reference kept to prevent garbage collection.
     private ButtplugFFI.FFICallback system_callback;
-    // callback references used to preserve callbacks until they have been called.
-    private final Set<ButtplugFFI.FFICallback> pending_callbacks = ConcurrentHashMap.newKeySet();
+
+    private final FFICallbackFactory factory = new FFICallbackFactory();
 
     ButtplugFFIClient(ButtplugFFI.LibButtplug buttplug, Pointer pointer, ButtplugFFI.FFICallback system_callback) {
         this.buttplug = buttplug;
@@ -32,30 +29,18 @@ public class ButtplugFFIClient implements AutoCloseable {
     }
 
     // todo: future vs callback?
-    CompletableFuture<byte[]> send_protobuf_message(ClientMessage message) {
-        CompletableFuture<byte[]> future = new CompletableFuture<>();
+    private CompletableFuture<ButtplugFFIServerMessage.FFIMessage> send_protobuf_message(ClientMessage.FFIMessage message) {
+        CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
 
         // TODO: hold weak instead of strong reference to future in callback?
-        ButtplugFFI.FFICallback cb = new ButtplugFFI.FFICallback() {
-            @Override
-            public void callback(Pointer ctx, ByteBuffer ptr, int len) {
-                try {
-                    byte[] buf = new byte[len];
-                    ptr.get(buf);
-                    future.complete(buf);
-                } catch (Throwable ex) {
-                    future.completeExceptionally(ex);
-                } finally {
-                    // we're done, don't need to hold onto a reference anymore.
-                    pending_callbacks.remove(this);
-                }
-            }
-        };
+        ButtplugFFI.FFICallback cb = factory.create(future);
 
-        byte[] buf = message.toByteArray();
+        byte[] buf = ClientMessage.newBuilder()
+                .setId(0xDEAFBEEF)
+                .setMessage(message)
+                .build()
+                .toByteArray();
 
-        // hold onto a reference to the callback until it's been called
-        pending_callbacks.add(cb);
         // TODO: pass a static callback and make use of ctx
         //  so that there only needs to be a few generated native stubs (in theory?)
         buttplug.buttplug_client_protobuf_message(pointer, buf, buf.length, cb, null);
@@ -65,6 +50,15 @@ public class ButtplugFFIClient implements AutoCloseable {
 
     public ButtplugFFIDevice create_device(int index) {
         Pointer ptr = buttplug.buttplug_create_device(pointer, index);
-        return new ButtplugFFIDevice(buttplug, pointer);
+        return new ButtplugFFIDevice(buttplug, pointer, index);
+    }
+
+    public CompletableFuture<Void> send_ping() {
+        ClientMessage.FFIMessage message = ClientMessage.FFIMessage.newBuilder()
+                .setPing(ClientMessage.Ping.getDefaultInstance())
+                .build();
+
+        return send_protobuf_message(message)
+                .thenAccept(ButtplugProtoUtil::to_result);
     }
 }
