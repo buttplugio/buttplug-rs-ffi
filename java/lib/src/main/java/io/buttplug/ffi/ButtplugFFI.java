@@ -57,15 +57,8 @@ public class ButtplugFFI {
         this.buttplug = LibraryLoader.create(LibButtplug.class).load("buttplug_rs_ffi");
     }
 
-    public ButtplugFFIClient create_client(ProtobufSystemCallback callback, String client_name) {
-        FFICallback cb = (ctx, ptr, len) -> {
-            byte[] buf = new byte[len];
-            ptr.get(buf);
-            callback.callback(buf);
-        };
-
-        Pointer client = buttplug.buttplug_create_protobuf_client(client_name, cb, null);
-        return new ButtplugFFIClient(buttplug, client, cb);
+    public ButtplugFFIClient create_client(String client_name) {
+        return new ButtplugFFIClient(buttplug, client_name);
     }
 
     public void activate_env_logger() {
