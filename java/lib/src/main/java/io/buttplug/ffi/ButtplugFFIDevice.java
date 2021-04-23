@@ -12,10 +12,12 @@ class ButtplugFFIDevice implements AutoCloseable {
 
     private final FFICallbackFactory factory = new FFICallbackFactory();
 
-    ButtplugFFIDevice(ButtplugFFI.LibButtplug buttplug, Pointer pointer, int index) {
+    ButtplugFFIDevice(ButtplugFFI.LibButtplug buttplug, Pointer client, ServerMessage.DeviceAdded msg) {
         this.buttplug = buttplug;
-        this.pointer = pointer;
-        this.index = index;
+        this.pointer = buttplug.buttplug_create_device(client, msg.getIndex());
+        this.index = msg.getIndex();
+
+        // TODO: handle attributes
     }
 
     // TODO: fail-safe on garbage collection before client is freed?
