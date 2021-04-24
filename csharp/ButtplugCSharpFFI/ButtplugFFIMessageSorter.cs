@@ -39,7 +39,7 @@ namespace Buttplug
             // If we've somehow destructed while holding tasks, throw exceptions at all of them.
             foreach (var task in _waitingMsgs.Values)
             {
-                task.TrySetException(new Exception("Sorter has been destroyed with live tasks still in queue."));
+                task.TrySetException(new ButtplugConnectorException("Sorter has been destroyed with live tasks still in queue, most likely due to a disconnection."));
             }
         }
 
