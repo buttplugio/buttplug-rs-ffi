@@ -1,8 +1,16 @@
+# 2.0.1 (2021-04-24)
+
+## Bugfixes
+
+- #69: Sorter now throws a ButtplugConnectorException (similar to disconnect errors) for tasks that
+  are still live during shutdown.
+- Update to buttplug-rs v3.0.3, fixing issue with RawWriteCmd JSON Schema
+
 # 2.0.0 (2021-04-22)
 
 ## Features
 
-- Update to buttplug-rs v3.0.0, using tokio runtimes and with better scoping for runtime
+- Update to buttplug-rs v3.0.2, using tokio runtimes and with better scoping for runtime
   setup/teardown
   - Mostly because it's the only way to get Buttplug Unity v1 working.
   - Also fixes some bugs with battery reading in Lovense and Magic Motion toys.
