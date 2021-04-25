@@ -1,3 +1,10 @@
+# 2.0.1 (2021/04/24)
+
+## Bugfixes
+
+- Update to Buttplug v3.0.3
+  - Fixes issue with RawWriteCmd JSON schema error
+
 # 2.0.0 (2021/04/22)
 
 ## Features
