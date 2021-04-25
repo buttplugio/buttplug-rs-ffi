@@ -1,18 +1,18 @@
 package io.buttplug.ffi;
 
+import com.google.protobuf.ByteString;
 import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 
+import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 class ButtplugFFIDevice implements AutoCloseable {
     private final ButtplugFFI.LibButtplug buttplug;
@@ -197,6 +197,74 @@ class ButtplugFFIDevice implements AutoCloseable {
 
     public CompletableFuture<Void> linear(Iterable<LinearComponent> components) {
         return linear(mapFromIterable(components));
+    }
+
+    public CompletableFuture<Double> queryBatteryLevel() {
+        DeviceMessage.FFIMessage message = DeviceMessage.FFIMessage.newBuilder()
+                .setBatteryLevelCmd(DeviceMessage.BatteryLevelCmd.getDefaultInstance())
+                .build();
+
+        return sendProtobufMessage(message)
+                .thenApply((recv) -> {
+                    // TODO: throw exception on wrong message
+                    return recv.getDeviceEvent().getBatteryLevelReading().getReading();
+                });
+    }
+
+    public CompletableFuture<Integer> queryRssiLevel() {
+        DeviceMessage.FFIMessage message = DeviceMessage.FFIMessage.newBuilder()
+                .setRssiLevelCmd(DeviceMessage.RSSILevelCmd.getDefaultInstance())
+                .build();
+
+        return sendProtobufMessage(message)
+                .thenApply((recv) -> {
+                    // TODO: throw exception on wrong message
+                    return recv.getDeviceEvent().getRssiLevelReading().getReading();
+                });
+    }
+
+    public CompletableFuture<ByteBuffer> rawRead(MessageAttributes.Endpoint endpoint, int expected_length, int timeout) {
+        DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
+        builder.getRawReadCmdBuilder()
+                .setEndpointValue(endpoint.value)
+                .setExpectedLength(expected_length)
+                // .setData(...) // ???
+                .setTimeout(timeout);
+
+        return sendProtobufMessage(builder.build())
+                .thenApply((recv) -> {
+                    // TODO: throw exception on wrong message
+                    return recv.getDeviceEvent().getRawReading().getData().asReadOnlyByteBuffer();
+                });
+    }
+
+    public CompletableFuture<Void> rawWrite(MessageAttributes.Endpoint endpoint, byte[] data, boolean writeWithResponse) {
+        DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
+        builder.getRawWriteCmdBuilder()
+                .setEndpointValue(endpoint.value)
+                .setData(ByteString.copyFrom(data))
+                .setWriteWithResponse(writeWithResponse);
+
+        return sendProtobufMessage(builder.build())
+                .thenAccept(ButtplugProtoUtil::to_result);
+    }
+
+    public CompletableFuture<Void> rawSubscribe(MessageAttributes.Endpoint endpoint) {
+        DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
+        builder.getRawSubscribeCmdBuilder()
+                .setEndpointValue(endpoint.value);
+
+        return sendProtobufMessage(builder.build())
+                .thenAccept(ButtplugProtoUtil::to_result);
+    }
+
+    public CompletableFuture<Void> rawUnsubscribe(MessageAttributes.Endpoint endpoint) {
+        DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
+        builder.getRawUnsubscribeCmdBuilder()
+                .setEndpointValue(endpoint.value);
+
+        return sendProtobufMessage(builder.build())
+                .thenAccept(ButtplugProtoUtil::to_result);
     }
 
     public CompletableFuture<Void> stopDevice() {
