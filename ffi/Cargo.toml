@@ -12,7 +12,7 @@ default = ["buttplug/tokio-runtime",  "buttplug/websockets", "buttplug/btleplug-
 wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures", "console_error_panic_hook"]
 
 [dependencies]
-buttplug = { version = "3.0.2", default-features = false, features = ["client", "server", "serialize-json"] }
+buttplug = { version = "3.0.3", default-features = false, features = ["client", "server", "serialize-json"] }
 # buttplug = { path = "../../buttplug-rs/buttplug", default-features = false, features = ["client", "server", "serialize-json"] }
 tracing-subscriber = "0.2.17"
 futures = "0.3.14"
@@ -24,19 +24,19 @@ lazy_static = "1.4.0"
 wasm-bindgen = { version = "0.2.73", features = ["serde-serialize"], optional = true }
 # Needed to build valico with wasm-bindgen
 uuid = { version = "0.8.2", features = ["wasm-bindgen"], optional = true }
-async-lock = "2.3.0"
+async-lock = "2.4.0"
 js-sys = { version = "0.3.50", optional = true }
 tracing-wasm = { version = "0.2.0", optional = true }
-async-trait = { version = "0.1.48", optional = true }
+async-trait = { version = "0.1.50", optional = true }
 wasm-bindgen-futures = { version = "0.4.23", optional = true }
-tokio = { version = "1.4.0", features = ["sync", "rt-multi-thread"] }
+tokio = { version = "1.5.0", features = ["sync", "rt-multi-thread"] }
 log-panics = { version = "2.0.0", optional = true, features = ["with-backtrace"] }
 console_error_panic_hook = { version = "0.1.6", optional = true }
 futures-timer = "3.0.2"
 
 [build-dependencies]
 prost-build = "0.7.0"
-vergen = "5.1.1"
+vergen = "5.1.4"
 anyhow = "1.0.40"
 
 [lib]
