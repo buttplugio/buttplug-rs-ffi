@@ -8,6 +8,21 @@ public class ButtplugFFILogHandler implements AutoCloseable {
     // reference kept to prevent garbage collection.
     private ButtplugFFI.LogFFICallback callback;
 
+    public enum Level {
+        // Off(null),
+        Error("Error"),
+        Warn("Warn"),
+        Info("Info"),
+        Debug("Debug"),
+        Trace("Trace");
+
+        final String value;
+
+        Level(String value) {
+            this.value = value;
+        }
+    }
+
     ButtplugFFILogHandler(ButtplugFFI.LibButtplug buttplug, ButtplugFFI.LogFFICallback callback) {
         this.buttplug = buttplug;
         this.callback = callback;

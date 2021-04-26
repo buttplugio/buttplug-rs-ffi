@@ -45,13 +45,12 @@ class ButtplugFFIDevice implements AutoCloseable {
         buttplug.buttplug_free_device(pointer);
     }
 
-    // TODO: split out Error, Ok, and DeviceEvent to make things easier?
     private CompletableFuture<ButtplugFFIServerMessage.FFIMessage> sendProtobufMessage(DeviceMessage.FFIMessage message) {
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
         ButtplugFFI.FFICallback cb = factory.create(future);
 
         byte[] buf = DeviceMessage.newBuilder()
-                // TODO: Index was already unused, ID will more or less be unused given the new context stuff
+                // NOTE: Index was already unused, ID will more or less be unused given the new context stuff
                 .setId(0xDEADBEEF)
                 .setIndex(index)
                 .setMessage(message)

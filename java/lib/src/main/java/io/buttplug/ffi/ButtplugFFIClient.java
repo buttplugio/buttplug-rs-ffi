@@ -1,6 +1,7 @@
 package io.buttplug.ffi;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import io.buttplug.ButtplugDeviceException;
 import io.buttplug.ButtplugException;
 import io.buttplug.ButtplugPingException;
 import io.buttplug.protos.ButtplugRsFfi.*;
@@ -9,6 +10,7 @@ import jnr.ffi.Pointer;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class ButtplugFFIClient implements AutoCloseable {
     private final ButtplugFFI.LibButtplug buttplug;
@@ -22,6 +24,14 @@ public class ButtplugFFIClient implements AutoCloseable {
     private boolean scanning = false;
 
     private final HashMap<Integer, ButtplugFFIDevice> devices = new HashMap<>();
+
+    public Consumer<ButtplugFFIDevice> onDeviceAdded;
+    public Consumer<ButtplugFFIDevice> onDeviceRemoved;
+    public Consumer<ButtplugException> onErrorRecieved;
+    // Note: these uses of Runnable has nothing to do with threading.
+    public Runnable onScanningFinished;
+    public Runnable onPingTimeout;
+    public Runnable onServerDisconnect;
 
     ButtplugFFIClient(ButtplugFFI.LibButtplug buttplug, String client_name) {
         this.buttplug = buttplug;
@@ -46,7 +56,6 @@ public class ButtplugFFIClient implements AutoCloseable {
         return scanning;
     }
 
-    // todo: future vs callback?
     private CompletableFuture<ButtplugFFIServerMessage.FFIMessage> sendProtobufMessage(ClientMessage.FFIMessage message) {
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
 
@@ -160,6 +169,9 @@ public class ButtplugFFIClient implements AutoCloseable {
         try {
             ButtplugFFIServerMessage incoming = ButtplugFFIServerMessage.parseFrom(buf);
             // TODO: is there another way we want to do this?
+            // Run the response in the context of the Java executor, not the Rust
+            // thread. This means that if something goes wrong we at least
+            // aren't blocking a rust executor thread.
             CompletableFuture.runAsync(() -> {
                 if (incoming.getId() != 0) {
                     // TODO: somehow got non-system message, warn/error?
@@ -174,12 +186,17 @@ public class ButtplugFFIClient implements AutoCloseable {
                         ServerMessage.DeviceAdded msg = serverMsg.getDeviceAdded();
 
                         if (devices.containsKey(msg.getIndex())) {
-                            // TODO: error callback
+                            if (onErrorRecieved != null) {
+                                onErrorRecieved.accept(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi"));
+                            }
                             return;
                         }
 
-                        devices.put(msg.getIndex(), createDevice(msg));
-                        // TODO: device added callback
+                        ButtplugFFIDevice device = createDevice(msg);
+                        devices.put(msg.getIndex(), device);
+                        if (onDeviceAdded != null) {
+                            onDeviceAdded.accept(device);
+                        }
                     } else if (serverMsg.hasDeviceRemoved()) {
                         ServerMessage.DeviceRemoved msg = serverMsg.getDeviceRemoved();
 
@@ -188,21 +205,33 @@ public class ButtplugFFIClient implements AutoCloseable {
                             return;
                         }
 
-                        devices.remove(msg.getIndex());
-                        // TODO: device removed callback
+                        ButtplugFFIDevice device = devices.remove(msg.getIndex());
+                        if (onDeviceRemoved != null) {
+                            onDeviceRemoved.accept(device);
+                        }
                     } else if (serverMsg.hasDisconnect()) {
                         connected = false;
                         devices.clear();
-                        // TODO: disconnect callback
+                        if (onServerDisconnect != null) {
+                            onServerDisconnect.run();
+                        }
                     } else if (serverMsg.hasScanningFinished()) {
                         scanning = false;
-                        // TODO: scanning finished callback
+                        if (onScanningFinished != null) {
+                            onScanningFinished.run();
+                        }
                     } else if (serverMsg.hasError()) {
                         ButtplugException ex = ButtplugException.fromError(serverMsg.getError());
                         if (ex instanceof ButtplugPingException) {
-                            // TODO: ping timeout callback
+                            if (onPingTimeout != null) {
+                                onPingTimeout.run();
+                            }
+                            // return?
                         }
-                        // TODO: error callback
+
+                        if (onErrorRecieved != null) {
+                            onErrorRecieved.accept(ex);
+                        }
                     } else {
                         // unhandled event?
                         return;
