@@ -18,13 +18,6 @@ public class ButtplugFFI {
         @Delegate void callback(Pointer ctx, @In ByteBuffer ptr, @u_int32_t int len);
     }
 
-    // this is the "clean" interface wrapped by FFICallback
-    // TODO: think about stream/future instead?
-    @FunctionalInterface
-    public interface ProtobufSystemCallback {
-        void callback(byte[] buf);
-    }
-
     // type LogFFICallback = extern "C" fn(*mut c_void, *const c_char);
     @FunctionalInterface
     public interface LogFFICallback {
@@ -65,9 +58,8 @@ public class ButtplugFFI {
         buttplug.buttplug_activate_env_logger();
     }
 
-    // TODO: level enum or something?
-    public ButtplugFFILogHandler add_log_handler(LogFFICallback cb, String level, boolean use_json) {
-        Pointer handle = buttplug.buttplug_create_log_handle(cb, null, level, use_json);
+    public ButtplugFFILogHandler add_log_handler(LogFFICallback cb, ButtplugFFILogHandler.Level level, boolean use_json) {
+        Pointer handle = buttplug.buttplug_create_log_handle(cb, null, level.value, use_json);
         return new ButtplugFFILogHandler(buttplug, cb);
     }
 }
