@@ -5,10 +5,7 @@ import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 
 import java.nio.ByteBuffer;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,21 +16,23 @@ class ButtplugDevice implements AutoCloseable {
     public final int index;
 
     private final FFICallbackFactory factory = new FFICallbackFactory();
-    private final EnumMap<MessageAttributes.Type, MessageAttributes> attributes;
+    public final Map<MessageAttributes.Type, MessageAttributes> attributes;
 
     ButtplugDevice(Pointer client, ServerMessage.DeviceAdded msg) {
         this.pointer = ButtplugFFI.getButtplugInstance().buttplug_create_device(client, msg.getIndex());
         this.index = msg.getIndex();
 
-        this.attributes = msg.getMessageAttributesList().stream()
-                .collect(Collectors.toMap(
-                        (m) -> MessageAttributes.Type.inverse.get(m.getMessageTypeValue()),
-                        MessageAttributes::new,
-                        (l, r) -> {
-                            throw new IllegalArgumentException("Duplicate keys!");
-                        },
-                        () -> new EnumMap<>(MessageAttributes.Type.class)
-                ));
+        this.attributes = Collections.unmodifiableMap(
+                msg.getMessageAttributesList().stream()
+                    .collect(Collectors.toMap(
+                            (m) -> MessageAttributes.Type.inverse.get(m.getMessageTypeValue()),
+                            MessageAttributes::new,
+                            (l, r) -> {
+                                throw new IllegalArgumentException("Duplicate keys!");
+                            },
+                            () -> new EnumMap<>(MessageAttributes.Type.class)
+                    ))
+        );
     }
 
     // TODO: fail-safe on garbage collection before client is freed?

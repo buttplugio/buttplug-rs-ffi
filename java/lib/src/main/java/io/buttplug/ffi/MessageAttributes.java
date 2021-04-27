@@ -4,9 +4,7 @@ import io.buttplug.protos.ButtplugRsFfi;
 import io.buttplug.protos.ButtplugRsFfi.ServerMessage;
 import io.buttplug.protos.ButtplugRsFfi.ServerMessage.MessageAttributeType;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -93,18 +91,20 @@ public class MessageAttributes {
     public final int featureCount;
     public final List<Integer> stepCount;
     // TODO: consider EnumSet?
-    public final List<Endpoint> endpoints;
+    public final Set<Endpoint> endpoints;
     public final List<Integer> maxDuration;
 //    public final String[][] patterns;
 //    public final String[] actuatorType;
 
     MessageAttributes(ServerMessage.MessageAttributes attribs) {
         featureCount = attribs.getFeatureCount();
-        stepCount = attribs.getStepCountList();
-        endpoints = attribs.getEndpointsList().stream()
-                .map((endpoint) -> Endpoint.inverse.get(endpoint.getNumber()))
-                .collect(Collectors.toList());
-        maxDuration = attribs.getMaxDurationList();
+        stepCount = Collections.unmodifiableList(attribs.getStepCountList());
+        endpoints = Collections.unmodifiableSet(
+                attribs.getEndpointsList().stream()
+                    .map((endpoint) -> Endpoint.inverse.get(endpoint.getNumber()))
+                    .collect(Collectors.toCollection(() -> EnumSet.noneOf(Endpoint.class)))
+        );
+        maxDuration = Collections.unmodifiableList(attribs.getMaxDurationList());
 //        patterns = null;
 //        actuatorType = null;
     }

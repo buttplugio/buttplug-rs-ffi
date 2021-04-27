@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 // TODO: consider moving into ButtplugFFI?
 class FFICallbackFactory {
     // callback references used to preserve callbacks until they have been called.
-    private final Set<ButtplugFFI.FFICallback> pending = ConcurrentHashMap.newKeySet();
+    final Set<ButtplugFFI.FFICallback> pending = ConcurrentHashMap.newKeySet();
 
     FFICallbackFactory() {
         super();
