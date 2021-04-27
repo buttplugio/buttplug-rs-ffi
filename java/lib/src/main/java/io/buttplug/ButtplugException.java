@@ -1,7 +1,6 @@
 package io.buttplug;
 
 import io.buttplug.protos.ButtplugRsFfi.ServerMessage;
-import io.buttplug.protos.ButtplugRsFfi.ServerMessage.ButtplugErrorType;
 
 public class ButtplugException extends Exception {
     public ButtplugException(String msg) {
