@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 
 class ButtplugFFIDevice implements AutoCloseable {
     private final ButtplugFFI.LibButtplug buttplug;
-    private final Pointer pointer;
+    private Pointer pointer;
     public final int index;
 
     private final FFICallbackFactory factory = new FFICallbackFactory();
@@ -42,10 +42,17 @@ class ButtplugFFIDevice implements AutoCloseable {
     // TODO: what about pending callbacks?
     @Override
     public void close() {
-        buttplug.buttplug_free_device(pointer);
+        if (pointer != null) {
+            buttplug.buttplug_free_device(pointer);
+            pointer = null;
+        }
     }
 
     private CompletableFuture<ButtplugFFIServerMessage.FFIMessage> sendProtobufMessage(DeviceMessage.FFIMessage message) {
+        if (pointer == null) {
+            throw new IllegalStateException("Attempt to send message when device has already been closed!");
+        }
+
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
         ButtplugFFI.FFICallback cb = factory.create(future);
 

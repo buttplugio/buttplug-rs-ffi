@@ -31,8 +31,10 @@ public class ButtplugFFILogHandler implements AutoCloseable {
     // TODO: fail-safe on garbage collection before client is freed?
     @Override
     public void close() {
-        buttplug.buttplug_free_log_handle(log_handle);
-        log_handle = null;
-        callback = null;
+        if (log_handle != null) {
+            buttplug.buttplug_free_log_handle(log_handle);
+            log_handle = null;
+            callback = null;
+        }
     }
 }
