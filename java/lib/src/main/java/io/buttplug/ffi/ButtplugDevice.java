@@ -1,12 +1,14 @@
 package io.buttplug.ffi;
 
 import com.google.protobuf.ByteString;
+import io.buttplug.ButtplugDeviceException;
 import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -35,7 +37,6 @@ class ButtplugDevice implements AutoCloseable {
         );
     }
 
-    // TODO: fail-safe on garbage collection before client is freed?
     // TODO: what about pending callbacks?
     @Override
     public void close() {
@@ -209,7 +210,13 @@ class ButtplugDevice implements AutoCloseable {
 
         return sendProtobufMessage(message)
                 .thenApply((recv) -> {
-                    // TODO: throw exception on wrong message
+                    if (!recv.hasDeviceEvent()) {
+                        throw new CompletionException(new ButtplugDeviceException("Expected message type DeviceEvent.BatteryLevelReading, got " + recv.getMsgCase().name() + " instead!"));
+                    }
+
+                    if (!recv.getDeviceEvent().hasBatteryLevelReading()) {
+                        throw new CompletionException(new ButtplugDeviceException("Expected message type BatteryLevelReading, got " + recv.getDeviceEvent().getMsgCase().name() + " instead!"));
+                    }
                     return recv.getDeviceEvent().getBatteryLevelReading().getReading();
                 });
     }
@@ -221,7 +228,13 @@ class ButtplugDevice implements AutoCloseable {
 
         return sendProtobufMessage(message)
                 .thenApply((recv) -> {
-                    // TODO: throw exception on wrong message
+                    if (!recv.hasDeviceEvent()) {
+                        throw new CompletionException(new ButtplugDeviceException("Expected message type DeviceEvent.RssiLevelReading, got " + recv.getMsgCase().name() + " instead!"));
+                    }
+
+                    if (!recv.getDeviceEvent().hasRssiLevelReading()) {
+                        throw new CompletionException(new ButtplugDeviceException("Expected message type RssiLevelReading, got " + recv.getDeviceEvent().getMsgCase().name() + " instead!"));
+                    }
                     return recv.getDeviceEvent().getRssiLevelReading().getReading();
                 });
     }
@@ -236,7 +249,13 @@ class ButtplugDevice implements AutoCloseable {
 
         return sendProtobufMessage(builder.build())
                 .thenApply((recv) -> {
-                    // TODO: throw exception on wrong message
+                    if (!recv.hasDeviceEvent()) {
+                        throw new CompletionException(new ButtplugDeviceException("Expected message type DeviceEvent.RawReading, got " + recv.getMsgCase().name() + " instead!"));
+                    }
+
+                    if (!recv.getDeviceEvent().hasRawReading()) {
+                        throw new CompletionException(new ButtplugDeviceException("Expected message type RawReading, got " + recv.getDeviceEvent().getMsgCase().name() + " instead!"));
+                    }
                     return recv.getDeviceEvent().getRawReading().getData().asReadOnlyByteBuffer();
                 });
     }
