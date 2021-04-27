@@ -10,87 +10,104 @@ import java.util.stream.Collectors;
 
 public class MessageAttributes {
     public enum Type {
-        VibrateCmd(MessageAttributeType.VibrateCmd_VALUE),
-        RotateCmd(MessageAttributeType.RotateCmd_VALUE),
-        LinearCmd(MessageAttributeType.LinearCmd_VALUE),
-        StopDeviceCmd(MessageAttributeType.StopDeviceCmd_VALUE),
-        RawReadCmd(MessageAttributeType.RawReadCmd_VALUE),
-        RawWriteCmd(MessageAttributeType.RawWriteCmd_VALUE),
-        RawSubscribeCmd(MessageAttributeType.RawSubscribeCmd_VALUE),
-        RawUnsubscribeCmd(MessageAttributeType.RawUnsubscribeCmd_VALUE),
-        BatteryLevelCmd(MessageAttributeType.BatteryLevelCmd_VALUE),
-        RSSILevelCmd(MessageAttributeType.RSSILevelCmd_VALUE);
+        VibrateCmd(MessageAttributeType.VibrateCmd),
+        RotateCmd(MessageAttributeType.RotateCmd),
+        LinearCmd(MessageAttributeType.LinearCmd),
+        StopDeviceCmd(MessageAttributeType.StopDeviceCmd),
+        RawReadCmd(MessageAttributeType.RawReadCmd),
+        RawWriteCmd(MessageAttributeType.RawWriteCmd),
+        RawSubscribeCmd(MessageAttributeType.RawSubscribeCmd),
+        RawUnsubscribeCmd(MessageAttributeType.RawUnsubscribeCmd),
+        BatteryLevelCmd(MessageAttributeType.BatteryLevelCmd),
+        RSSILevelCmd(MessageAttributeType.RSSILevelCmd);
 
-        final int value;
+        final MessageAttributeType value;
 
-        final static Map<Integer, Type> inverse = Arrays.stream(Type.values())
-                .collect(Collectors.toMap((v) -> v.value, Function.identity()));
+        final static EnumMap<MessageAttributeType, Type> inverse = Arrays.stream(Type.values())
+                .collect(
+                        Collectors.toMap(
+                                (v) -> v.value,
+                                Function.identity(),
+                                (l, r) -> {
+                                    throw new IllegalArgumentException("Duplicate keys!");
+                                },
+                                () -> new EnumMap<>(MessageAttributeType.class)
+                        )
+                );
 
-        Type(int value) {
+        Type(MessageAttributeType value) {
             this.value = value;
         }
     }
 
     public enum Endpoint {
-        Command(ButtplugRsFfi.Endpoint.Command_VALUE),
-        Firmware(ButtplugRsFfi.Endpoint.Firmware_VALUE),
-        Rx(ButtplugRsFfi.Endpoint.Rx_VALUE),
-        RxAccel(ButtplugRsFfi.Endpoint.RxAccel_VALUE),
-        RxBLEBattery(ButtplugRsFfi.Endpoint.RxBLEBattery_VALUE),
-        RxPressure(ButtplugRsFfi.Endpoint.RxPressure_VALUE),
-        RxTouch(ButtplugRsFfi.Endpoint.RxTouch_VALUE),
-        Tx(ButtplugRsFfi.Endpoint.Tx_VALUE),
-        TxMode(ButtplugRsFfi.Endpoint.TxMode_VALUE),
-        TxShock(ButtplugRsFfi.Endpoint.TxShock_VALUE),
-        TxVibrate(ButtplugRsFfi.Endpoint.TxVibrate_VALUE),
-        TxVendorControl(ButtplugRsFfi.Endpoint.TxVendorControl_VALUE),
-        Whitelist(ButtplugRsFfi.Endpoint.Whitelist_VALUE),
-        Generic0(ButtplugRsFfi.Endpoint.Generic0_VALUE),
-        Generic1(ButtplugRsFfi.Endpoint.Generic1_VALUE),
-        Generic2(ButtplugRsFfi.Endpoint.Generic2_VALUE),
-        Generic3(ButtplugRsFfi.Endpoint.Generic3_VALUE),
-        Generic4(ButtplugRsFfi.Endpoint.Generic4_VALUE),
-        Generic5(ButtplugRsFfi.Endpoint.Generic5_VALUE),
-        Generic6(ButtplugRsFfi.Endpoint.Generic6_VALUE),
-        Generic7(ButtplugRsFfi.Endpoint.Generic7_VALUE),
-        Generic8(ButtplugRsFfi.Endpoint.Generic8_VALUE),
-        Generic9(ButtplugRsFfi.Endpoint.Generic9_VALUE),
-        Generic10(ButtplugRsFfi.Endpoint.Generic10_VALUE),
-        Generic11(ButtplugRsFfi.Endpoint.Generic11_VALUE),
-        Generic12(ButtplugRsFfi.Endpoint.Generic12_VALUE),
-        Generic13(ButtplugRsFfi.Endpoint.Generic13_VALUE),
-        Generic14(ButtplugRsFfi.Endpoint.Generic14_VALUE),
-        Generic15(ButtplugRsFfi.Endpoint.Generic15_VALUE),
-        Generic16(ButtplugRsFfi.Endpoint.Generic16_VALUE),
-        Generic17(ButtplugRsFfi.Endpoint.Generic17_VALUE),
-        Generic18(ButtplugRsFfi.Endpoint.Generic18_VALUE),
-        Generic19(ButtplugRsFfi.Endpoint.Generic19_VALUE),
-        Generic20(ButtplugRsFfi.Endpoint.Generic20_VALUE),
-        Generic21(ButtplugRsFfi.Endpoint.Generic21_VALUE),
-        Generic22(ButtplugRsFfi.Endpoint.Generic22_VALUE),
-        Generic23(ButtplugRsFfi.Endpoint.Generic23_VALUE),
-        Generic24(ButtplugRsFfi.Endpoint.Generic24_VALUE),
-        Generic25(ButtplugRsFfi.Endpoint.Generic25_VALUE),
-        Generic26(ButtplugRsFfi.Endpoint.Generic26_VALUE),
-        Generic27(ButtplugRsFfi.Endpoint.Generic27_VALUE),
-        Generic28(ButtplugRsFfi.Endpoint.Generic28_VALUE),
-        Generic29(ButtplugRsFfi.Endpoint.Generic29_VALUE),
-        Generic30(ButtplugRsFfi.Endpoint.Generic30_VALUE),
-        Generic31(ButtplugRsFfi.Endpoint.Generic31_VALUE);
+        Command(ButtplugRsFfi.Endpoint.Command),
+        Firmware(ButtplugRsFfi.Endpoint.Firmware),
+        Rx(ButtplugRsFfi.Endpoint.Rx),
+        RxAccel(ButtplugRsFfi.Endpoint.RxAccel),
+        RxBLEBattery(ButtplugRsFfi.Endpoint.RxBLEBattery),
+        RxPressure(ButtplugRsFfi.Endpoint.RxPressure),
+        RxTouch(ButtplugRsFfi.Endpoint.RxTouch),
+        Tx(ButtplugRsFfi.Endpoint.Tx),
+        TxMode(ButtplugRsFfi.Endpoint.TxMode),
+        TxShock(ButtplugRsFfi.Endpoint.TxShock),
+        TxVibrate(ButtplugRsFfi.Endpoint.TxVibrate),
+        TxVendorControl(ButtplugRsFfi.Endpoint.TxVendorControl),
+        Whitelist(ButtplugRsFfi.Endpoint.Whitelist),
+        Generic0(ButtplugRsFfi.Endpoint.Generic0),
+        Generic1(ButtplugRsFfi.Endpoint.Generic1),
+        Generic2(ButtplugRsFfi.Endpoint.Generic2),
+        Generic3(ButtplugRsFfi.Endpoint.Generic3),
+        Generic4(ButtplugRsFfi.Endpoint.Generic4),
+        Generic5(ButtplugRsFfi.Endpoint.Generic5),
+        Generic6(ButtplugRsFfi.Endpoint.Generic6),
+        Generic7(ButtplugRsFfi.Endpoint.Generic7),
+        Generic8(ButtplugRsFfi.Endpoint.Generic8),
+        Generic9(ButtplugRsFfi.Endpoint.Generic9),
+        Generic10(ButtplugRsFfi.Endpoint.Generic10),
+        Generic11(ButtplugRsFfi.Endpoint.Generic11),
+        Generic12(ButtplugRsFfi.Endpoint.Generic12),
+        Generic13(ButtplugRsFfi.Endpoint.Generic13),
+        Generic14(ButtplugRsFfi.Endpoint.Generic14),
+        Generic15(ButtplugRsFfi.Endpoint.Generic15),
+        Generic16(ButtplugRsFfi.Endpoint.Generic16),
+        Generic17(ButtplugRsFfi.Endpoint.Generic17),
+        Generic18(ButtplugRsFfi.Endpoint.Generic18),
+        Generic19(ButtplugRsFfi.Endpoint.Generic19),
+        Generic20(ButtplugRsFfi.Endpoint.Generic20),
+        Generic21(ButtplugRsFfi.Endpoint.Generic21),
+        Generic22(ButtplugRsFfi.Endpoint.Generic22),
+        Generic23(ButtplugRsFfi.Endpoint.Generic23),
+        Generic24(ButtplugRsFfi.Endpoint.Generic24),
+        Generic25(ButtplugRsFfi.Endpoint.Generic25),
+        Generic26(ButtplugRsFfi.Endpoint.Generic26),
+        Generic27(ButtplugRsFfi.Endpoint.Generic27),
+        Generic28(ButtplugRsFfi.Endpoint.Generic28),
+        Generic29(ButtplugRsFfi.Endpoint.Generic29),
+        Generic30(ButtplugRsFfi.Endpoint.Generic30),
+        Generic31(ButtplugRsFfi.Endpoint.Generic31);
 
-        final int value;
+        final ButtplugRsFfi.Endpoint value;
 
-        final static Map<Integer, Endpoint> inverse = Arrays.stream(Endpoint.values())
-                .collect(Collectors.toMap((v) -> v.value, Function.identity()));
+        final static EnumMap<ButtplugRsFfi.Endpoint, Endpoint> inverse = Arrays.stream(Endpoint.values())
+                .collect(
+                        Collectors.toMap(
+                                (v) -> v.value,
+                                Function.identity(),
+                                (l, r) -> {
+                                    throw new IllegalArgumentException("Duplicate keys!");
+                                },
+                                () -> new EnumMap<>(ButtplugRsFfi.Endpoint.class)
+                        )
+                );
 
-        Endpoint(int value) {
+        Endpoint(ButtplugRsFfi.Endpoint value) {
             this.value = value;
         }
     }
 
     public final int featureCount;
     public final List<Integer> stepCount;
-    // TODO: consider EnumSet?
     public final Set<Endpoint> endpoints;
     public final List<Integer> maxDuration;
 //    public final String[][] patterns;
@@ -101,7 +118,7 @@ public class MessageAttributes {
         stepCount = Collections.unmodifiableList(attribs.getStepCountList());
         endpoints = Collections.unmodifiableSet(
                 attribs.getEndpointsList().stream()
-                    .map((endpoint) -> Endpoint.inverse.get(endpoint.getNumber()))
+                    .map(Endpoint.inverse::get)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(Endpoint.class)))
         );
         maxDuration = Collections.unmodifiableList(attribs.getMaxDurationList());
