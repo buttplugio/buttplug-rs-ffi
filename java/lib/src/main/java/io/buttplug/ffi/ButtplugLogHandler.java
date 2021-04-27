@@ -31,13 +31,12 @@ public class ButtplugLogHandler implements AutoCloseable {
         void log(Pointer ctx, String str);
     }
 
-    ButtplugLogHandler(LogFFICallback cb, ButtplugLogHandler.Level level, boolean use_json) {
+    public ButtplugLogHandler(LogFFICallback cb, ButtplugLogHandler.Level level, boolean use_json) {
         callback = cb;
         log_handle = ButtplugFFI.getButtplugInstance()
                 .buttplug_create_log_handle(callback, null, level.value, use_json);
     }
 
-    // TODO: fail-safe on garbage collection before client is freed?
     @Override
     public void close() {
         if (log_handle != null) {

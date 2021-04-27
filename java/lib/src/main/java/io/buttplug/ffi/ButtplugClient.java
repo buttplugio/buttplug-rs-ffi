@@ -32,12 +32,11 @@ public class ButtplugClient implements AutoCloseable {
     public Runnable onPingTimeout;
     public Runnable onServerDisconnect;
 
-    ButtplugClient(String client_name) {
+    public ButtplugClient(String client_name) {
         this.systemCallback = this::handleSystemMessage;
         this.pointer = ButtplugFFI.getButtplugInstance().buttplug_create_protobuf_client(client_name, this.systemCallback, null);
     }
 
-    // TODO: fail-safe on garbage collection before client is freed?
     // TODO: what about pending callbacks?
     @Override
     public void close() {
