@@ -1,6 +1,6 @@
-package io.buttplug.ffi;
+package io.buttplug;
 
-import io.buttplug.ButtplugException;
+import io.buttplug.exceptions.ButtplugException;
 import io.buttplug.protos.ButtplugRsFfi;
 import jnr.ffi.Pointer;
 

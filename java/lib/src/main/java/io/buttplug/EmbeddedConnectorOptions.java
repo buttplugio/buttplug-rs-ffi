@@ -1,4 +1,4 @@
-package io.buttplug.ffi;
+package io.buttplug;
 
 import io.buttplug.protos.ButtplugRsFfi.ClientMessage.DeviceCommunicationManagerTypes;
 

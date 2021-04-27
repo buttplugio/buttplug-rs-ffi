@@ -1,4 +1,4 @@
-package io.buttplug.ffi;
+package io.buttplug;
 
 import jnr.ffi.Pointer;
 import jnr.ffi.annotations.Delegate;

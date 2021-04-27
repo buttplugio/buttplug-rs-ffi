@@ -1,4 +1,4 @@
-package io.buttplug;
+package io.buttplug.exceptions;
 
 import io.buttplug.protos.ButtplugRsFfi.ServerMessage;
 

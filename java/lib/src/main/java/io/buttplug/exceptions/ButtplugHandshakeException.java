@@ -1,4 +1,4 @@
-package io.buttplug;
+package io.buttplug.exceptions;
 
 public class ButtplugHandshakeException extends ButtplugException {
     public ButtplugHandshakeException(String msg) {

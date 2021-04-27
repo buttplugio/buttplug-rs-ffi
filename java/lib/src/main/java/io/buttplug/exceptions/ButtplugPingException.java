@@ -1,4 +1,4 @@
-package io.buttplug;
+package io.buttplug.exceptions;
 
 public class ButtplugPingException extends ButtplugException {
     public ButtplugPingException(String msg) {
