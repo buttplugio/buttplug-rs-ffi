@@ -89,7 +89,7 @@ public class ButtplugClient implements AutoCloseable {
     public CompletableFuture<Void> connect(EmbeddedConnectorOptions options) {
         int manager_types = 0;
         for (EmbeddedConnectorOptions.DeviceCommunicationManager val: options.deviceCommunicationManagerTypes) {
-            manager_types |= val.value;
+            manager_types |= val.value.getNumber();
         }
 
         ClientMessage.FFIMessage.Builder builder = ClientMessage.FFIMessage.newBuilder();

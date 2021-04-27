@@ -229,7 +229,7 @@ class ButtplugDevice implements AutoCloseable {
     public CompletableFuture<ByteBuffer> rawRead(MessageAttributes.Endpoint endpoint, int expected_length, int timeout) {
         DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
         builder.getRawReadCmdBuilder()
-                .setEndpointValue(endpoint.value)
+                .setEndpoint(endpoint.value)
                 .setExpectedLength(expected_length)
                 // .setData(...) // ???
                 .setTimeout(timeout);
@@ -244,7 +244,7 @@ class ButtplugDevice implements AutoCloseable {
     public CompletableFuture<Void> rawWrite(MessageAttributes.Endpoint endpoint, byte[] data, boolean writeWithResponse) {
         DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
         builder.getRawWriteCmdBuilder()
-                .setEndpointValue(endpoint.value)
+                .setEndpoint(endpoint.value)
                 .setData(ByteString.copyFrom(data))
                 .setWriteWithResponse(writeWithResponse);
 
@@ -255,7 +255,7 @@ class ButtplugDevice implements AutoCloseable {
     public CompletableFuture<Void> rawSubscribe(MessageAttributes.Endpoint endpoint) {
         DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
         builder.getRawSubscribeCmdBuilder()
-                .setEndpointValue(endpoint.value);
+                .setEndpoint(endpoint.value);
 
         return sendProtobufMessage(builder.build())
                 .thenAccept(ButtplugProtoUtil::to_result);
@@ -264,7 +264,7 @@ class ButtplugDevice implements AutoCloseable {
     public CompletableFuture<Void> rawUnsubscribe(MessageAttributes.Endpoint endpoint) {
         DeviceMessage.FFIMessage.Builder builder = DeviceMessage.FFIMessage.newBuilder();
         builder.getRawUnsubscribeCmdBuilder()
-                .setEndpointValue(endpoint.value);
+                .setEndpoint(endpoint.value);
 
         return sendProtobufMessage(builder.build())
                 .thenAccept(ButtplugProtoUtil::to_result);

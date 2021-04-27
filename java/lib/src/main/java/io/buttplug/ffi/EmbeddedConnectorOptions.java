@@ -6,15 +6,15 @@ import java.util.EnumSet;
 
 public class EmbeddedConnectorOptions {
     public enum DeviceCommunicationManager {
-        Btleplug(DeviceCommunicationManagerTypes.Btleplug_VALUE),
-        XInput(DeviceCommunicationManagerTypes.XInput_VALUE),
-        SerialPort(DeviceCommunicationManagerTypes.SerialPort_VALUE),
-        LovenseHIDDongle(DeviceCommunicationManagerTypes.LovenseHIDDongle_VALUE),
-        LovenseSerialDongle(DeviceCommunicationManagerTypes.LovenseSerialDongle_VALUE);
+        Btleplug(DeviceCommunicationManagerTypes.Btleplug),
+        XInput(DeviceCommunicationManagerTypes.XInput),
+        SerialPort(DeviceCommunicationManagerTypes.SerialPort),
+        LovenseHIDDongle(DeviceCommunicationManagerTypes.LovenseHIDDongle),
+        LovenseSerialDongle(DeviceCommunicationManagerTypes.LovenseSerialDongle);
 
-        public final int value;
+        public final DeviceCommunicationManagerTypes value;
 
-        DeviceCommunicationManager(int value) {
+        DeviceCommunicationManager(DeviceCommunicationManagerTypes value) {
             this.value = value;
         }
     }
