@@ -1,4 +1,4 @@
-package io.buttplug;
+package io.buttplug.exceptions;
 
 public class ButtplugUnknownException extends ButtplugException {
     public ButtplugUnknownException(String msg) {

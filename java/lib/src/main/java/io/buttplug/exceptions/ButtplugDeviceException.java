@@ -1,4 +1,4 @@
-package io.buttplug;
+package io.buttplug.exceptions;
 
 public class ButtplugDeviceException extends ButtplugException {
     public ButtplugDeviceException(String msg) {

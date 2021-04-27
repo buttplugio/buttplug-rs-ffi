@@ -1,6 +1,6 @@
-package io.buttplug.ffi;
+package io.buttplug;
 
-import io.buttplug.ButtplugMessageException;
+import io.buttplug.exceptions.ButtplugMessageException;
 import io.buttplug.protos.ButtplugRsFfi.*;
 
 import java.util.concurrent.CompletionException;

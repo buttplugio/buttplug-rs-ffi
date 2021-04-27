@@ -1,9 +1,9 @@
-package io.buttplug.ffi;
+package io.buttplug;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.buttplug.ButtplugDeviceException;
-import io.buttplug.ButtplugException;
-import io.buttplug.ButtplugPingException;
+import io.buttplug.exceptions.ButtplugDeviceException;
+import io.buttplug.exceptions.ButtplugException;
+import io.buttplug.exceptions.ButtplugPingException;
 import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 

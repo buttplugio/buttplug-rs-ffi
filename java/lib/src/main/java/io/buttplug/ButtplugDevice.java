@@ -1,7 +1,7 @@
-package io.buttplug.ffi;
+package io.buttplug;
 
 import com.google.protobuf.ByteString;
-import io.buttplug.ButtplugDeviceException;
+import io.buttplug.exceptions.ButtplugDeviceException;
 import io.buttplug.protos.ButtplugRsFfi.*;
 import jnr.ffi.Pointer;
 
