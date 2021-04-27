@@ -27,7 +27,7 @@ public class ButtplugFFIClient implements AutoCloseable {
 
     public Consumer<ButtplugFFIDevice> onDeviceAdded;
     public Consumer<ButtplugFFIDevice> onDeviceRemoved;
-    public Consumer<ButtplugException> onErrorRecieved;
+    public Consumer<ButtplugException> onErrorReceived;
     // Note: these uses of Runnable has nothing to do with threading.
     public Runnable onScanningFinished;
     public Runnable onPingTimeout;
@@ -43,9 +43,11 @@ public class ButtplugFFIClient implements AutoCloseable {
     // TODO: what about pending callbacks?
     @Override
     public void close() {
-        buttplug.buttplug_free_client(pointer);
-        this.systemCallback = null;
-        this.pointer = null;
+        if (pointer != null) {
+            buttplug.buttplug_free_client(pointer);
+            this.systemCallback = null;
+            this.pointer = null;
+        }
     }
 
     public boolean isConnected() {
@@ -57,6 +59,10 @@ public class ButtplugFFIClient implements AutoCloseable {
     }
 
     private CompletableFuture<ButtplugFFIServerMessage.FFIMessage> sendProtobufMessage(ClientMessage.FFIMessage message) {
+        if (pointer == null) {
+            throw new IllegalStateException("Attempt to send message when client has already been closed!");
+        }
+
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
 
         // TODO: hold weak instead of strong reference to future in callback?
@@ -76,6 +82,9 @@ public class ButtplugFFIClient implements AutoCloseable {
     }
 
     private ButtplugFFIDevice createDevice(ServerMessage.DeviceAdded msg) {
+        if (pointer == null) {
+            throw new IllegalStateException("Attempt to create device when client has already been closed!");
+        }
         return new ButtplugFFIDevice(buttplug, pointer, msg);
     }
 
@@ -186,8 +195,8 @@ public class ButtplugFFIClient implements AutoCloseable {
                         ServerMessage.DeviceAdded msg = serverMsg.getDeviceAdded();
 
                         if (devices.containsKey(msg.getIndex())) {
-                            if (onErrorRecieved != null) {
-                                onErrorRecieved.accept(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi"));
+                            if (onErrorReceived != null) {
+                                onErrorReceived.accept(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi"));
                             }
                             return;
                         }
@@ -229,8 +238,8 @@ public class ButtplugFFIClient implements AutoCloseable {
                             // return?
                         }
 
-                        if (onErrorRecieved != null) {
-                            onErrorRecieved.accept(ex);
+                        if (onErrorReceived != null) {
+                            onErrorReceived.accept(ex);
                         }
                     } else {
                         // unhandled event?
