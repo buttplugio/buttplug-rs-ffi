@@ -27,7 +27,7 @@ class ButtplugDevice implements AutoCloseable {
         this.attributes = Collections.unmodifiableMap(
                 msg.getMessageAttributesList().stream()
                     .collect(Collectors.toMap(
-                            (m) -> MessageAttributes.Type.inverse.get(m.getMessageTypeValue()),
+                            (m) -> MessageAttributes.Type.inverse.get(m.getMessageType()),
                             MessageAttributes::new,
                             (l, r) -> {
                                 throw new IllegalArgumentException("Duplicate keys!");
