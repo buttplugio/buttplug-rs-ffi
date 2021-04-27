@@ -18,21 +18,14 @@ public class ButtplugFFI {
         @Delegate void callback(Pointer ctx, @In ByteBuffer ptr, @u_int32_t int len);
     }
 
-    // type LogFFICallback = extern "C" fn(*mut c_void, *const c_char);
-    @FunctionalInterface
-    public interface LogFFICallback {
-        // maybe take Pointer instead of String?
-        @Delegate void log(Pointer ctx, String str);
-    }
-
-    // package private so that ButtplugFFIClient and ButtplugFFIDevice can make use of it
+    // package private so that ButtplugClient and ButtplugDevice can make use of it
     interface LibButtplug {
-        // ButtplugFFIClient
+        // ButtplugClient
         Pointer buttplug_create_protobuf_client(String client_name, FFICallback callback, Pointer ctx);
         void buttplug_free_client(Pointer client);
         void buttplug_client_protobuf_message(Pointer client, @Out byte[] buf, @int32_t int buf_len, FFICallback callback, Pointer ctx);
 
-        // ButtplugFFIDevice
+        // ButtplugDevice
         Pointer buttplug_create_device(Pointer client, @u_int32_t int index);
         // TODO: Consider @Pinned
         void buttplug_device_protobuf_message(Pointer device, @Out byte[] buf, @int32_t int buf_len, FFICallback callback, Pointer ctx);
@@ -40,26 +33,26 @@ public class ButtplugFFI {
 
         // ButtplugLogHandle?
         void buttplug_activate_env_logger();
-        Pointer buttplug_create_log_handle(LogFFICallback callback, Pointer ctx, String max_level, boolean use_json);
+        Pointer buttplug_create_log_handle(ButtplugLogHandler.LogFFICallback callback, Pointer ctx, String max_level, boolean use_json);
         void buttplug_free_log_handle(Pointer log_handle);
     }
 
-    private final LibButtplug buttplug;
+    private static LibButtplug buttplug_instance;
 
-    public ButtplugFFI() {
-        this.buttplug = LibraryLoader.create(LibButtplug.class).load("buttplug_rs_ffi");
+    static LibButtplug getButtplugInstance() {
+        if (buttplug_instance == null) {
+            synchronized (LibButtplug.class) {
+                // check again, in case of race.
+                if (buttplug_instance == null) {
+                    buttplug_instance = LibraryLoader.create(LibButtplug.class).load("buttplug_rs_ffi");
+                }
+            }
+        }
+
+        return buttplug_instance;
     }
 
-    public ButtplugFFIClient create_client(String client_name) {
-        return new ButtplugFFIClient(buttplug, client_name);
-    }
-
-    public void activate_env_logger() {
-        buttplug.buttplug_activate_env_logger();
-    }
-
-    public ButtplugFFILogHandler add_log_handler(LogFFICallback cb, ButtplugFFILogHandler.Level level, boolean use_json) {
-        Pointer handle = buttplug.buttplug_create_log_handle(cb, null, level.value, use_json);
-        return new ButtplugFFILogHandler(buttplug, cb);
+    public static void activate_env_logger() {
+        getButtplugInstance().buttplug_activate_env_logger();
     }
 }

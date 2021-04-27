@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 // TODO: consider making static or something?
 // TODO: generate context instead of callbacks directly?
+// TODO: consider moving into ButtplugFFI?
 class FFICallbackFactory {
     // callback references used to preserve callbacks until they have been called.
     private final Set<ButtplugFFI.FFICallback> pending = ConcurrentHashMap.newKeySet();

@@ -14,17 +14,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class ButtplugFFIDevice implements AutoCloseable {
-    private final ButtplugFFI.LibButtplug buttplug;
+class ButtplugDevice implements AutoCloseable {
     private Pointer pointer;
     public final int index;
 
     private final FFICallbackFactory factory = new FFICallbackFactory();
     private final EnumMap<MessageAttributes.Type, MessageAttributes> attributes;
 
-    ButtplugFFIDevice(ButtplugFFI.LibButtplug buttplug, Pointer client, ServerMessage.DeviceAdded msg) {
-        this.buttplug = buttplug;
-        this.pointer = buttplug.buttplug_create_device(client, msg.getIndex());
+    ButtplugDevice(Pointer client, ServerMessage.DeviceAdded msg) {
+        this.pointer = ButtplugFFI.getButtplugInstance().buttplug_create_device(client, msg.getIndex());
         this.index = msg.getIndex();
 
         this.attributes = msg.getMessageAttributesList().stream()
@@ -43,7 +41,7 @@ class ButtplugFFIDevice implements AutoCloseable {
     @Override
     public void close() {
         if (pointer != null) {
-            buttplug.buttplug_free_device(pointer);
+            ButtplugFFI.getButtplugInstance().buttplug_free_device(pointer);
             pointer = null;
         }
     }
@@ -66,7 +64,7 @@ class ButtplugFFIDevice implements AutoCloseable {
 
         // TODO: maybe pass a static callback and make use of ctx
         //  so that there only needs to be a few generated native stubs?
-        buttplug.buttplug_device_protobuf_message(pointer, buf, buf.length, cb, null);
+        ButtplugFFI.getButtplugInstance().buttplug_device_protobuf_message(pointer, buf, buf.length, cb, null);
 
         return future;
     }

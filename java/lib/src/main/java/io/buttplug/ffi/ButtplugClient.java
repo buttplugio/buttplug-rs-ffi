@@ -12,8 +12,7 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class ButtplugFFIClient implements AutoCloseable {
-    private final ButtplugFFI.LibButtplug buttplug;
+public class ButtplugClient implements AutoCloseable {
     private Pointer pointer;
     // reference kept to prevent garbage collection.
     private ButtplugFFI.FFICallback systemCallback;
@@ -23,20 +22,19 @@ public class ButtplugFFIClient implements AutoCloseable {
     private boolean connected = false;
     private boolean scanning = false;
 
-    private final HashMap<Integer, ButtplugFFIDevice> devices = new HashMap<>();
+    private final HashMap<Integer, ButtplugDevice> devices = new HashMap<>();
 
-    public Consumer<ButtplugFFIDevice> onDeviceAdded;
-    public Consumer<ButtplugFFIDevice> onDeviceRemoved;
+    public Consumer<ButtplugDevice> onDeviceAdded;
+    public Consumer<ButtplugDevice> onDeviceRemoved;
     public Consumer<ButtplugException> onErrorReceived;
     // Note: these uses of Runnable has nothing to do with threading.
     public Runnable onScanningFinished;
     public Runnable onPingTimeout;
     public Runnable onServerDisconnect;
 
-    ButtplugFFIClient(ButtplugFFI.LibButtplug buttplug, String client_name) {
-        this.buttplug = buttplug;
+    ButtplugClient(String client_name) {
         this.systemCallback = this::handleSystemMessage;
-        this.pointer = buttplug.buttplug_create_protobuf_client(client_name, this.systemCallback, null);
+        this.pointer = ButtplugFFI.getButtplugInstance().buttplug_create_protobuf_client(client_name, this.systemCallback, null);
     }
 
     // TODO: fail-safe on garbage collection before client is freed?
@@ -44,7 +42,7 @@ public class ButtplugFFIClient implements AutoCloseable {
     @Override
     public void close() {
         if (pointer != null) {
-            buttplug.buttplug_free_client(pointer);
+            ButtplugFFI.getButtplugInstance().buttplug_free_client(pointer);
             this.systemCallback = null;
             this.pointer = null;
         }
@@ -76,16 +74,16 @@ public class ButtplugFFIClient implements AutoCloseable {
 
         // TODO: pass a static callback and make use of ctx
         //  so that there only needs to be a few generated native stubs (in theory?)
-        buttplug.buttplug_client_protobuf_message(pointer, buf, buf.length, cb, null);
+        ButtplugFFI.getButtplugInstance().buttplug_client_protobuf_message(pointer, buf, buf.length, cb, null);
 
         return future;
     }
 
-    private ButtplugFFIDevice createDevice(ServerMessage.DeviceAdded msg) {
+    private ButtplugDevice createDevice(ServerMessage.DeviceAdded msg) {
         if (pointer == null) {
             throw new IllegalStateException("Attempt to create device when client has already been closed!");
         }
-        return new ButtplugFFIDevice(buttplug, pointer, msg);
+        return new ButtplugDevice(pointer, msg);
     }
 
     public CompletableFuture<Void> connect(EmbeddedConnectorOptions options) {
@@ -201,7 +199,7 @@ public class ButtplugFFIClient implements AutoCloseable {
                             return;
                         }
 
-                        ButtplugFFIDevice device = createDevice(msg);
+                        ButtplugDevice device = createDevice(msg);
                         devices.put(msg.getIndex(), device);
                         if (onDeviceAdded != null) {
                             onDeviceAdded.accept(device);
@@ -214,7 +212,7 @@ public class ButtplugFFIClient implements AutoCloseable {
                             return;
                         }
 
-                        ButtplugFFIDevice device = devices.remove(msg.getIndex());
+                        ButtplugDevice device = devices.remove(msg.getIndex());
                         if (onDeviceRemoved != null) {
                             onDeviceRemoved.accept(device);
                         }

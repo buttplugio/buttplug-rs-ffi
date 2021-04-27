@@ -5,6 +5,7 @@ import io.buttplug.protos.ButtplugRsFfi.*;
 
 import java.util.concurrent.CompletionException;
 
+// TODO: consider moving into ButtplugFFI?
 class ButtplugProtoUtil {
     static void to_result(ButtplugFFIServerMessage.FFIMessage msg) throws CompletionException {
         Exception ex;
