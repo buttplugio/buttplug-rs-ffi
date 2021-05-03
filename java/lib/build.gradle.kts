@@ -15,6 +15,14 @@ plugins {
     id("com.google.protobuf") version "0.8.8"
 }
 
+group = "io.buttplug"
+version = "0.0.1"
+
+java {
+    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+    targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+}
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()

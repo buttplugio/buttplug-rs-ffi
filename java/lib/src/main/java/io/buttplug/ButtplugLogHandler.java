@@ -25,14 +25,18 @@ public class ButtplugLogHandler implements AutoCloseable {
 
     // type LogFFICallback = extern "C" fn(*mut c_void, *const c_char);
     @FunctionalInterface
-    public interface LogFFICallback {
+    interface LogFFICallback {
         // maybe take Pointer instead of String?
         @Delegate
         void log(Pointer ctx, String str);
     }
 
-    public ButtplugLogHandler(LogFFICallback cb, ButtplugLogHandler.Level level, boolean use_json) {
-        callback = cb;
+    public interface Callback {
+        void log(String str);
+    }
+
+    public ButtplugLogHandler(Callback cb, ButtplugLogHandler.Level level, boolean use_json) {
+        callback = (ctx, str) -> cb.log(str);
         log_handle = ButtplugFFI.getButtplugInstance()
                 .buttplug_create_log_handle(callback, null, level.value, use_json);
     }
