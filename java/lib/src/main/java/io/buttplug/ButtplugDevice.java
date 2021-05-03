@@ -3,7 +3,9 @@ package io.buttplug;
 import com.google.protobuf.ByteString;
 import io.buttplug.exceptions.ButtplugDeviceException;
 import io.buttplug.protos.ButtplugRsFfi.*;
+import jnr.ffi.ObjectReferenceManager;
 import jnr.ffi.Pointer;
+import jnr.ffi.Runtime;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -13,16 +15,31 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class ButtplugDevice implements AutoCloseable {
+public class ButtplugDevice implements AutoCloseable {
+    // TODO: some sort of weak reference?
+    private static ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager;
+    private static final ButtplugFFI.FFICallback resultCallback = ButtplugDevice::staticResultHandler;
+
     private Pointer pointer;
     public final int index;
+    public final String name;
 
-    private final FFICallbackFactory factory = new FFICallbackFactory();
     public final Map<MessageAttributes.Type, MessageAttributes> attributes;
 
     ButtplugDevice(Pointer client, ServerMessage.DeviceAdded msg) {
-        this.pointer = ButtplugFFI.getButtplugInstance().buttplug_create_device(client, msg.getIndex());
+        ButtplugFFI.LibButtplug buttplug = ButtplugFFI.getButtplugInstance();
+
+        if (resultReferenceManager == null) {
+            synchronized (ButtplugDevice.class) {
+                if (resultReferenceManager == null) {
+                    resultReferenceManager = Runtime.getRuntime(buttplug).newObjectReferenceManager();
+                }
+            }
+        }
+
+        this.pointer = buttplug.buttplug_create_device(client, msg.getIndex());
         this.index = msg.getIndex();
+        this.name = msg.getName();
 
         this.attributes = Collections.unmodifiableMap(
                 msg.getMessageAttributesList().stream()
@@ -37,7 +54,6 @@ class ButtplugDevice implements AutoCloseable {
         );
     }
 
-    // TODO: what about pending callbacks?
     @Override
     public void close() {
         if (pointer != null) {
@@ -52,7 +68,6 @@ class ButtplugDevice implements AutoCloseable {
         }
 
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = new CompletableFuture<>();
-        ButtplugFFI.FFICallback cb = factory.create(future);
 
         byte[] buf = DeviceMessage.newBuilder()
                 // NOTE: Index was already unused, ID will more or less be unused given the new context stuff
@@ -62,9 +77,7 @@ class ButtplugDevice implements AutoCloseable {
                 .build()
                 .toByteArray();
 
-        // TODO: maybe pass a static callback and make use of ctx
-        //  so that there only needs to be a few generated native stubs?
-        ButtplugFFI.getButtplugInstance().buttplug_device_protobuf_message(pointer, buf, buf.length, cb, null);
+        ButtplugFFI.getButtplugInstance().buttplug_device_protobuf_message(pointer, buf, buf.length, resultCallback, resultReferenceManager.add(future));
 
         return future;
     }
@@ -296,5 +309,15 @@ class ButtplugDevice implements AutoCloseable {
 
         return sendProtobufMessage(message)
                 .thenAccept(ButtplugProtoUtil::to_result);
+    }
+
+    private static void staticResultHandler(Pointer ctx, Pointer ptr, int len) {
+        CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = resultReferenceManager.get(ctx);
+
+        try {
+            ButtplugProtoUtil.protobufResultHandler(future, ptr, len);
+        } finally {
+            resultReferenceManager.remove(ctx);
+        }
     }
 }
