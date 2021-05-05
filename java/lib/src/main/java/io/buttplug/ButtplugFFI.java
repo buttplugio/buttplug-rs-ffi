@@ -54,20 +54,27 @@ public class ButtplugFFI {
     static native void buttplug_free_log_handle(Pointer log_handle);
 
     private static native void buttplug_activate_env_logger();
-    public static void activate_env_logger() {
+    public static void activateBuiltinLogger() {
         buttplug_activate_env_logger();
     }
 
     static {
         // TODO: put shared objects under "${os-prefix}/LIBRARY_FILENAME"
         try {
+            Native.register("buttplug_rs_ffi");
+        } catch (Throwable ex) {
+            throw new RuntimeException("Missing natives for platform: '" + getNativeLibraryResourcePrefix() + "'", ex);
+        }
+    }
+
+    // NOTE: used for getting native library prefixes when you don't know what the prefix for the current platform is.
+    static String getNativeLibraryResourcePrefix() {
+        try {
             Method getNativeLibraryResourcePrefix = Platform.class.getDeclaredMethod("getNativeLibraryResourcePrefix");
             getNativeLibraryResourcePrefix.setAccessible(true);
-            System.out.println((String)getNativeLibraryResourcePrefix.invoke(null));
+            return (String)getNativeLibraryResourcePrefix.invoke(null);
         } catch (Throwable ex) {
-            // do nothing
+            return null;
         }
-
-        Native.register("buttplug_rs_ffi");
     }
 }
