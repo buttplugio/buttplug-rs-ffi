@@ -14,6 +14,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+/**
+ * Object representing an FFI client instance.
+ *
+ * Make sure to close this to prevent a leak.
+ */
 public class ButtplugClient implements AutoCloseable {
     private static final ObjectReferenceManager<ButtplugClient> clientReferenceManager = new ObjectReferenceManager<>();
     private static final ButtplugFFI.FFICallback systemCallback = ButtplugClient::staticSystemMessageHandler;
@@ -30,20 +35,53 @@ public class ButtplugClient implements AutoCloseable {
 
     private final HashMap<Integer, ButtplugDevice> devices = new HashMap<>();
 
+    /**
+     * Name of the client, used for server UI/permissions.
+     */
+    public final String name;
+
+    /**
+     * Callback fired on Buttplug device added, either after connect or while scanning for devices.
+     */
     public Consumer<ButtplugDevice> onDeviceAdded;
+
+    /**
+     * Callback fired on Buttplug device removed. Can fire at any time after device connection.
+     */
     public Consumer<ButtplugDevice> onDeviceRemoved;
+
+    /**
+     * Fires when an error that was not provoked by a client action is received from the server,
+     * such as a device exception, message parsing error, etc... Server may possibly disconnect
+     * after this event fires.
+     */
     public Consumer<ButtplugException> onErrorReceived;
+
     // Note: these uses of Runnable has nothing to do with threading.
+    /**
+     * Callback fired when the server has finished scanning for devices.
+     */
     public Runnable onScanningFinished;
+
+    /**
+     * Callback fired when a server ping timeout has occurred.
+     */
     public Runnable onPingTimeout;
+
+    /**
+     * Callback fired when a server disconnect has occurred.
+     */
     public Runnable onServerDisconnect;
 
     public ButtplugClient(String client_name) {
         systemCallbackCtx = clientReferenceManager.add(this);
         this.pointer = ButtplugFFI.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
+        this.name = client_name;
     }
 
-    // NOTE: if this is not called, the ButtplugClient will leak via the static object reference manager.
+    /**
+     * Frees the FFI Client. If this is not called, then it will leak.
+     */
     @Override
     public void close() {
         if (pointer != null) {
@@ -65,6 +103,9 @@ public class ButtplugClient implements AutoCloseable {
         return scanning;
     }
 
+    /**
+     * @return information about devices currently connected to the server.
+     */
     public Map<Integer, ButtplugDevice> getDevices() {
         return Collections.unmodifiableMap(devices);
     }
@@ -231,6 +272,7 @@ public class ButtplugClient implements AutoCloseable {
                         if (onDeviceRemoved != null) {
                             onDeviceRemoved.accept(device);
                         }
+                        device.close();
                     } else if (serverMsg.hasDisconnect()) {
                         connected = false;
                         devices.clear();

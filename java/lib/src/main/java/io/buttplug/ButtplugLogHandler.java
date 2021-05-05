@@ -2,10 +2,32 @@ package io.buttplug;
 
 import com.sun.jna.Pointer;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * Represents a log callback that the FFI can call to output log messages.
+ *
+ * Only one should be constructed at a given time.
+ */
 public class ButtplugLogHandler implements AutoCloseable {
     private Pointer log_handle;
     // reference kept to prevent garbage collection.
     private LogFFICallback callback;
+
+    private static final AtomicBoolean logHandlerActive = new AtomicBoolean(false);
+
+    /**
+     * Activates the logger built-in to buttplug, which logs to console.
+     *
+     * This should not be used in conjunction with an {@link ButtplugLogHandler} instance.
+     * This cannot be deactivated once it has been activated.
+     */
+    public static void activateBuiltinLogger() throws IllegalStateException {
+        if (!logHandlerActive.compareAndSet(false, true)) {
+            throw new IllegalStateException("There is already an active log handler!");
+        }
+        ButtplugFFI.buttplug_activate_env_logger();
+    }
 
     public enum Level {
         // Off(null),
@@ -33,7 +55,11 @@ public class ButtplugLogHandler implements AutoCloseable {
         void log(String str);
     }
 
-    public ButtplugLogHandler(Callback cb, ButtplugLogHandler.Level level, boolean use_json) {
+    public ButtplugLogHandler(Callback cb, ButtplugLogHandler.Level level, boolean use_json) throws IllegalStateException {
+        if (!logHandlerActive.compareAndSet(false, true)) {
+            throw new IllegalStateException("There is already an active log handler!");
+        }
+
         callback = (ctx, str) -> cb.log(str);
         log_handle = ButtplugFFI
                 .buttplug_create_log_handle(callback, null, level.value, use_json);
@@ -45,6 +71,10 @@ public class ButtplugLogHandler implements AutoCloseable {
             ButtplugFFI.buttplug_free_log_handle(log_handle);
             log_handle = null;
             callback = null;
+
+            if (!logHandlerActive.compareAndSet(true, false)) {
+                throw new IllegalStateException("No active log handler when closing log handler?!?");
+            }
         }
     }
 }

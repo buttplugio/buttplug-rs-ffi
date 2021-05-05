@@ -13,15 +13,34 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Object representing an FFI device instance.
+ *
+ * Lifetimes are more-or-less handled by the library
+ */
 public class ButtplugDevice implements AutoCloseable {
-    // TODO: some sort of weak reference?
+    // TODO: weak reference?
     private static final ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager = new ObjectReferenceManager<>();
     private static final ButtplugFFI.FFICallback resultCallback = ButtplugDevice::staticResultHandler;
 
     private Pointer pointer;
+
+    /**
+     * The device index, which uniquely identifies the device on the server.
+     *
+     * If a device is removed, this may be the only populated field. If the same device
+     * reconnects, the index should be reused.
+     */
     public final int index;
+
+    /**
+     * The device name, which usually contains the device brand and model.
+     */
     public final String name;
 
+    /**
+     * The Buttplug Protocol messages supported by this device, with additional attributes.
+     */
     public final Map<MessageAttributes.Type, MessageAttributes> attributes;
 
     ButtplugDevice(Pointer client, ServerMessage.DeviceAdded msg) {

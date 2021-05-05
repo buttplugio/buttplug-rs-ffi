@@ -12,7 +12,7 @@ public class EmbeddedConnectorOptions {
         LovenseHIDDongle(DeviceCommunicationManagerTypes.LovenseHIDDongle),
         LovenseSerialDongle(DeviceCommunicationManagerTypes.LovenseSerialDongle);
 
-        public final DeviceCommunicationManagerTypes value;
+        final DeviceCommunicationManagerTypes value;
 
         DeviceCommunicationManager(DeviceCommunicationManagerTypes value) {
             this.value = value;
