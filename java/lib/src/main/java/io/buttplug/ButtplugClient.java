@@ -16,18 +16,12 @@ import java.util.function.Consumer;
 
 public class ButtplugClient implements AutoCloseable {
     private static final ObjectReferenceManager<ButtplugClient> clientReferenceManager = new ObjectReferenceManager<>();
-    private static final ButtplugFFI.FFICallback systemCallback = (a, b, c) -> {
-        System.out.println("Buttplug: received system message");
-        staticSystemMessageHandler(a, b, c);
-    };
+    private static final ButtplugFFI.FFICallback systemCallback = ButtplugClient::staticSystemMessageHandler;
     private final Pointer systemCallbackCtx;
 
     // TODO: some sort of weak reference?
     private static final ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager = new ObjectReferenceManager<>();
-    private static final ButtplugFFI.FFICallback resultCallback = (a, b, c) -> {
-        System.out.println("Buttplug: received client result");
-        staticResultHandler(a, b, c);
-    };
+    private static final ButtplugFFI.FFICallback resultCallback = ButtplugClient::staticResultHandler;
 
     private Pointer pointer;
 
@@ -184,7 +178,6 @@ public class ButtplugClient implements AutoCloseable {
     }
 
     private static void staticSystemMessageHandler(Pointer ctx, Pointer ptr, ButtplugFFI.uint32_t len) {
-        System.out.println("Buttplug: received system message");
         ButtplugClient client = clientReferenceManager.get(ctx);
 
         if (client != null) {
@@ -276,7 +269,6 @@ public class ButtplugClient implements AutoCloseable {
     }
 
     private static void staticResultHandler(Pointer ctx, Pointer ptr, ButtplugFFI.uint32_t len) {
-        System.out.println("Buttplug: received client result");
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = resultReferenceManager.get(ctx);
 
         try {
