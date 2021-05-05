@@ -1,11 +1,9 @@
 package io.buttplug;
 
 import com.google.protobuf.ByteString;
+import com.sun.jna.Pointer;
 import io.buttplug.exceptions.ButtplugDeviceException;
 import io.buttplug.protos.ButtplugRsFfi.*;
-import jnr.ffi.ObjectReferenceManager;
-import jnr.ffi.Pointer;
-import jnr.ffi.Runtime;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -17,7 +15,7 @@ import java.util.stream.IntStream;
 
 public class ButtplugDevice implements AutoCloseable {
     // TODO: some sort of weak reference?
-    private static ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager;
+    private static final ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager = new ObjectReferenceManager<>();
     private static final ButtplugFFI.FFICallback resultCallback = ButtplugDevice::staticResultHandler;
 
     private Pointer pointer;
@@ -27,17 +25,7 @@ public class ButtplugDevice implements AutoCloseable {
     public final Map<MessageAttributes.Type, MessageAttributes> attributes;
 
     ButtplugDevice(Pointer client, ServerMessage.DeviceAdded msg) {
-        ButtplugFFI.LibButtplug buttplug = ButtplugFFI.getButtplugInstance();
-
-        if (resultReferenceManager == null) {
-            synchronized (ButtplugDevice.class) {
-                if (resultReferenceManager == null) {
-                    resultReferenceManager = Runtime.getRuntime(buttplug).newObjectReferenceManager();
-                }
-            }
-        }
-
-        this.pointer = buttplug.buttplug_create_device(client, msg.getIndex());
+        this.pointer = ButtplugFFI.buttplug_create_device(client, new ButtplugFFI.uint32_t(msg.getIndex()));
         this.index = msg.getIndex();
         this.name = msg.getName();
 
@@ -57,7 +45,7 @@ public class ButtplugDevice implements AutoCloseable {
     @Override
     public void close() {
         if (pointer != null) {
-            ButtplugFFI.getButtplugInstance().buttplug_free_device(pointer);
+            ButtplugFFI.buttplug_free_device(pointer);
             pointer = null;
         }
     }
@@ -77,7 +65,7 @@ public class ButtplugDevice implements AutoCloseable {
                 .build()
                 .toByteArray();
 
-        ButtplugFFI.getButtplugInstance().buttplug_device_protobuf_message(pointer, buf, buf.length, resultCallback, resultReferenceManager.add(future));
+        ButtplugFFI.buttplug_device_protobuf_message(pointer, buf, new ButtplugFFI.int32_t(buf.length), resultCallback, resultReferenceManager.add(future));
 
         return future;
     }
@@ -311,11 +299,11 @@ public class ButtplugDevice implements AutoCloseable {
                 .thenAccept(ButtplugProtoUtil::to_result);
     }
 
-    private static void staticResultHandler(Pointer ctx, Pointer ptr, int len) {
+    private static void staticResultHandler(Pointer ctx, Pointer ptr, ButtplugFFI.uint32_t len) {
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = resultReferenceManager.get(ctx);
 
         try {
-            ButtplugProtoUtil.protobufResultHandler(future, ptr, len);
+            ButtplugProtoUtil.protobufResultHandler(future, ptr, len.intValue());
         } finally {
             resultReferenceManager.remove(ctx);
         }

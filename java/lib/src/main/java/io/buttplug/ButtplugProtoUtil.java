@@ -1,9 +1,9 @@
 package io.buttplug;
 
+import com.sun.jna.Pointer;
 import io.buttplug.exceptions.ButtplugException;
 import io.buttplug.exceptions.ButtplugMessageException;
 import io.buttplug.protos.ButtplugRsFfi.*;
-import jnr.ffi.Pointer;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -26,8 +26,7 @@ class ButtplugProtoUtil {
     }
 
     static void protobufResultHandler(CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future, Pointer ptr, int len) {
-        byte[] buf = new byte[len];
-        ptr.get(0, buf, 0, len);
+        ByteBuffer buf = ptr.getByteBuffer(0, len);
         try {
             ButtplugFFIServerMessage.FFIMessage msg = ButtplugFFIServerMessage.parseFrom(buf).getMessage();
 

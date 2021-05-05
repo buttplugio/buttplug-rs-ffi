@@ -44,7 +44,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // ffi
-    implementation("com.github.jnr:jnr-ffi:2.2.2")
+    implementation("net.java.dev.jna:jna:5.8.0")
     implementation("com.google.protobuf:protobuf-java:3.6.1")
 }
 
