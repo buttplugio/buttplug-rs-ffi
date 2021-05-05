@@ -1,30 +1,33 @@
 package io.buttplug;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.sun.jna.Pointer;
 import io.buttplug.exceptions.ButtplugDeviceException;
 import io.buttplug.exceptions.ButtplugException;
 import io.buttplug.exceptions.ButtplugPingException;
 import io.buttplug.protos.ButtplugRsFfi.*;
-import jnr.ffi.ObjectReferenceManager;
-import jnr.ffi.Pointer;
-import jnr.ffi.Runtime;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 public class ButtplugClient implements AutoCloseable {
-    private static final ButtplugFFI.FFICallback systemCallback = ButtplugClient::staticSystemMessageHandler;
+    private static final ObjectReferenceManager<ButtplugClient> clientReferenceManager = new ObjectReferenceManager<>();
+    private static final ButtplugFFI.FFICallback systemCallback = (a, b, c) -> {
+        System.out.println("Buttplug: received system message");
+        staticSystemMessageHandler(a, b, c);
+    };
     private final Pointer systemCallbackCtx;
 
     // TODO: some sort of weak reference?
-    private static ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager;
-    private static final ButtplugFFI.FFICallback resultCallback = ButtplugClient::staticResultHandler;
+    private static final ObjectReferenceManager<CompletableFuture<ButtplugFFIServerMessage.FFIMessage>> resultReferenceManager = new ObjectReferenceManager<>();
+    private static final ButtplugFFI.FFICallback resultCallback = (a, b, c) -> {
+        System.out.println("Buttplug: received client result");
+        staticResultHandler(a, b, c);
+    };
 
     private Pointer pointer;
 
@@ -42,18 +45,8 @@ public class ButtplugClient implements AutoCloseable {
     public Runnable onServerDisconnect;
 
     public ButtplugClient(String client_name) {
-        ButtplugFFI.LibButtplug buttplug = ButtplugFFI.getButtplugInstance();
-
-        if (resultReferenceManager == null) {
-            synchronized (ButtplugClient.class) {
-                if (resultReferenceManager == null) {
-                    resultReferenceManager = Runtime.getRuntime(buttplug).newObjectReferenceManager();
-                }
-            }
-        }
-
-        systemCallbackCtx = ButtplugFFI.getClientReferenceManager().add(this);
-        this.pointer = buttplug.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
+        systemCallbackCtx = clientReferenceManager.add(this);
+        this.pointer = ButtplugFFI.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
     }
 
     // NOTE: if this is not called, the ButtplugClient will leak via the static object reference manager.
@@ -62,9 +55,9 @@ public class ButtplugClient implements AutoCloseable {
         if (pointer != null) {
             synchronized (this) {
                 if (pointer != null) {
-                    ButtplugFFI.getButtplugInstance().buttplug_free_client(pointer);
+                    ButtplugFFI.buttplug_free_client(pointer);
                     this.pointer = null;
-                    ButtplugFFI.getClientReferenceManager().remove(systemCallbackCtx);
+                    clientReferenceManager.remove(systemCallbackCtx);
                 }
             }
         }
@@ -95,7 +88,7 @@ public class ButtplugClient implements AutoCloseable {
                 .build()
                 .toByteArray();
 
-        ButtplugFFI.getButtplugInstance().buttplug_client_protobuf_message(pointer, buf, buf.length, resultCallback, resultReferenceManager.add(future));
+        ButtplugFFI.buttplug_client_protobuf_message(pointer, buf, new ButtplugFFI.int32_t(buf.length), resultCallback, resultReferenceManager.add(future));
 
         return future;
     }
@@ -190,21 +183,19 @@ public class ButtplugClient implements AutoCloseable {
                 .thenAccept(ButtplugProtoUtil::to_result);
     }
 
-    private static void staticSystemMessageHandler(Pointer ctx, Pointer ptr, int len) {
-        ButtplugClient client = ButtplugFFI.getClientReferenceManager().get(ctx);
+    private static void staticSystemMessageHandler(Pointer ctx, Pointer ptr, ButtplugFFI.uint32_t len) {
+        System.out.println("Buttplug: received system message");
+        ButtplugClient client = clientReferenceManager.get(ctx);
 
         if (client != null) {
-            byte[] buf = new byte[len];
-            ptr.get(0, buf, 0, len);
-            client.handleSystemMessage(buf);
+            client.handleSystemMessage(ptr.getByteBuffer(0, len.intValue()));
         } else {
             // TODO: what do we do if we receive a call from rust after we have freed the client?
         }
     }
 
-    private void handleSystemMessage(byte[] buf) {
+    private void handleSystemMessage(ByteBuffer buf) {
         try {
-            Logger.getLogger("buttplug").warning("recieved system message");
             ButtplugFFIServerMessage incoming = ButtplugFFIServerMessage.parseFrom(buf);
             // TODO: is there another way we want to do this?
             // Run the response in the context of the Java executor, not the Rust
@@ -284,12 +275,12 @@ public class ButtplugClient implements AutoCloseable {
         }
     }
 
-    private static void staticResultHandler(Pointer ctx, Pointer ptr, int len) {
+    private static void staticResultHandler(Pointer ctx, Pointer ptr, ButtplugFFI.uint32_t len) {
+        System.out.println("Buttplug: received client result");
         CompletableFuture<ButtplugFFIServerMessage.FFIMessage> future = resultReferenceManager.get(ctx);
-        Logger.getLogger("buttplug").warning("recieved client result");
 
         try {
-            ButtplugProtoUtil.protobufResultHandler(future, ptr, len);
+            ButtplugProtoUtil.protobufResultHandler(future, ptr, len.intValue());
         } finally {
             resultReferenceManager.remove(ctx);
         }

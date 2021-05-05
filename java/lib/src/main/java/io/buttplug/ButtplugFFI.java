@@ -1,73 +1,73 @@
 package io.buttplug;
 
-import jnr.ffi.LibraryLoader;
-import jnr.ffi.ObjectReferenceManager;
-import jnr.ffi.Pointer;
-import jnr.ffi.Runtime;
-import jnr.ffi.annotations.Delegate;
-import jnr.ffi.annotations.Pinned;
-import jnr.ffi.types.int32_t;
-import jnr.ffi.types.u_int32_t;
+import com.sun.jna.*;
 
 import java.lang.FunctionalInterface;
-import java.nio.ByteBuffer;
+import java.lang.reflect.Method;
 
 public class ButtplugFFI {
+    public static class int32_t extends IntegerType {
+        public static final int32_t ZERO = new int32_t();
+
+        private static final long serialVersionUID = 1L;
+
+        public int32_t() {
+            this(0);
+        }
+        public int32_t(long value) {
+            // 4*8 == 32 bits
+            super(4, value, false);
+        }
+    }
+
+    public static class uint32_t extends IntegerType {
+        public static final uint32_t ZERO = new uint32_t();
+
+        private static final long serialVersionUID = 1L;
+
+        public uint32_t() {
+            this(0);
+        }
+        public uint32_t(long value) {
+            super(4, value, false);
+        }
+    }
+
     // type FFICallback = extern "C" fn(*mut c_void, *const u8, u32);
     @FunctionalInterface
-    interface FFICallback {
-        @Delegate void callback(Pointer ctx, Pointer ptr, @u_int32_t int len);
+    interface FFICallback extends Callback {
+        void callback(Pointer ctx, Pointer ptr, uint32_t len);
     }
 
-    // package private so that ButtplugClient and ButtplugDevice can make use of it
-    public interface LibButtplug {
-        // ButtplugClient
-        Pointer buttplug_create_protobuf_client(String client_name, FFICallback callback, Pointer ctx);
-        void buttplug_free_client(Pointer client);
-        void buttplug_client_protobuf_message(Pointer client, @Pinned byte[] buf, @int32_t int buf_len, FFICallback callback, Pointer ctx);
+    // ButtplugClient
+    static native Pointer buttplug_create_protobuf_client(String client_name, FFICallback callback, Pointer ctx);
+    static native void buttplug_free_client(Pointer client);
+    static native void buttplug_client_protobuf_message(Pointer client, byte[] buf, int32_t buf_len, FFICallback callback, Pointer ctx);
 
-        // ButtplugDevice
-        Pointer buttplug_create_device(Pointer client, @u_int32_t int index);
-        void buttplug_device_protobuf_message(Pointer device, @Pinned byte[] buf, @int32_t int buf_len, FFICallback callback, Pointer ctx);
-        void buttplug_free_device(Pointer device);
+    // ButtplugDevice
+    static native Pointer buttplug_create_device(Pointer client, uint32_t index);
+    static native void buttplug_device_protobuf_message(Pointer device, byte[] buf, int32_t buf_len, FFICallback callback, Pointer ctx);
+    static native void buttplug_free_device(Pointer device);
 
-        // ButtplugLogHandler
-        void buttplug_activate_env_logger();
-        Pointer buttplug_create_log_handle(ButtplugLogHandler.LogFFICallback callback, Pointer ctx, String max_level, boolean use_json);
-        void buttplug_free_log_handle(Pointer log_handle);
-    }
+    // ButtplugLogHandler
+    static native Pointer buttplug_create_log_handle(ButtplugLogHandler.LogFFICallback callback, Pointer ctx, String max_level, boolean use_json);
+    static native void buttplug_free_log_handle(Pointer log_handle);
 
-    private static LibButtplug buttplug_instance;
-    private static ObjectReferenceManager<ButtplugClient> clientReferenceManager;
-
-    static LibButtplug getButtplugInstance() {
-        if (buttplug_instance == null) {
-            synchronized (LibButtplug.class) {
-                // check again, in case of race.
-                if (buttplug_instance == null) {
-                    buttplug_instance = LibraryLoader.create(LibButtplug.class)
-                            .search("/home/kitlith/src/buttplug-rs-ffi/ffi/target/debug/")
-                            .load("buttplug_rs_ffi");
-                }
-            }
-        }
-
-        return buttplug_instance;
-    }
-
-    static ObjectReferenceManager<ButtplugClient> getClientReferenceManager() {
-        if (clientReferenceManager == null) {
-            synchronized (LibButtplug.class) {
-                if (clientReferenceManager == null) {
-                    clientReferenceManager = Runtime.getRuntime(getButtplugInstance()).newObjectReferenceManager();
-                }
-            }
-        }
-
-        return clientReferenceManager;
-    }
-
+    private static native void buttplug_activate_env_logger();
     public static void activate_env_logger() {
-        getButtplugInstance().buttplug_activate_env_logger();
+        buttplug_activate_env_logger();
+    }
+
+    static {
+        // TODO: put shared objects under "${os-prefix}/LIBRARY_FILENAME"
+        try {
+            Method getNativeLibraryResourcePrefix = Platform.class.getDeclaredMethod("getNativeLibraryResourcePrefix");
+            getNativeLibraryResourcePrefix.setAccessible(true);
+            System.out.println((String)getNativeLibraryResourcePrefix.invoke(null));
+        } catch (Throwable ex) {
+            // do nothing
+        }
+
+        Native.register("buttplug_rs_ffi");
     }
 }
