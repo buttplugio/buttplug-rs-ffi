@@ -1,9 +1,5 @@
-trigger:
-  branches:
-    exclude: ['*']
-  tags:
-    exclude: ['*']
-
+trigger: none
+ 
 jobs:
  - template: build/default.yml
    parameters:
