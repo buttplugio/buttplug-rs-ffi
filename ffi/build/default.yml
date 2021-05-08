@@ -158,7 +158,7 @@ jobs:
      - task: PublishPipelineArtifact@0
        inputs:
          targetPath: '$(Build.ArtifactStagingDirectory)'
-         artifactName: 'artifacts'           
+         artifactName: 'artifacts-$(Agent.OS)'       
  - ${{ if ne('', parameters.codecov_token) }}:
    - template: coverage.yml@templates
      parameters:
