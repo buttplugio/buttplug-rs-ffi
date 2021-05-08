@@ -119,25 +119,24 @@ jobs:
        condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))       
        inputs:
          contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.dll"
-         targetFolder: "$(System.DefaultWorkingDirectory)/ffi/"
+         targetFolder: "$(Build.ArtifactStagingDirectory)"
          flattenFolders: true
-         cleanTargetFolder: true
+
      - task: CopyFiles@2
        displayName: "Copy DLL (macOS)"
        condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin'))
        inputs:
          contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.dylib"
-         targetFolder: "$(System.DefaultWorkingDirectory)/ffi"
+         targetFolder: "$(Build.ArtifactStagingDirectory)"
          flattenFolders: true
-         cleanTargetFolder: true
+
      - task: CopyFiles@2
        displayName: "Copy DLL (Linux)"
-       condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin'))
+       condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
        inputs:
-         contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.dylib"
-         targetFolder: "$(System.DefaultWorkingDirectory)/ffi"
+         contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.so"
+         targetFolder: "$(Build.ArtifactStagingDirectory)"
          flattenFolders: true
-         cleanTargetFolder: true
      - task: ArchiveFiles@2
        displayName: "Archive nuget package"
        condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
