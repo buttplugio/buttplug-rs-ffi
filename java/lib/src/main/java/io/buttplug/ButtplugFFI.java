@@ -63,28 +63,10 @@ public class ButtplugFFI {
     static native void buttplug_activate_env_logger();
 
     static {
-        // TODO: put shared objects under "${os-prefix}/LIBRARY_FILENAME"
         try {
             Native.register("buttplug_rs_ffi");
         } catch (Throwable ex) {
-            throw new RuntimeException("Missing natives for platform: '" + getNativeLibraryResourcePrefix() + "'", ex);
-        }
-    }
-
-    /**
-     * Can't make up my mind on whether other people should be able to call this or not.
-     *
-     * Uses reflection to pull the native library prefix from JNA.
-     *
-     * @return the prefix used to locate the native libraries for the current platform
-     */
-    public static String getNativeLibraryResourcePrefix() {
-        try {
-            Method getNativeLibraryResourcePrefix = Platform.class.getDeclaredMethod("getNativeLibraryResourcePrefix");
-            getNativeLibraryResourcePrefix.setAccessible(true);
-            return (String)getNativeLibraryResourcePrefix.invoke(null);
-        } catch (Throwable ex) {
-            return null;
+            throw new RuntimeException("Missing natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
         }
     }
 }
