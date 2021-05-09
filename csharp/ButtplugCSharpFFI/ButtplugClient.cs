@@ -14,7 +14,7 @@ namespace Buttplug
         /// <summary>
         /// Name of the client, used for server UI/permissions.
         /// </summary>
-        public readonly string Name;
+        public string Name { get; }
 
         public bool Connected { get; private set; } = false;
 

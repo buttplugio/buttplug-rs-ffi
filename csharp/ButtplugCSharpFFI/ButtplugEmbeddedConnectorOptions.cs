@@ -6,16 +6,16 @@ namespace Buttplug
 {
     public class ButtplugEmbeddedConnectorOptions
     {
-        public string ServerName = "Buttplug C# Embedded Server";
+        public string ServerName { get; set; } = "Buttplug C# Embedded Server";
         // Empty string means ignore.
-        public string DeviceConfigJSON = "";
+        public string DeviceConfigJSON { get; set; } = "";
         // Empty string means ignore.
-        public string UserDeviceConfigJSON = "";
+        public string UserDeviceConfigJSON { get; set; } = "";
         // 0 here means all device.
-        public ushort DeviceCommunicationManagerTypes = 0;
+        public ushort DeviceCommunicationManagerTypes { get; set; } = 0;
         // Always opt-in on raw messages.
-        public bool AllowRawMessages = false;
-        public uint MaxPingTime = 0;
+        public bool AllowRawMessages { get; set; } = false;
+        public uint MaxPingTime { get; set; } = 0;
 
         public ButtplugEmbeddedConnectorOptions()
         {

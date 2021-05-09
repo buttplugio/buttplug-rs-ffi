@@ -6,12 +6,12 @@ namespace Buttplug
 {
     public class ButtplugMessageAttributes
     {
-        public readonly uint FeatureCount;
-        public readonly uint[] StepCount;
-        public readonly Endpoint[] Endpoints;
-        public readonly uint[] MaxDuration;
-        public readonly string[][] Patterns;
-        public readonly string[] ActuatorType;
+        public uint FeatureCount { get; }
+        public uint[] StepCount { get; }
+        public Endpoint[] Endpoints { get; }
+        public uint[] MaxDuration { get; }
+        public string[][] Patterns { get; }
+        public string[] ActuatorType { get; }
 
         public ButtplugMessageAttributes(uint aFeatureCount, uint[] aStepCount, Endpoint[] aEndpoints, uint[] aMaxDuration, string[][] aPatterns, string[] aActuatorType) 
         {

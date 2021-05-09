@@ -15,7 +15,7 @@ namespace Buttplug
         /// <summary>
         /// The client representation of a Buttplug Device.
         /// </summary>
-        public readonly ButtplugClientDevice Device;
+        public ButtplugClientDevice Device { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceRemovedEventArgs"/> class.
