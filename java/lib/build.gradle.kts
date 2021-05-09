@@ -11,7 +11,7 @@ import com.google.protobuf.gradle.*
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
-    `idea`
+    idea
     id("com.google.protobuf") version "0.8.8"
 }
 
@@ -26,6 +26,21 @@ java {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    // grab and cache things from buttplug github releases
+    val github = ivy {
+        url = uri("https://github.com/")
+        patternLayout {
+            artifact("/[organisation]/buttplug-rs-ffi/releases/download/[revision]/[module].[ext]")
+        }
+        metadataSources { artifact() }
+    }
+    // only grab stuff from the buttplug-rs-ffi repo
+    exclusiveContent {
+        forRepositories(github)
+        filter {
+            includeGroup("buttplugio")
+        }
+    }
 }
 
 sourceSets {
@@ -35,6 +50,10 @@ sourceSets {
         }
     }
 }
+
+val ffiObject: Configuration by configurations.creating
+
+val buttplugFfiVersion = "core-2.0.1"
 
 dependencies {
     // Use JUnit Jupiter API for testing.
@@ -46,6 +65,33 @@ dependencies {
     // ffi
     implementation("net.java.dev.jna:jna:5.8.0")
     implementation("com.google.protobuf:protobuf-java:3.6.1")
+
+    // ffi shared objects, classifiers represent the target directory.
+    ffiObject(group = "buttplugio", name = "buttplug_rs_ffi-lib-linux-x64", ext = "zip", classifier = "linux-x86-64", version = buttplugFfiVersion)
+    ffiObject(group = "buttplugio", name = "buttplug_rs_ffi-lib-macos-x64", ext = "zip", classifier = "darwin-x86-64", version = buttplugFfiVersion)
+    ffiObject(group = "buttplugio", name = "buttplug_rs_ffi-lib-win-x64", ext = "zip", classifier = "win32-x86-64", version = buttplugFfiVersion)
+}
+
+// for each shared object:
+ffiObject.resolvedConfiguration.resolvedArtifacts.forEach {
+    // retrieve the platform name that JNA uses
+    val targetFolder = it.classifier
+    // unzip into the correct folder
+    val unzipTask = tasks.register<Copy>("unzip-$targetFolder") {
+        from(zipTree(it.file))
+        into(file("${buildDir}/generated/source/ffi-objects/main/resources/$targetFolder"))
+    }
+    // ensure that they're ready in time for resources to be put in the jar
+    tasks.processResources {
+        dependsOn(unzipTask)
+    }
+}
+
+sourceSets.main {
+    resources {
+        // include the folder that has the shared object resources
+        srcDir(file("${buildDir}/generated/source/ffi-objects/main/resources"))
+    }
 }
 
 protobuf {
