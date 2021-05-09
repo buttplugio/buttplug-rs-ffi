@@ -14,12 +14,12 @@ namespace Buttplug
         /// If a device is removed, this may be the only populated field. If the same device
         /// reconnects, the index should be reused.
         /// </remarks>
-        public readonly uint Index;
+        public uint Index { get; }
 
         /// <summary>
         /// The device name, which usually contains the device brand and model.
         /// </summary>
-        public readonly string Name;
+        public string Name { get; }
 
         /// <summary>
         /// The Buttplug Protocol messages supported by this device, with additional attributes.
