@@ -8,8 +8,8 @@ namespace Buttplug
 {
     public class ButtplugClient : IDisposable
     {
-        private readonly static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
-        private readonly static uint _clientCounter = 1;
+        private static readonly Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
+        private static readonly uint _clientCounter = 1;
 
         private readonly ButtplugFFIMessageSorter _messageSorter;
         private readonly ButtplugFFIClientHandle _clientHandle;
@@ -128,7 +128,7 @@ namespace Buttplug
             Connected = false;
         }
 
-        static protected void StaticSorterCallback(IntPtr ctx, IntPtr buf, int buf_length)
+        protected static void StaticSorterCallback(IntPtr ctx, IntPtr buf, int buf_length)
         {
             GCHandle indexHandle = GCHandle.FromIntPtr(ctx);
             uint index = (uint)indexHandle.Target;

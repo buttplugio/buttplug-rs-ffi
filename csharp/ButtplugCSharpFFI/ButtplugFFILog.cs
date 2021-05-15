@@ -45,7 +45,7 @@ namespace Buttplug
     {
         // If we don't hold a reference to our log callback that lives for the lifetime of the process, we'll
         // get gc'd while in native code and that will be Bad (usually we'll get an exception before that).
-        private readonly static ButtplugLogCallback _logCallback = OnLogMessage;
+        private static readonly ButtplugLogCallback _logCallback = OnLogMessage;
 
         private static ButtplugFFILogHandle _logHandle;
         private static bool _logHandleSet;
