@@ -16,9 +16,5 @@ namespace Buttplug
         // Always opt-in on raw messages.
         public bool AllowRawMessages { get; set; } = false;
         public uint MaxPingTime { get; set; } = 0;
-
-        public ButtplugEmbeddedConnectorOptions()
-        {
-        }
     }
 }
