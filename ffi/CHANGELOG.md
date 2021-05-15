@@ -1,3 +1,13 @@
+# 2.0.2 (2021/05/15)
+
+## Features
+
+- CI now builds for all platforms, so we can upload artifacts for other FFI systems
+
+## Bugfixes
+
+- #76: Remove Drop impls that could cause crashes if logging is turned on.
+
 # 2.0.1 (2021/04/24)
 
 ## Bugfixes
