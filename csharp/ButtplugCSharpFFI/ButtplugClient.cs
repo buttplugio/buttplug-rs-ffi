@@ -16,7 +16,7 @@ namespace Buttplug
         /// </summary>
         public string Name { get; }
 
-        public bool Connected { get; private set; } = false;
+        public bool Connected { get; private set; }
 
         private readonly ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
 
