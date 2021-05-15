@@ -49,7 +49,7 @@ namespace Buttplug
 
     }
 
-    internal class ButtplugFFICalls
+    internal static class ButtplugFFICalls
     {
         [DllImport("buttplug_rs_ffi")]
         internal static extern ButtplugFFIClientHandle buttplug_create_protobuf_client(string client_name, ButtplugCallback callback, IntPtr ctx);
@@ -73,7 +73,7 @@ namespace Buttplug
         internal static extern void buttplug_activate_env_logger();
     }
 
-    internal class ButtplugFFI
+    internal static class ButtplugFFI
     {
         internal static ButtplugFFIClientHandle SendCreateClient(string aClientName, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {

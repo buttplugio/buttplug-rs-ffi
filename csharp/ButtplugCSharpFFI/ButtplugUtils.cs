@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Buttplug
 {
-    public class ButtplugUtils
+    public static class ButtplugUtils
     {
         public static void ActivateEnvLogger()
         {

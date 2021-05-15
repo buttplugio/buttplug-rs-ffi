@@ -17,7 +17,7 @@ namespace Buttplug
         Trace,
     }
 
-    internal class ButtplugFFILogCalls
+    internal static class ButtplugFFILogCalls
     {
         [DllImport("buttplug_rs_ffi")]
         internal static extern ButtplugFFILogHandle buttplug_create_log_handle(ButtplugLogCallback callback, IntPtr ctx, string level, bool aUseJSON);

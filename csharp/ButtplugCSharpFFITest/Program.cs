@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace ButtplugCSharpFFITest
 {
-    class Program
+    public static class Program
     {
         private static async Task WaitForKey()
         {
