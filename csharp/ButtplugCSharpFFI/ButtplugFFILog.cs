@@ -53,9 +53,9 @@ namespace Buttplug
     {
         // If we don't hold a reference to our log callback that lives for the lifetime of the process, we'll
         // get gc'd while in native code and that will be Bad (usually we'll get an exception before that).
-        private readonly static ButtplugLogCallback LogCallback = OnLogMessage;
-        private static ButtplugFFILogHandle LogHandle = null;
-        private static bool LogHandleSet = false;
+        private readonly static ButtplugLogCallback _logCallback = OnLogMessage;
+        private static ButtplugFFILogHandle _logHandle = null;
+        private static bool _logHandleSet = false;
 
         public static event EventHandler<string> LogMessage;
 
@@ -73,20 +73,20 @@ namespace Buttplug
         {
             if (aMaxLevel != ButtplugLogLevel.Off)
             {
-                if (LogHandleSet)
+                if (_logHandleSet)
                 {
                     throw new InvalidOperationException("Cannot set logging options twice (this is a bug, will be fixed at some point, see https://github.com/buttplugio/buttplug-rs-ffi/issues/23).");
                 }
 
-                LogHandle = ButtplugFFILogCalls.ButtplugCreateLogHandle(LogCallback, IntPtr.Zero, aMaxLevel.ToString(), aUseJSON);
-                LogHandleSet = true;
+                _logHandle = ButtplugFFILogCalls.ButtplugCreateLogHandle(_logCallback, IntPtr.Zero, aMaxLevel.ToString(), aUseJSON);
+                _logHandleSet = true;
             }
             else
             {
-                if (LogHandle != null)
+                if (_logHandle != null)
                 {
-                    LogHandle.Dispose();
-                    LogHandle = null;
+                    _logHandle.Dispose();
+                    _logHandle = null;
                 }
             }
         }
