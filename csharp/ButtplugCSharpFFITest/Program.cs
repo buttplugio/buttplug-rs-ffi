@@ -27,7 +27,7 @@ namespace ButtplugCSharpFFITest
             ButtplugFFILog.LogMessage += (aObj, aMsg) => { Console.WriteLine($"LOG: {aMsg}"); };
             ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Info, true);
             var client = new ButtplugClient("Test Client");
-            client.DeviceAdded += async (obj, args) =>
+            client.DeviceAdded += (obj, args) =>
             {
                 var device = args.Device;
                 Console.WriteLine($"Device Added: {device.Name}");
