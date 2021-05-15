@@ -5,7 +5,7 @@ namespace Buttplug
 {
     
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    delegate void ButtplugLogCallback(IntPtr ctx, string aLogMsg);
+    public delegate void ButtplugLogCallback(IntPtr ctx, string aLogMsg);
 
     public enum ButtplugLogLevel
     {

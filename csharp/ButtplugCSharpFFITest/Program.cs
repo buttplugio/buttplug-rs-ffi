@@ -102,7 +102,7 @@ namespace ButtplugCSharpFFITest
             await WaitForKey();
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             // ButtplugUtils.ActivateEnvLogger();
              RunExample().Wait();

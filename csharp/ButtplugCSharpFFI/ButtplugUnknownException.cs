@@ -2,7 +2,7 @@
 
 namespace Buttplug
 {
-    class ButtplugUnknownException : ButtplugException
+    public class ButtplugUnknownException : ButtplugException
     {
         /// <inheritdoc />
         public ButtplugUnknownException()
