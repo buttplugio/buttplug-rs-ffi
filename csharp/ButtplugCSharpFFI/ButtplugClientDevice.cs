@@ -26,12 +26,12 @@ namespace Buttplug
         /// </summary>
         public Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes> AllowedMessages { get; }
 
-        private ButtplugFFIMessageSorter Sorter;
+        private readonly ButtplugFFIMessageSorter Sorter;
 
-        private ButtplugFFIDeviceHandle Handle;
+        private readonly ButtplugFFIDeviceHandle Handle;
 
-        private ButtplugCallback SorterCallback;
-        private IntPtr SorterCallbackCtx;
+        private readonly ButtplugCallback SorterCallback;
+        private readonly IntPtr SorterCallbackCtx;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtplugClientDevice"/> class, using
