@@ -3,46 +3,31 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using Google.Protobuf;
+using Microsoft.Win32.SafeHandles;
 
 namespace Buttplug
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void ButtplugCallback(IntPtr ctx, IntPtr buf, int buf_length);
 
-    internal class ButtplugFFIClientHandle : SafeHandle
+    internal class ButtplugFFIClientHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public ButtplugFFIClientHandle() : base(IntPtr.Zero, true) { }
-
-        public override bool IsInvalid
-        {
-            get { return this.handle == IntPtr.Zero; }
-        }
+        public ButtplugFFIClientHandle() : base(true) { }
 
         protected override bool ReleaseHandle()
         {
-            if (!this.IsInvalid)
-            {
-                ButtplugFFICalls.ButtplugFreeClient(handle);
-            }
+            ButtplugFFICalls.ButtplugFreeClient(handle);
             return true;
         }
     }
 
-    internal class ButtplugFFIDeviceHandle : SafeHandle
+    internal class ButtplugFFIDeviceHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public ButtplugFFIDeviceHandle() : base(IntPtr.Zero, true) { }
-
-        public override bool IsInvalid
-        {
-            get { return this.handle == IntPtr.Zero; }
-        }
+        public ButtplugFFIDeviceHandle() : base(true) { }
 
         protected override bool ReleaseHandle()
         {
-            if (!this.IsInvalid)
-            {
-                ButtplugFFICalls.ButtplugFreeDevice(handle);
-            }
+            ButtplugFFICalls.ButtplugFreeDevice(handle);
             return true;
         }
     }
