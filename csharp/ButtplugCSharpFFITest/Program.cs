@@ -12,7 +12,7 @@ namespace ButtplugCSharpFFITest
             Console.WriteLine("Press any key to continue.");
             while (!Console.KeyAvailable)
             {
-                await Task.Delay(10);
+                await Task.Delay(10).ConfigureAwait(false);
             }
             Console.ReadKey(true);
         }
@@ -56,7 +56,7 @@ namespace ButtplugCSharpFFITest
             };
             var options = new Buttplug.ButtplugEmbeddedConnectorOptions();
             //options.AllowRawMessages = true;
-            await client.ConnectAsync(options);
+            await client.ConnectAsync(options).ConfigureAwait(false);
             /*
             await client.ConnectAsync(new Buttplug.ButtplugWebsocketConnectorOptions(new Uri("ws://localhost:12345")));
             await client.StartScanningAsync();
@@ -72,11 +72,11 @@ namespace ButtplugCSharpFFITest
             await WaitForKey();
             await client.ConnectAsync(new Buttplug.ButtplugWebsocketConnectorOptions(new Uri("ws://localhost:12345")));
             */
-            await client.StartScanningAsync();
+            await client.StartScanningAsync().ConfigureAwait(false);
             Console.WriteLine($"Is Scanning: {client.IsScanning}");
-            await WaitForKey();
+            await WaitForKey().ConfigureAwait(false);
 //            ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Debug, true);
-            await client.StopScanningAsync();
+            await client.StopScanningAsync().ConfigureAwait(false);
             /*
             while (true) {
                 foreach (var device in client.Devices) {
@@ -93,13 +93,13 @@ namespace ButtplugCSharpFFITest
                 }
             }
             */
-            await WaitForKey();
+            await WaitForKey().ConfigureAwait(false);
             Console.WriteLine("killing log?");
             ButtplugFFILog.SetLogOptions(ButtplugLogLevel.Off, true);
-            await WaitForKey();
+            await WaitForKey().ConfigureAwait(false);
             client.Dispose();
             client = null;
-            await WaitForKey();
+            await WaitForKey().ConfigureAwait(false);
         }
 
         public static void Main(string[] args)
