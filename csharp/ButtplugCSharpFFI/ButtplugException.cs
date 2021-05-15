@@ -50,6 +50,7 @@ namespace Buttplug
                 case ServerMessage.Types.ButtplugErrorType.ButtplugDeviceError:
                     return new ButtplugDeviceException(err_str);
             }
+
             return new ButtplugUnknownException($"Unknown error type: {aMsg.ErrorType} | Message: {aMsg.Message}");
         }
     }

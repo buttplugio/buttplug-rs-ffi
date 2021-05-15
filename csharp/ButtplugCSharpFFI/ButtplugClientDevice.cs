@@ -8,9 +8,7 @@ namespace Buttplug
     public class ButtplugClientDevice : IDisposable
     {
         private readonly ButtplugFFIMessageSorter Sorter;
-
         private readonly ButtplugFFIDeviceHandle Handle;
-
         private readonly ButtplugCallback SorterCallback;
         private readonly IntPtr SorterCallbackCtx;
 
@@ -75,6 +73,7 @@ namespace Buttplug
             {
                 count = AllowedMessages[ServerMessage.Types.MessageAttributeType.VibrateCmd].FeatureCount;
             }
+
             // There is probably a cleaner, LINQyer way to do this but ugh don't care.
             var commandDict = new Dictionary<uint, double>();
             for (var i = 0u; i < count; ++i)
@@ -103,12 +102,14 @@ namespace Buttplug
             {
                 count = AllowedMessages[ServerMessage.Types.MessageAttributeType.RotateCmd].FeatureCount;
             }
+
             // There is probably a cleaner, LINQyer way to do this but ugh don't care.
             var commandDict = new Dictionary<uint, (double, bool)>();
             for (var i = 0u; i < count; ++i)
             {
                 commandDict.Add(i, (aSpeed, aClockwise));
             }
+
             return SendRotateCmd(commandDict);
         }
 
@@ -130,12 +131,14 @@ namespace Buttplug
             {
                 count = AllowedMessages[ServerMessage.Types.MessageAttributeType.LinearCmd].FeatureCount;
             }
+
             // There is probably a cleaner, LINQyer way to do this but ugh don't care.
             var commandDict = new Dictionary<uint, (uint, double)>();
             for (var i = 0u; i < count; ++i)
             {
                 commandDict.Add(i, (aDuration, aPosition));
             }
+
             return SendLinearCmd(commandDict);
         }
 
@@ -153,10 +156,13 @@ namespace Buttplug
         {
             var reading = await ButtplugFFI.SendBatteryLevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx)
                                            .ConfigureAwait(false);
-            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.BatteryLevelReading)
+
+            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent
+             && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.BatteryLevelReading)
             {
                 return reading.Message.DeviceEvent.BatteryLevelReading.Reading;
             }
+
             throw new ButtplugDeviceException($"Expected message type of BatteryLevelReading not received, got {reading.Message.MsgCase} instead.");
         }
 
@@ -164,10 +170,13 @@ namespace Buttplug
         {
             var reading = await ButtplugFFI.SendRSSILevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx)
                                            .ConfigureAwait(false);
-            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RssiLevelReading)
+
+            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent
+             && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RssiLevelReading)
             {
                 return reading.Message.DeviceEvent.RssiLevelReading.Reading;
             }
+
             throw new ButtplugDeviceException($"Expected message type of RssiLevelReading not received, got {reading.Message.MsgCase} instead.");
         }
 
@@ -175,10 +184,13 @@ namespace Buttplug
         {
             var reading = await ButtplugFFI.SendRawReadCmd(Sorter, Handle, Index, aEndpoint, aExpectedLength, aTimeout, SorterCallback, SorterCallbackCtx)
                                            .ConfigureAwait(false);
-            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RawReading)
+
+            if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent
+             && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RawReading)
             {
                 return reading.Message.DeviceEvent.RawReading.Data.ToArray();
             }
+
             throw new ButtplugDeviceException($"Expected message type of RssiLevelReading not received, got {reading.Message.MsgCase} instead.");
         }
 
