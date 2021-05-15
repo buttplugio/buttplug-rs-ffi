@@ -13,7 +13,7 @@ namespace Buttplug
         public string[][] Patterns { get; }
         public string[] ActuatorType { get; }
 
-        public ButtplugMessageAttributes(uint aFeatureCount, uint[] aStepCount, Endpoint[] aEndpoints, uint[] aMaxDuration, string[][] aPatterns, string[] aActuatorType) 
+        public ButtplugMessageAttributes(uint aFeatureCount, uint[] aStepCount, Endpoint[] aEndpoints, uint[] aMaxDuration, string[][] aPatterns, string[] aActuatorType)
         {
             FeatureCount = aFeatureCount;
             StepCount = aStepCount;
