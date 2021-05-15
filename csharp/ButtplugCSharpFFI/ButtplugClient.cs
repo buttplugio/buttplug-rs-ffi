@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +21,7 @@ namespace Buttplug
         private readonly ButtplugCallback _sorterCallbackDelegate;
 
         // To detect redundant calls
-        private bool _disposed = false;
+        private bool _disposed;
         private GCHandle _indexHandle;
 
         public ButtplugClientDevice[] Devices => _devices.Values.ToArray();
