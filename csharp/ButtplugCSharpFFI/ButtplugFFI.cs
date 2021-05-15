@@ -340,16 +340,17 @@ namespace Buttplug
         {
             var msg = new DeviceMessage
             {
-                Message = new DeviceMessage.Types.FFIMessage(),
-                Index = aDeviceIndex
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    RawReadCmd = new DeviceMessage.Types.RawReadCmd
+                    {
+                        Endpoint = aEndpoint,
+                        ExpectedLength = aLength,
+                        Timeout = aTimeout
+                    }
+                }
             };
-            var cmd = new DeviceMessage.Types.RawReadCmd {
-                Endpoint = aEndpoint,
-                ExpectedLength = aLength,
-                Timeout = aTimeout
-            };
-            msg.Message.RawReadCmd = cmd;
-
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -357,16 +358,17 @@ namespace Buttplug
         {
             var msg = new DeviceMessage
             {
-                Message = new DeviceMessage.Types.FFIMessage(),
-                Index = aDeviceIndex
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    RawWriteCmd = new DeviceMessage.Types.RawWriteCmd
+                    {
+                        Endpoint = aEndpoint,
+                        Data = ByteString.CopyFrom(aData),
+                        WriteWithResponse = aWriteWithResponse
+                    }
+                }
             };
-            var cmd = new DeviceMessage.Types.RawWriteCmd
-            {
-                Endpoint = aEndpoint,
-                Data = ByteString.CopyFrom(aData),
-                WriteWithResponse = aWriteWithResponse
-            };
-            msg.Message.RawWriteCmd = cmd;
 
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
@@ -375,14 +377,15 @@ namespace Buttplug
         {
             var msg = new DeviceMessage
             {
-                Message = new DeviceMessage.Types.FFIMessage(),
-                Index = aDeviceIndex
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    RawSubscribeCmd = new DeviceMessage.Types.RawSubscribeCmd
+                    {
+                        Endpoint = aEndpoint,
+                    }
+                }
             };
-            var cmd = new DeviceMessage.Types.RawSubscribeCmd
-            {
-                Endpoint = aEndpoint,
-            };
-            msg.Message.RawSubscribeCmd = cmd;
 
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
@@ -391,14 +394,15 @@ namespace Buttplug
         {
             var msg = new DeviceMessage
             {
-                Message = new DeviceMessage.Types.FFIMessage(),
-                Index = aDeviceIndex
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    RawUnsubscribeCmd = new DeviceMessage.Types.RawUnsubscribeCmd
+                    {
+                        Endpoint = aEndpoint,
+                    }
+                }
             };
-            var cmd = new DeviceMessage.Types.RawUnsubscribeCmd
-            {
-                Endpoint = aEndpoint,
-            };
-            msg.Message.RawUnsubscribeCmd = cmd;
 
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
