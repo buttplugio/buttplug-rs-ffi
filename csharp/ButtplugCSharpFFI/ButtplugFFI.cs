@@ -22,7 +22,7 @@ namespace Buttplug
         {
             if (!this.IsInvalid)
             {
-                ButtplugFFICalls.buttplug_free_client(handle);
+                ButtplugFFICalls.ButtplugFreeClient(handle);
             }
             return true;
         }
@@ -41,7 +41,7 @@ namespace Buttplug
         {
             if (!this.IsInvalid)
             {
-                ButtplugFFICalls.buttplug_free_device(handle);
+                ButtplugFFICalls.ButtplugFreeDevice(handle);
             }
             return true;
         }
@@ -49,40 +49,40 @@ namespace Buttplug
 
     internal static class ButtplugFFICalls
     {
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern ButtplugFFIClientHandle buttplug_create_protobuf_client(string client_name, ButtplugCallback callback, IntPtr ctx);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_create_protobuf_client")]
+        internal static extern ButtplugFFIClientHandle ButtplugCreateProtobufClient(string client_name, ButtplugCallback callback, IntPtr ctx);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_free_client(IntPtr client_handle);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_free_client")]
+        internal static extern void ButtplugFreeClient(IntPtr client_handle);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_client_protobuf_message(ButtplugFFIClientHandle client_handle, byte[] buf, int buf_length, ButtplugCallback callback, IntPtr ctx);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_client_protobuf_message")]
+        internal static extern void ButtplugClientProtobufMessage(ButtplugFFIClientHandle client_handle, byte[] buf, int buf_length, ButtplugCallback callback, IntPtr ctx);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern ButtplugFFIDeviceHandle buttplug_create_device(ButtplugFFIClientHandle client_handle, uint device_index);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_create_device")]
+        internal static extern ButtplugFFIDeviceHandle ButtplugCreateDevice(ButtplugFFIClientHandle client_handle, uint device_index);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_device_protobuf_message(ButtplugFFIDeviceHandle client_handle, byte[] buf, int buf_length, ButtplugCallback callback, IntPtr ctx);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_device_protobuf_message")]
+        internal static extern void ButtplugDeviceProtobufMessage(ButtplugFFIDeviceHandle client_handle, byte[] buf, int buf_length, ButtplugCallback callback, IntPtr ctx);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_free_device(IntPtr device_handle);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_free_device")]
+        internal static extern void ButtplugFreeDevice(IntPtr device_handle);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_activate_env_logger();
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_activate_env_logger")]
+        internal static extern void ButtplugActivateEnvLogger();
     }
 
     internal static class ButtplugFFI
     {
         internal static ButtplugFFIClientHandle SendCreateClient(string aClientName, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            return ButtplugFFICalls.buttplug_create_protobuf_client(aClientName, aCallback, aCallbackCtx);
+            return ButtplugFFICalls.ButtplugCreateProtobufClient(aClientName, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendClientMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ClientMessage aMsg, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
             var task = aSorter.PrepareClientMessage(aMsg);
             var buf = aMsg.ToByteArray();
-            ButtplugFFICalls.buttplug_client_protobuf_message(aHandle, buf, buf.Length, aCallback, aCallbackCtx);
+            ButtplugFFICalls.ButtplugClientProtobufMessage(aHandle, buf, buf.Length, aCallback, aCallbackCtx);
             return task;
         }
 
@@ -193,14 +193,14 @@ namespace Buttplug
 
         internal static ButtplugFFIDeviceHandle SendCreateDevice(ButtplugFFIClientHandle aHandle, uint aDeviceIndex)
         {
-            return ButtplugFFICalls.buttplug_create_device(aHandle, aDeviceIndex);
+            return ButtplugFFICalls.ButtplugCreateDevice(aHandle, aDeviceIndex);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendDeviceMessage(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, DeviceMessage aMsg, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
             var task = aSorter.PrepareDeviceMessage(aMsg);
             var buf = aMsg.ToByteArray();
-            ButtplugFFICalls.buttplug_device_protobuf_message(aHandle, buf, buf.Length, aCallback, aCallbackCtx);
+            ButtplugFFICalls.ButtplugDeviceProtobufMessage(aHandle, buf, buf.Length, aCallback, aCallbackCtx);
             return task;
         }
 
@@ -385,7 +385,7 @@ namespace Buttplug
 
         internal static void ActivateEnvLogger()
         {
-            ButtplugFFICalls.buttplug_activate_env_logger();
+            ButtplugFFICalls.ButtplugActivateEnvLogger();
         }
     }
 }
