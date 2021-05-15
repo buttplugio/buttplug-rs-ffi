@@ -98,68 +98,96 @@ namespace Buttplug
             ButtplugCallback aCallback,
             IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.ConnectLocal = new ClientMessage.Types.ConnectLocal
+            var msg = new ClientMessage
             {
-                ServerName = aServerName,
-                MaxPingTime = aMaxPingTime,
-                AllowRawMessages = aAllowRawMessages,
-                DeviceConfigurationJson = aDeviceConfigJSON ?? "",
-                UserDeviceConfigurationJson = aUserDeviceConfigJSON ?? "",
-                CommManagerTypes = aDeviceCommManagerTypes
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    ConnectLocal = new ClientMessage.Types.ConnectLocal
+                    {
+                        ServerName = aServerName,
+                        MaxPingTime = aMaxPingTime,
+                        AllowRawMessages = aAllowRawMessages,
+                        DeviceConfigurationJson = aDeviceConfigJSON ?? "",
+                        UserDeviceConfigurationJson = aUserDeviceConfigJSON ?? "",
+                        CommManagerTypes = aDeviceCommManagerTypes
+                    }
+                }
             };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendConnectWebsocket(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, string aAddress, bool aIgnoreCert, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.ConnectWebsocket = new ClientMessage.Types.ConnectWebsocket
+            var msg = new ClientMessage
             {
-                Address = aAddress,
-                BypassCertVerification = aIgnoreCert,
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    ConnectWebsocket = new ClientMessage.Types.ConnectWebsocket
+                    {
+                        Address = aAddress,
+                        BypassCertVerification = aIgnoreCert,
+                    }
+                }
             };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendDisconnect(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.Disconnect = new ClientMessage.Types.Disconnect();
+            var msg = new ClientMessage
+            {
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    Disconnect = new ClientMessage.Types.Disconnect()
+                }
+            };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStartScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.StartScanning = new ClientMessage.Types.StartScanning();
+            var msg = new ClientMessage
+            {
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    StartScanning = new ClientMessage.Types.StartScanning()
+                }
+            };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStopScanning(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.StopScanning = new ClientMessage.Types.StopScanning();
+            var msg = new ClientMessage
+            {
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    StopScanning = new ClientMessage.Types.StopScanning()
+                }
+            };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStopAllDevices(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.StopAllDevices = new ClientMessage.Types.StopAllDevices();
+            var msg = new ClientMessage
+            {
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    StopAllDevices = new ClientMessage.Types.StopAllDevices()
+                }
+            };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
         internal static Task<ButtplugFFIServerMessage> SendPing(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new ClientMessage();
-            msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.Ping = new ClientMessage.Types.Ping();
+            var msg = new ClientMessage
+            {
+                Message = new ClientMessage.Types.FFIMessage
+                {
+                    Ping = new ClientMessage.Types.Ping()
+                }
+            };
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -178,27 +206,31 @@ namespace Buttplug
 
         internal static Task<ButtplugFFIServerMessage> SendVibrateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, double> aSpeeds, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new DeviceMessage();
-            msg.Message = new DeviceMessage.Types.FFIMessage();
             var command_list = new List<DeviceMessage.Types.VibrateComponent>();
             foreach (var pair in aSpeeds)
             {
-                command_list.Add(new DeviceMessage.Types.VibrateComponent {
+                command_list.Add(new DeviceMessage.Types.VibrateComponent
+                {
                     Index = pair.Key,
                     Speed = pair.Value,
                 });
             }
-            msg.Index = aDeviceIndex;
-            var vibrate_cmd = new DeviceMessage.Types.VibrateCmd();
-            vibrate_cmd.Speeds.Add(command_list);
-            msg.Message.VibrateCmd = vibrate_cmd;
+            var cmd = new DeviceMessage.Types.VibrateCmd();
+            cmd.Speeds.Add(command_list);
+
+            var msg = new DeviceMessage
+            {
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    VibrateCmd = cmd
+                }
+            };
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendRotateCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, (double, bool)> aRotations, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new DeviceMessage();
-            msg.Message = new DeviceMessage.Types.FFIMessage();
             var command_list = new List<DeviceMessage.Types.RotateComponent>();
             foreach (var pair in aRotations)
             {
@@ -209,17 +241,22 @@ namespace Buttplug
                     Clockwise = pair.Value.Item2,
                 });
             }
-            msg.Index = aDeviceIndex;
             var cmd = new DeviceMessage.Types.RotateCmd();
             cmd.Rotations.Add(command_list);
-            msg.Message.RotateCmd = cmd;
+
+            var msg = new DeviceMessage
+            {
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    RotateCmd = cmd
+                }
+            };
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendLinearCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, Dictionary<uint, (uint, double)> aLinears, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new DeviceMessage();
-            msg.Message = new DeviceMessage.Types.FFIMessage();
             var command_list = new List<DeviceMessage.Types.LinearComponent>();
             foreach (var pair in aLinears)
             {
@@ -230,40 +267,56 @@ namespace Buttplug
                     Position = pair.Value.Item2,
                 });
             }
-            msg.Index = aDeviceIndex;
             var cmd = new DeviceMessage.Types.LinearCmd();
             cmd.Movements.Add(command_list);
-            msg.Message.LinearCmd = cmd;
+
+            var msg = new DeviceMessage
+            {
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    LinearCmd = cmd
+                }
+            };
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendStopDeviceCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new DeviceMessage();
-            msg.Message = new DeviceMessage.Types.FFIMessage();
-            msg.Index = aDeviceIndex;
-            var cmd = new DeviceMessage.Types.StopDeviceCmd();
-            msg.Message.StopDeviceCmd = cmd;
+            var msg = new DeviceMessage
+            {
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    StopDeviceCmd = new DeviceMessage.Types.StopDeviceCmd()
+                }
+            };
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendBatteryLevelCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new DeviceMessage();
-            msg.Message = new DeviceMessage.Types.FFIMessage();
-            msg.Index = aDeviceIndex;
-            var cmd = new DeviceMessage.Types.BatteryLevelCmd();
-            msg.Message.BatteryLevelCmd = cmd;
+            var msg = new DeviceMessage
+            {
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    BatteryLevelCmd = new DeviceMessage.Types.BatteryLevelCmd()
+                }
+            };
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
         internal static Task<ButtplugFFIServerMessage> SendRSSILevelCmd(ButtplugFFIMessageSorter aSorter, ButtplugFFIDeviceHandle aHandle, uint aDeviceIndex, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
-            var msg = new DeviceMessage();
-            msg.Message = new DeviceMessage.Types.FFIMessage();
-            msg.Index = aDeviceIndex;
-            var cmd = new DeviceMessage.Types.RSSILevelCmd();
-            msg.Message.RssiLevelCmd = cmd;
+            var msg = new DeviceMessage
+            {
+                Index = aDeviceIndex,
+                Message = new DeviceMessage.Types.FFIMessage
+                {
+                    RssiLevelCmd = new DeviceMessage.Types.RSSILevelCmd()
+                }
+            };
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
