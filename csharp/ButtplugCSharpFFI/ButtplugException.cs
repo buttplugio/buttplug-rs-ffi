@@ -8,11 +8,27 @@ namespace Buttplug
         /// <summary>
         /// Creates a ButtplugException.
         /// </summary>
+        public ButtplugException()
+        {
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Creates a ButtplugException.
+        /// </summary>
+        /// <param name="aMessage">Exception message.</param>
+        public ButtplugException(string aMessage) : base(aMessage)
+        {
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Creates a ButtplugException.
+        /// </summary>
         /// <param name="aMessage">Exception message.</param>
         /// <param name="aClass">Exception class, based on Buttplug Error Message Classes. (https://buttplug-spec.docs.buttplug.io/status.html#error).</param>
-        /// <param name="aInner">Optional inner exception.</param>
-        public ButtplugException(string aMessage, Exception aInner = null)
-            : base(aMessage, aInner)
+        /// <param name="aInner">Inner exception.</param>
+        public ButtplugException(string aMessage, Exception aInner) : base(aMessage, aInner)
         {
         }
 

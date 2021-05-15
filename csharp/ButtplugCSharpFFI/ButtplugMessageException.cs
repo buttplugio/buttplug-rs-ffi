@@ -5,8 +5,17 @@ namespace Buttplug
     public class ButtplugMessageException : ButtplugException
     {
         /// <inheritdoc />
-        public ButtplugMessageException(string aMessage, Exception aInner = null)
-            : base(aMessage, aInner)
+        public ButtplugMessageException()
+        {
+        }
+
+        /// <inheritdoc />
+        public ButtplugMessageException(string aMessage) : base(aMessage)
+        {
+        }
+
+        /// <inheritdoc />
+        public ButtplugMessageException(string aMessage, Exception aInner) : base(aMessage, aInner)
         {
         }
     }

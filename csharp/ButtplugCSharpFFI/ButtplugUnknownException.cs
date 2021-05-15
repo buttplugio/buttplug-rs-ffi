@@ -4,8 +4,18 @@ namespace Buttplug
 {
     class ButtplugUnknownException : ButtplugException
     {
-        public ButtplugUnknownException(string aMessage, Exception aInner = null)
-            : base(aMessage, aInner)
+        /// <inheritdoc />
+        public ButtplugUnknownException()
+        {
+        }
+
+        /// <inheritdoc />
+        public ButtplugUnknownException(string aMessage) : base(aMessage)
+        {
+        }
+
+        /// <inheritdoc />
+        public ButtplugUnknownException(string aMessage, Exception aInner) : base(aMessage, aInner)
         {
         }
     }
