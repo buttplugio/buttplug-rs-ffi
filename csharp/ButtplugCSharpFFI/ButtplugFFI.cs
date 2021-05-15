@@ -136,9 +136,7 @@ namespace Buttplug
         {
             var msg = new ClientMessage();
             msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.StartScanning = new ClientMessage.Types.StartScanning
-            {
-            };
+            msg.Message.StartScanning = new ClientMessage.Types.StartScanning();
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -146,9 +144,7 @@ namespace Buttplug
         {
             var msg = new ClientMessage();
             msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.StopScanning = new ClientMessage.Types.StopScanning
-            {
-            };
+            msg.Message.StopScanning = new ClientMessage.Types.StopScanning();
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -156,18 +152,14 @@ namespace Buttplug
         {
             var msg = new ClientMessage();
             msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.StopAllDevices = new ClientMessage.Types.StopAllDevices
-            {
-            };
+            msg.Message.StopAllDevices = new ClientMessage.Types.StopAllDevices();
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
         internal static Task<ButtplugFFIServerMessage> SendPing(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
         {
             var msg = new ClientMessage();
             msg.Message = new ClientMessage.Types.FFIMessage();
-            msg.Message.Ping = new ClientMessage.Types.Ping
-            {
-            };
+            msg.Message.Ping = new ClientMessage.Types.Ping();
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
