@@ -199,6 +199,5 @@ namespace Buttplug
             // Every message should support this, but it doesn't hurt to check
             return ButtplugFFI.SendStopDeviceCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx);
         }
-
     }
 }
