@@ -14,6 +14,12 @@ namespace Buttplug
     public class ButtplugFFIMessageSorter
     {
         /// <summary>
+        /// Stores messages waiting for reply from the server.
+        /// </summary>
+        private readonly ConcurrentDictionary<uint, TaskCompletionSource<ButtplugFFIServerMessage>> _waitingMsgs =
+            new ConcurrentDictionary<uint, TaskCompletionSource<ButtplugFFIServerMessage>>();
+
+        /// <summary>
         /// Holds count for message IDs, if needed.
         /// </summary>
         private int _counter;
@@ -22,12 +28,6 @@ namespace Buttplug
         /// Gets the next available message ID. In most cases, setting the message ID is done automatically.
         /// </summary>
         public uint NextMsgId => Convert.ToUInt32(Interlocked.Increment(ref _counter));
-
-        /// <summary>
-        /// Stores messages waiting for reply from the server.
-        /// </summary>
-        private readonly ConcurrentDictionary<uint, TaskCompletionSource<ButtplugFFIServerMessage>> _waitingMsgs =
-            new ConcurrentDictionary<uint, TaskCompletionSource<ButtplugFFIServerMessage>>();
 
         ~ButtplugFFIMessageSorter()
         {

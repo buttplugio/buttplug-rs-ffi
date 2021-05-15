@@ -11,16 +11,31 @@ namespace Buttplug
         private readonly static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
         private readonly static uint _clientCounter = 1;
 
+        private readonly ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
+
+        private readonly ButtplugFFIClientHandle _clientHandle;
+
+        /// <summary>
+        /// Stores information about devices currently connected to the server.
+        /// </summary>
+        private readonly Dictionary<uint, ButtplugClientDevice> _devices =
+            new Dictionary<uint, ButtplugClientDevice>();
+
+        private readonly ButtplugCallback SorterCallbackDelegate;
+
+        // To detect redundant calls
+        private bool _disposed = false;
+
+        private GCHandle _indexHandle;
+
+        public ButtplugClientDevice[] Devices => _devices.Values.ToArray();
+
         /// <summary>
         /// Name of the client, used for server UI/permissions.
         /// </summary>
         public string Name { get; }
 
         public bool Connected { get; private set; }
-
-        private readonly ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
-
-        private readonly ButtplugFFIClientHandle _clientHandle;
 
         /// <summary>
         /// Event fired on Buttplug device added, either after connect or while scanning for devices.
@@ -55,21 +70,6 @@ namespace Buttplug
         public event EventHandler ServerDisconnect;
 
         public bool IsScanning { get; private set; }
-
-        /// <summary>
-        /// Stores information about devices currently connected to the server.
-        /// </summary>
-        private readonly Dictionary<uint, ButtplugClientDevice> _devices =
-            new Dictionary<uint, ButtplugClientDevice>();
-
-        public ButtplugClientDevice[] Devices => _devices.Values.ToArray();
-
-        private readonly ButtplugCallback SorterCallbackDelegate;
-
-        // To detect redundant calls
-        private bool _disposed = false;
-
-        private GCHandle _indexHandle;
 
         public ButtplugClient(string aClientName): this(aClientName, StaticSorterCallback)
         {

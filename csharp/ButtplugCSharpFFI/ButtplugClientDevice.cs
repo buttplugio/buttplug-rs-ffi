@@ -7,6 +7,13 @@ namespace Buttplug
 {
     public class ButtplugClientDevice : IDisposable
     {
+        private readonly ButtplugFFIMessageSorter Sorter;
+
+        private readonly ButtplugFFIDeviceHandle Handle;
+
+        private readonly ButtplugCallback SorterCallback;
+        private readonly IntPtr SorterCallbackCtx;
+
         /// <summary>
         /// The device index, which uniquely identifies the device on the server.
         /// </summary>
@@ -25,13 +32,6 @@ namespace Buttplug
         /// The Buttplug Protocol messages supported by this device, with additional attributes.
         /// </summary>
         public Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes> AllowedMessages { get; }
-
-        private readonly ButtplugFFIMessageSorter Sorter;
-
-        private readonly ButtplugFFIDeviceHandle Handle;
-
-        private readonly ButtplugCallback SorterCallback;
-        private readonly IntPtr SorterCallbackCtx;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtplugClientDevice"/> class, using
