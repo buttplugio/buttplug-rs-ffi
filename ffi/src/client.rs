@@ -46,14 +46,6 @@ pub struct ButtplugFFIClient {
   runtime: Arc<Runtime>,
 }
 
-impl Drop for ButtplugFFIClient {
-  fn drop(&mut self) {
-    #[cfg(not(feature = "wasm"))]
-    let _guard = self.runtime.enter();
-    info!("DROPPED RUST FFI CLIENT");
-  }
-}
-
 impl ButtplugFFIClient {
   pub fn new(
     #[cfg(not(feature = "wasm"))]

@@ -220,9 +220,3 @@ impl ButtplugFFIDevice {
     .unwrap();
   }
 }
-
-impl Drop for ButtplugFFIDevice {
-  fn drop(&mut self) {
-    info!("DROPPED RUST FFI DEVICE");
-  }
-}
