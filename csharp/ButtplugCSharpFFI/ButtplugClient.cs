@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,13 +11,13 @@ namespace Buttplug
         private readonly static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
         private readonly static uint _clientCounter = 1;
 
-        private readonly ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
+        private readonly ButtplugFFIMessageSorter _messageSorter;
         private readonly ButtplugFFIClientHandle _clientHandle;
 
         /// <summary>
         /// Stores information about devices currently connected to the server.
         /// </summary>
-        private readonly Dictionary<uint, ButtplugClientDevice> _devices = new Dictionary<uint, ButtplugClientDevice>();
+        private readonly Dictionary<uint, ButtplugClientDevice> _devices;
         private readonly ButtplugCallback _sorterCallbackDelegate;
 
         // To detect redundant calls
@@ -74,6 +74,9 @@ namespace Buttplug
         {
             Name = aClientName;
             _sorterCallbackDelegate = aCallback;
+
+            _messageSorter = new ButtplugFFIMessageSorter();
+            _devices = new Dictionary<uint, ButtplugClientDevice>();
 
             var context = new WeakReference(this);
             var clientIndex = _clientCounter;
