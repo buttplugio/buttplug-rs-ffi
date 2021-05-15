@@ -1,3 +1,13 @@
+# 2.0.2 (2021-05-15)
+
+## Features
+
+- #77: C# Cleanup/Linting
+
+## Bugfixes
+
+- #76: Fix issue with log messages causing exceptions on device drop in FFI
+
 # 2.0.1 (2021-04-24)
 
 ## Bugfixes
