@@ -8,8 +8,8 @@ namespace Buttplug
 {
     public class ButtplugClient : IDisposable
     {
-        private static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
-        private static uint _clientCounter = 1;
+        private readonly static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
+        private readonly static uint _clientCounter = 1;
 
         /// <summary>
         /// Name of the client, used for server UI/permissions.
@@ -18,9 +18,9 @@ namespace Buttplug
 
         public bool Connected { get; private set; } = false;
 
-        private ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
+        private readonly ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
 
-        private ButtplugFFIClientHandle _clientHandle;
+        private readonly ButtplugFFIClientHandle _clientHandle;
 
         /// <summary>
         /// Event fired on Buttplug device added, either after connect or while scanning for devices.
@@ -64,7 +64,7 @@ namespace Buttplug
 
         public ButtplugClientDevice[] Devices => _devices.Values.ToArray();
 
-        private ButtplugCallback SorterCallbackDelegate;
+        private readonly ButtplugCallback SorterCallbackDelegate;
 
         // To detect redundant calls
         private bool _disposed = false;

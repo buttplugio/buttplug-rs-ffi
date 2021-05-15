@@ -53,7 +53,7 @@ namespace Buttplug
         public static event EventHandler<string> LogMessage;
         // If we don't hold a reference to our log callback that lives for the lifetime of the process, we'll
         // get gc'd while in native code and that will be Bad (usually we'll get an exception before that).
-        private static ButtplugLogCallback LogCallback = OnLogMessage;
+        private readonly static ButtplugLogCallback LogCallback = OnLogMessage;
         private static ButtplugFFILogHandle LogHandle = null;
         private static bool LogHandleSet = false;
 
