@@ -151,7 +151,8 @@ namespace Buttplug
 
         public async Task<double> SendBatteryLevelCmd()
         {
-            var reading = await ButtplugFFI.SendBatteryLevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx);
+            var reading = await ButtplugFFI.SendBatteryLevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx)
+                                           .ConfigureAwait(false);
             if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.BatteryLevelReading)
             {
                 return reading.Message.DeviceEvent.BatteryLevelReading.Reading;
@@ -161,7 +162,8 @@ namespace Buttplug
 
         public async Task<int> SendRSSIBatteryLevelCmd()
         {
-            var reading = await ButtplugFFI.SendRSSILevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx);
+            var reading = await ButtplugFFI.SendRSSILevelCmd(Sorter, Handle, Index, SorterCallback, SorterCallbackCtx)
+                                           .ConfigureAwait(false);
             if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RssiLevelReading)
             {
                 return reading.Message.DeviceEvent.RssiLevelReading.Reading;
@@ -171,7 +173,8 @@ namespace Buttplug
 
         public async Task<byte[]> SendRawReadCmd(Endpoint aEndpoint, uint aExpectedLength, uint aTimeout)
         {
-            var reading = await ButtplugFFI.SendRawReadCmd(Sorter, Handle, Index, aEndpoint, aExpectedLength, aTimeout, SorterCallback, SorterCallbackCtx);
+            var reading = await ButtplugFFI.SendRawReadCmd(Sorter, Handle, Index, aEndpoint, aExpectedLength, aTimeout, SorterCallback, SorterCallbackCtx)
+                                           .ConfigureAwait(false);
             if (reading.Message.MsgCase == ButtplugFFIServerMessage.Types.FFIMessage.MsgOneofCase.DeviceEvent && reading.Message.DeviceEvent.MsgCase == DeviceEvent.MsgOneofCase.RawReading)
             {
                 return reading.Message.DeviceEvent.RawReading.Data.ToArray();

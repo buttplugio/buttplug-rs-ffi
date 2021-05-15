@@ -105,19 +105,22 @@ namespace Buttplug
                 aConnector.DeviceConfigJSON,
                 aConnector.UserDeviceConfigJSON,
                 aConnector.DeviceCommunicationManagerTypes,
-                SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+                SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                .ConfigureAwait(false);
             Connected = true;
         }
 
         public async Task ConnectAsync(ButtplugWebsocketConnectorOptions aConnector)
         {
-            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                             .ConfigureAwait(false);
             Connected = true;
         }
 
         public async Task DisconnectAsync()
         {
-            await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                             .ConfigureAwait(false);
             _devices.Clear();
             Connected = false;
         }
@@ -232,22 +235,26 @@ namespace Buttplug
         public async Task StartScanningAsync()
         {
             IsScanning = true;
-            await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            await ButtplugFFI.SendStartScanning(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                             .ConfigureAwait(false);
         }
 
         public async Task StopScanningAsync()
         {
             IsScanning = false;
-            await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            await ButtplugFFI.SendStopScanning(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                             .ConfigureAwait(false);
         }
 
         public async Task StopAllDevicesAsync()
         {
-            await ButtplugFFI.SendStopAllDevices(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            await ButtplugFFI.SendStopAllDevices(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                             .ConfigureAwait(false);
         }
         public async Task PingAsync()
         {
-            await ButtplugFFI.SendPing(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
+            await ButtplugFFI.SendPing(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
+                             .ConfigureAwait(false);
         }
 
         public void Dispose()
