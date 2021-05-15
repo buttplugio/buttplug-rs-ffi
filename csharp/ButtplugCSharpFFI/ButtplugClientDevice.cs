@@ -37,7 +37,7 @@ namespace Buttplug
         /// </summary>
         /// <param name="aIndex">The device index.</param>
         /// <param name="aName">The device name.</param>
-        /// <param name="aMessages">The device allowed message list, with corresponding attributes.</param>
+        /// <param name="aAllowedMessages">The device allowed message list, with corresponding attributes.</param>
         internal ButtplugClientDevice(ButtplugFFIMessageSorter aSorter,
             ButtplugFFIDeviceHandle aHandle,
             uint aIndex,
