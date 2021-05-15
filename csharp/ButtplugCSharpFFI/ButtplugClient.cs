@@ -53,7 +53,7 @@ namespace Buttplug
         /// Event fired when a server disconnect has occured.
         /// </summary>
         public event EventHandler ServerDisconnect;
-         
+
         public bool IsScanning { get; private set; }
 
         /// <summary>
@@ -107,7 +107,6 @@ namespace Buttplug
                 aConnector.DeviceCommunicationManagerTypes,
                 SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
             Connected = true;
-
         }
 
         public async Task ConnectAsync(ButtplugWebsocketConnectorOptions aConnector)
@@ -122,7 +121,7 @@ namespace Buttplug
             _devices.Clear();
             Connected = false;
         }
-        
+
         static protected void StaticSorterCallback(IntPtr ctx, IntPtr buf, int buf_length)
         {
             GCHandle indexHandle = GCHandle.FromIntPtr(ctx);
@@ -137,7 +136,6 @@ namespace Buttplug
 
         protected void SorterCallbackHandler(IntPtr buf, int buf_length)
         {
-            
             // Process the data BEFORE we throw to the C# executor, otherwise
             // Rust will clean up the memory and we'll have nothing to read
             // from, meaning a null message at best and a crash at worst.

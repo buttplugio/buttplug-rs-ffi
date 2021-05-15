@@ -26,7 +26,6 @@ namespace Buttplug
             }
             return true;
         }
-
     }
 
     internal class ButtplugFFIDeviceHandle : SafeHandle
@@ -46,7 +45,6 @@ namespace Buttplug
             }
             return true;
         }
-
     }
 
     internal static class ButtplugFFICalls
@@ -89,7 +87,7 @@ namespace Buttplug
         }
 
         internal static Task<ButtplugFFIServerMessage> SendConnectLocal(
-            ButtplugFFIMessageSorter aSorter, 
+            ButtplugFFIMessageSorter aSorter,
             ButtplugFFIClientHandle aHandle,
             string aServerName,
             uint aMaxPingTime,
@@ -97,7 +95,7 @@ namespace Buttplug
             string aDeviceConfigJSON,
             string aUserDeviceConfigJSON,
             ushort aDeviceCommManagerTypes,
-            ButtplugCallback aCallback, 
+            ButtplugCallback aCallback,
             IntPtr aCallbackCtx)
         {
             var msg = new ClientMessage();
@@ -193,7 +191,7 @@ namespace Buttplug
             var command_list = new List<DeviceMessage.Types.VibrateComponent>();
             foreach (var pair in aSpeeds)
             {
-                command_list.Add(new DeviceMessage.Types.VibrateComponent { 
+                command_list.Add(new DeviceMessage.Types.VibrateComponent {
                     Index = pair.Key,
                     Speed = pair.Value,
                 });

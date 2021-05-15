@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace Buttplug
 {
-    
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void ButtplugLogCallback(IntPtr ctx, string aLogMsg);
 
@@ -47,7 +46,6 @@ namespace Buttplug
             }
             return true;
         }
-
     }
 
     public static class ButtplugFFILog
@@ -90,5 +88,4 @@ namespace Buttplug
             }
         }
     }
-    
 }
