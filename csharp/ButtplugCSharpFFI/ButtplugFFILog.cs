@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Buttplug
@@ -28,23 +29,14 @@ namespace Buttplug
         internal static extern void ButtplugActivateEnvLogger();
     }
 
-    internal class ButtplugFFILogHandle : SafeHandle
+    internal class ButtplugFFILogHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public ButtplugFFILogHandle() : base(IntPtr.Zero, true) { }
-
-        public override bool IsInvalid
-        {
-            get { return this.handle == IntPtr.Zero; }
-        }
+        public ButtplugFFILogHandle() : base(true) { }
 
         protected override bool ReleaseHandle()
         {
             Console.WriteLine("Releasing handle?!");
-            if (!this.IsInvalid)
-            {
-                ButtplugFFILogCalls.ButtplugFreeLogHandle(handle);
-            }
-
+            ButtplugFFILogCalls.ButtplugFreeLogHandle(handle);
             return true;
         }
     }
