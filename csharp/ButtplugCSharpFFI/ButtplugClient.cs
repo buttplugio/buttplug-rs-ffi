@@ -8,8 +8,8 @@ namespace Buttplug
 {
     public class ButtplugClient : IDisposable
     {
-        static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
-        static uint _clientCounter = 1;
+        private static Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
+        private static uint _clientCounter = 1;
 
         /// <summary>
         /// Name of the client, used for server UI/permissions.
