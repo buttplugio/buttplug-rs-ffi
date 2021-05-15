@@ -113,6 +113,7 @@ namespace Buttplug
                     }
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -129,6 +130,7 @@ namespace Buttplug
                     }
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -141,6 +143,7 @@ namespace Buttplug
                     Disconnect = new ClientMessage.Types.Disconnect()
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -153,6 +156,7 @@ namespace Buttplug
                     StartScanning = new ClientMessage.Types.StartScanning()
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -165,6 +169,7 @@ namespace Buttplug
                     StopScanning = new ClientMessage.Types.StopScanning()
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -177,6 +182,7 @@ namespace Buttplug
                     StopAllDevices = new ClientMessage.Types.StopAllDevices()
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
         internal static Task<ButtplugFFIServerMessage> SendPing(ButtplugFFIMessageSorter aSorter, ButtplugFFIClientHandle aHandle, ButtplugCallback aCallback, IntPtr aCallbackCtx)
@@ -188,6 +194,7 @@ namespace Buttplug
                     Ping = new ClientMessage.Types.Ping()
                 }
             };
+
             return SendClientMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -215,6 +222,7 @@ namespace Buttplug
                     Speed = pair.Value,
                 });
             }
+
             var cmd = new DeviceMessage.Types.VibrateCmd();
             cmd.Speeds.Add(command_list);
 
@@ -226,6 +234,7 @@ namespace Buttplug
                     VibrateCmd = cmd
                 }
             };
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -241,6 +250,7 @@ namespace Buttplug
                     Clockwise = pair.Value.Item2,
                 });
             }
+
             var cmd = new DeviceMessage.Types.RotateCmd();
             cmd.Rotations.Add(command_list);
 
@@ -252,6 +262,7 @@ namespace Buttplug
                     RotateCmd = cmd
                 }
             };
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -267,6 +278,7 @@ namespace Buttplug
                     Position = pair.Value.Item2,
                 });
             }
+
             var cmd = new DeviceMessage.Types.LinearCmd();
             cmd.Movements.Add(command_list);
 
@@ -278,6 +290,7 @@ namespace Buttplug
                     LinearCmd = cmd
                 }
             };
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -291,6 +304,7 @@ namespace Buttplug
                     StopDeviceCmd = new DeviceMessage.Types.StopDeviceCmd()
                 }
             };
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -304,6 +318,7 @@ namespace Buttplug
                     BatteryLevelCmd = new DeviceMessage.Types.BatteryLevelCmd()
                 }
             };
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -317,6 +332,7 @@ namespace Buttplug
                     RssiLevelCmd = new DeviceMessage.Types.RSSILevelCmd()
                 }
             };
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -333,6 +349,7 @@ namespace Buttplug
                 Timeout = aTimeout
             };
             msg.Message.RawReadCmd = cmd;
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -350,6 +367,7 @@ namespace Buttplug
                 WriteWithResponse = aWriteWithResponse
             };
             msg.Message.RawWriteCmd = cmd;
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -365,6 +383,7 @@ namespace Buttplug
                 Endpoint = aEndpoint,
             };
             msg.Message.RawSubscribeCmd = cmd;
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 
@@ -380,6 +399,7 @@ namespace Buttplug
                 Endpoint = aEndpoint,
             };
             msg.Message.RawUnsubscribeCmd = cmd;
+
             return SendDeviceMessage(aSorter, aHandle, msg, aCallback, aCallbackCtx);
         }
 

@@ -12,20 +12,16 @@ namespace Buttplug
         private readonly static uint _clientCounter = 1;
 
         private readonly ButtplugFFIMessageSorter _messageSorter = new ButtplugFFIMessageSorter();
-
         private readonly ButtplugFFIClientHandle _clientHandle;
 
         /// <summary>
         /// Stores information about devices currently connected to the server.
         /// </summary>
-        private readonly Dictionary<uint, ButtplugClientDevice> _devices =
-            new Dictionary<uint, ButtplugClientDevice>();
-
+        private readonly Dictionary<uint, ButtplugClientDevice> _devices = new Dictionary<uint, ButtplugClientDevice>();
         private readonly ButtplugCallback SorterCallbackDelegate;
 
         // To detect redundant calls
         private bool _disposed = false;
-
         private GCHandle _indexHandle;
 
         public ButtplugClientDevice[] Devices => _devices.Values.ToArray();
@@ -34,7 +30,6 @@ namespace Buttplug
         /// Name of the client, used for server UI/permissions.
         /// </summary>
         public string Name { get; }
-
         public bool Connected { get; private set; }
 
         /// <summary>
@@ -79,8 +74,10 @@ namespace Buttplug
         {
             Name = aClientName;
             SorterCallbackDelegate = aCallback;
+
             var context = new WeakReference(this);
             var clientIndex = _clientCounter;
+
             // Since we can pass the handle, I don't *think* this needs to be pinned?
             _indexHandle = GCHandle.Alloc(clientIndex);
             _clientStorage.Add(_clientCounter, context);
@@ -107,6 +104,7 @@ namespace Buttplug
                 aConnector.DeviceCommunicationManagerTypes,
                 SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
                 .ConfigureAwait(false);
+
             Connected = true;
         }
 
@@ -114,6 +112,7 @@ namespace Buttplug
         {
             await ButtplugFFI.SendConnectWebsocket(_messageSorter, _clientHandle, aConnector.NetworkAddress.ToString(), false, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
                              .ConfigureAwait(false);
+
             Connected = true;
         }
 
@@ -121,6 +120,7 @@ namespace Buttplug
         {
             await ButtplugFFI.SendDisconnect(_messageSorter, _clientHandle, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle))
                              .ConfigureAwait(false);
+
             _devices.Clear();
             Connected = false;
         }
@@ -147,6 +147,7 @@ namespace Buttplug
             {
                 byteArray = new Span<byte>(buf.ToPointer(), buf_length);
             }
+
             var server_message = ButtplugFFIServerMessage.Parser.ParseFrom(byteArray.ToArray());
             // Run the response in the context of the C# executor, not the Rust
             // thread. This means that if something goes wrong we at least
@@ -167,15 +168,17 @@ namespace Buttplug
                             ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(new ButtplugDeviceException("A duplicate device index was received. This is most likely a bug, please file at https://github.com/buttplugio/buttplug-rs-ffi")));
                             return;
                         }
+
                         var device_handle = ButtplugFFI.SendCreateDevice(_clientHandle, device_added_message.Index);
                         var attribute_dict = new Dictionary<ServerMessage.Types.MessageAttributeType, ButtplugMessageAttributes>();
                         for (var i = 0; i < device_added_message.MessageAttributes.Count; ++i)
                         {
                             var attributes = device_added_message.MessageAttributes[i];
                             var device_message_attributes = new ButtplugMessageAttributes(attributes.FeatureCount, attributes.StepCount.ToArray(),
-                                attributes.Endpoints.ToArray(), attributes.MaxDuration.ToArray(), null, null);
+                                                                                          attributes.Endpoints.ToArray(), attributes.MaxDuration.ToArray(), null, null);
                             attribute_dict.Add(attributes.MessageType, device_message_attributes);
                         }
+
                         var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict, SorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
                         _devices.Add(device_added_message.Index, device);
                         DeviceAdded?.Invoke(this, new DeviceAddedEventArgs(device));
@@ -188,6 +191,7 @@ namespace Buttplug
                             // Device was removed from our dict before we could remove it ourselves.
                             return;
                         }
+
                         try
                         {
                             var device = _devices[device_removed_message.Index];
@@ -213,6 +217,7 @@ namespace Buttplug
                         {
                             PingTimeout?.Invoke(this, null);
                         }
+
                         ErrorReceived?.Invoke(this, new ButtplugExceptionEventArgs(error));
                     }
                     else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.ScanningFinished)

@@ -44,6 +44,7 @@ namespace Buttplug
             {
                 ButtplugFFILogCalls.ButtplugFreeLogHandle(handle);
             }
+
             return true;
         }
     }
@@ -76,6 +77,7 @@ namespace Buttplug
                 {
                     throw new InvalidOperationException("Cannot set logging options twice (this is a bug, will be fixed at some point, see https://github.com/buttplugio/buttplug-rs-ffi/issues/23).");
                 }
+
                 LogHandle = ButtplugFFILogCalls.ButtplugCreateLogHandle(LogCallback, IntPtr.Zero, aMaxLevel.ToString(), aUseJSON);
                 LogHandleSet = true;
             }
