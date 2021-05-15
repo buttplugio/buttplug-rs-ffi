@@ -18,14 +18,14 @@ namespace Buttplug
 
     internal static class ButtplugFFILogCalls
     {
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern ButtplugFFILogHandle buttplug_create_log_handle(ButtplugLogCallback callback, IntPtr ctx, string level, bool aUseJSON);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_create_log_handle")]
+        internal static extern ButtplugFFILogHandle ButtplugCreateLogHandle(ButtplugLogCallback callback, IntPtr ctx, string level, bool aUseJSON);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_free_log_handle(IntPtr log_handle);
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_free_log_handle")]
+        internal static extern void ButtplugFreeLogHandle(IntPtr log_handle);
 
-        [DllImport("buttplug_rs_ffi")]
-        internal static extern void buttplug_activate_env_logger();
+        [DllImport("buttplug_rs_ffi", EntryPoint = "buttplug_activate_env_logger")]
+        internal static extern void ButtplugActivateEnvLogger();
     }
 
     internal class ButtplugFFILogHandle : SafeHandle
@@ -42,7 +42,7 @@ namespace Buttplug
             Console.WriteLine("Releasing handle?!");
             if (!this.IsInvalid)
             {
-                ButtplugFFILogCalls.buttplug_free_log_handle(handle);
+                ButtplugFFILogCalls.ButtplugFreeLogHandle(handle);
             }
             return true;
         }
@@ -59,7 +59,7 @@ namespace Buttplug
 
         private static void ActivateEnvLogger()
         {
-            ButtplugFFILogCalls.buttplug_activate_env_logger();
+            ButtplugFFILogCalls.ButtplugActivateEnvLogger();
         }
 
         private static void OnLogMessage(IntPtr ctx, string aLogMessage)
@@ -75,7 +75,7 @@ namespace Buttplug
                 {
                     throw new InvalidOperationException("Cannot set logging options twice (this is a bug, will be fixed at some point, see https://github.com/buttplugio/buttplug-rs-ffi/issues/23).");
                 }
-                LogHandle = ButtplugFFILogCalls.buttplug_create_log_handle(LogCallback, IntPtr.Zero, aMaxLevel.ToString(), aUseJSON);
+                LogHandle = ButtplugFFILogCalls.ButtplugCreateLogHandle(LogCallback, IntPtr.Zero, aMaxLevel.ToString(), aUseJSON);
                 LogHandleSet = true;
             }
             else
