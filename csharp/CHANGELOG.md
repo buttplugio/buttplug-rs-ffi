@@ -1,3 +1,9 @@
+# 2.0.3 (2021-05-17)
+
+## Bugfixes
+
+- #78: Fix key duplication exception when > 1 client instances created.
+
 # 2.0.2 (2021-05-15)
 
 ## Features
