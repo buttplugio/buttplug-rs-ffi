@@ -9,7 +9,7 @@ namespace Buttplug
     public class ButtplugClient : IDisposable
     {
         private static readonly Dictionary<uint, WeakReference> _clientStorage = new Dictionary<uint, WeakReference>();
-        private static readonly uint _clientCounter = 1;
+        private static uint _clientCounter = 1;
 
         private readonly ButtplugFFIMessageSorter _messageSorter;
         private readonly ButtplugFFIClientHandle _clientHandle;
@@ -80,10 +80,11 @@ namespace Buttplug
 
             var context = new WeakReference(this);
             var clientIndex = _clientCounter;
+            _clientCounter += 1;
 
             // Since we can pass the handle, I don't *think* this needs to be pinned?
             _indexHandle = GCHandle.Alloc(clientIndex);
-            _clientStorage.Add(_clientCounter, context);
+            _clientStorage.Add(clientIndex, context);
             _clientHandle = ButtplugFFI.SendCreateClient(aClientName, _sorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
         }
 
