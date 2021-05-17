@@ -12,6 +12,10 @@ namespace Buttplug
         private readonly ButtplugCallback _sorterCallback;
         private readonly IntPtr _sorterCallbackCtx;
 
+        private object _disposeLock;
+
+        private bool _disposed;
+
         /// <summary>
         /// The device index, which uniquely identifies the device on the server.
         /// </summary>
@@ -46,6 +50,8 @@ namespace Buttplug
             ButtplugCallback aCallback,
             IntPtr aCallbackCtx)
         {
+            _disposeLock = new object();
+            _disposed = false;
             _sorter = aSorter;
             _handle = aHandle;
             Index = aIndex;
@@ -55,9 +61,33 @@ namespace Buttplug
             _sorterCallbackCtx = aCallbackCtx;
         }
 
+        ~ButtplugClientDevice() => Dispose(false);
+
         public void Dispose()
         {
-            _handle.Dispose();
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            lock (_disposeLock) 
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                if (disposing)
+                {
+                    // Dispose managed state (managed objects).
+                    _handle?.Dispose();
+                }
+
+                _disposed = true;
+            }
         }
 
         public bool Equals(ButtplugClientDevice aDevice)

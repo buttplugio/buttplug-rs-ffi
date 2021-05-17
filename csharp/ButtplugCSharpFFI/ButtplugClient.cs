@@ -66,6 +66,8 @@ namespace Buttplug
 
         public bool IsScanning { get; private set; }
 
+        private object _disposeLock;
+
         public ButtplugClient(string aClientName): this(aClientName, StaticSorterCallback)
         {
         }
@@ -74,6 +76,7 @@ namespace Buttplug
         {
             Name = aClientName;
             _sorterCallbackDelegate = aCallback;
+            _disposeLock = new object();
 
             _messageSorter = new ButtplugFFIMessageSorter();
             _devices = new Dictionary<uint, ButtplugClientDevice>();
@@ -276,20 +279,23 @@ namespace Buttplug
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed)
+            lock (_disposeLock) 
             {
-                return;
-            }
+                if (_disposed)
+                {
+                    return;
+                }
 
-            if (disposing)
-            {
-                // Dispose managed state (managed objects).
-                _clientStorage.Remove((uint)_indexHandle.Target);
-                _indexHandle.Free();
-                _clientHandle?.Dispose();
-            }
+                if (disposing)
+                {
+                    // Dispose managed state (managed objects).
+                    _clientStorage.Remove((uint)_indexHandle.Target);
+                    _indexHandle.Free();
+                    _clientHandle?.Dispose();
+                }
 
-            _disposed = true;
+                _disposed = true;
+            }
         }
     }
 }
