@@ -3,6 +3,7 @@
 ## Bugfixes
 
 - #78: Fix key duplication exception when > 1 client instances created.
+- #79: Fix issue with re-entrancy causing double-disposes
 
 # 2.0.2 (2021-05-15)
 
