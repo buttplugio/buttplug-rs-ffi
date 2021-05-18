@@ -29,11 +29,43 @@ pub use logging::*;
 
 #[cfg(feature = "wasm")]
 use js_sys;
+use buttplug::client::ButtplugClientError;
 
 #[cfg(not(feature = "wasm"))]
 type FFICallback = extern "C" fn(*mut libc::c_void, *const u8, u32);
 #[cfg(not(feature = "wasm"))]
 type FFICallbackContext = *mut libc::c_void;
+
+#[repr(C, u8)]
+enum FFIResult<T> {
+    Ok(T),
+    // TODO: make ButtplugClientError repr(C) or something
+    Err(ButtplugClientError)
+}
+
+type FFIResultCallback<T> = extern "C" fn(*mut libc::c_void, *const FFIResult<T>);
+
+#[repr(C)]
+struct DeviceAttribute {
+    // TODO
+}
+
+#[repr(C, u8)]
+enum FFISystemMessage {
+    ScanningFinished,
+    DeviceAdded {
+        name: *const libc::c_char,
+        index: u32,
+        attributes: *const DeviceAttribute,
+        attributes_len: usize
+    },
+    DeviceRemoved {
+        index: u32
+    },
+    Disconnect
+}
+
+type FFISystemCallback = extern "C" fn(*mut libc::c_void, *const FFISystemMessage);
 
 #[cfg(feature = "wasm")]
 type FFICallback = js_sys::Function;
