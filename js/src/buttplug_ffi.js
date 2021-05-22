@@ -1,22 +1,24 @@
+// BEGIN_MODULARIZE
+// This file was modified by scripts/modularize.js to create Node ESM-compatible bindings.
+// Do not modify this file directly as your changes will be overwritten.
+// END_MODULARIZE
 /*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
-"use strict";
-
-var $protobuf = require("protobufjs/minimal");
+import $protobuf from "protobufjs/minimal.js";
 
 // Common aliases
-var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
 
 // Exported root namespace
-var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
+const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-$root.Buttplug = (function() {
+export const Buttplug = $root.Buttplug = (() => {
 
     /**
      * Namespace Buttplug.
      * @exports Buttplug
      * @namespace
      */
-    var Buttplug = {};
+    const Buttplug = {};
 
     /**
      * Endpoint enum.
@@ -69,7 +71,7 @@ $root.Buttplug = (function() {
      * @property {number} Generic31=44 Generic31 value
      */
     Buttplug.Endpoint = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "Command"] = 0;
         values[valuesById[1] = "Firmware"] = 1;
         values[valuesById[2] = "Rx"] = 2;
@@ -138,7 +140,7 @@ $root.Buttplug = (function() {
          */
         function ClientMessage(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -217,9 +219,9 @@ $root.Buttplug = (function() {
         ClientMessage.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.id = reader.uint32();
@@ -266,7 +268,7 @@ $root.Buttplug = (function() {
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
             if (message.message != null && message.hasOwnProperty("message")) {
-                var error = $root.Buttplug.ClientMessage.FFIMessage.verify(message.message);
+                let error = $root.Buttplug.ClientMessage.FFIMessage.verify(message.message);
                 if (error)
                     return "message." + error;
             }
@@ -284,7 +286,7 @@ $root.Buttplug = (function() {
         ClientMessage.fromObject = function fromObject(object) {
             if (object instanceof $root.Buttplug.ClientMessage)
                 return object;
-            var message = new $root.Buttplug.ClientMessage();
+            let message = new $root.Buttplug.ClientMessage();
             if (object.id != null)
                 message.id = object.id >>> 0;
             if (object.message != null) {
@@ -307,7 +309,7 @@ $root.Buttplug = (function() {
         ClientMessage.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (options.defaults) {
                 object.id = 0;
                 object.message = null;
@@ -342,7 +344,7 @@ $root.Buttplug = (function() {
          * @property {number} LovenseSerialDongle=16 LovenseSerialDongle value
          */
         ClientMessage.DeviceCommunicationManagerTypes = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "All"] = 0;
             values[valuesById[1] = "Btleplug"] = 1;
             values[valuesById[2] = "XInput"] = 2;
@@ -376,7 +378,7 @@ $root.Buttplug = (function() {
              */
             function ConnectLocal(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -495,9 +497,9 @@ $root.Buttplug = (function() {
             ConnectLocal.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.ConnectLocal();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.ConnectLocal();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.serverName = reader.string();
@@ -584,7 +586,7 @@ $root.Buttplug = (function() {
             ConnectLocal.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ClientMessage.ConnectLocal)
                     return object;
-                var message = new $root.Buttplug.ClientMessage.ConnectLocal();
+                let message = new $root.Buttplug.ClientMessage.ConnectLocal();
                 if (object.serverName != null)
                     message.serverName = String(object.serverName);
                 if (object.maxPingTime != null)
@@ -612,7 +614,7 @@ $root.Buttplug = (function() {
             ConnectLocal.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.serverName = "";
                     object.maxPingTime = 0;
@@ -670,7 +672,7 @@ $root.Buttplug = (function() {
              */
             function ConnectWebsocket(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -749,9 +751,9 @@ $root.Buttplug = (function() {
             ConnectWebsocket.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.ConnectWebsocket();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.ConnectWebsocket();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.address = reader.string();
@@ -814,7 +816,7 @@ $root.Buttplug = (function() {
             ConnectWebsocket.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ClientMessage.ConnectWebsocket)
                     return object;
-                var message = new $root.Buttplug.ClientMessage.ConnectWebsocket();
+                let message = new $root.Buttplug.ClientMessage.ConnectWebsocket();
                 if (object.address != null)
                     message.address = String(object.address);
                 if (object.bypassCertVerification != null)
@@ -834,7 +836,7 @@ $root.Buttplug = (function() {
             ConnectWebsocket.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.address = "";
                     object.bypassCertVerification = false;
@@ -878,7 +880,7 @@ $root.Buttplug = (function() {
              */
             function StartScanning(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -937,9 +939,9 @@ $root.Buttplug = (function() {
             StartScanning.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.StartScanning();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.StartScanning();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -1038,7 +1040,7 @@ $root.Buttplug = (function() {
              */
             function StopScanning(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -1097,9 +1099,9 @@ $root.Buttplug = (function() {
             StopScanning.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.StopScanning();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.StopScanning();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -1198,7 +1200,7 @@ $root.Buttplug = (function() {
              */
             function StopAllDevices(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -1257,9 +1259,9 @@ $root.Buttplug = (function() {
             StopAllDevices.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.StopAllDevices();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.StopAllDevices();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -1358,7 +1360,7 @@ $root.Buttplug = (function() {
              */
             function Disconnect(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -1417,9 +1419,9 @@ $root.Buttplug = (function() {
             Disconnect.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.Disconnect();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.Disconnect();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -1518,7 +1520,7 @@ $root.Buttplug = (function() {
              */
             function Ping(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -1577,9 +1579,9 @@ $root.Buttplug = (function() {
             Ping.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.Ping();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.Ping();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -1685,7 +1687,7 @@ $root.Buttplug = (function() {
              */
             function FFIMessage(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -1747,7 +1749,7 @@ $root.Buttplug = (function() {
             FFIMessage.prototype.ping = null;
 
             // OneOf field names bound to virtual getters and setters
-            var $oneOfFields;
+            let $oneOfFields;
 
             /**
              * FFIMessage msg.
@@ -1828,9 +1830,9 @@ $root.Buttplug = (function() {
             FFIMessage.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.FFIMessage();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ClientMessage.FFIMessage();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.connectLocal = $root.Buttplug.ClientMessage.ConnectLocal.decode(reader, reader.uint32());
@@ -1888,11 +1890,11 @@ $root.Buttplug = (function() {
             FFIMessage.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                var properties = {};
+                let properties = {};
                 if (message.connectLocal != null && message.hasOwnProperty("connectLocal")) {
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.ConnectLocal.verify(message.connectLocal);
+                        let error = $root.Buttplug.ClientMessage.ConnectLocal.verify(message.connectLocal);
                         if (error)
                             return "connectLocal." + error;
                     }
@@ -1902,7 +1904,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.ConnectWebsocket.verify(message.connectWebsocket);
+                        let error = $root.Buttplug.ClientMessage.ConnectWebsocket.verify(message.connectWebsocket);
                         if (error)
                             return "connectWebsocket." + error;
                     }
@@ -1912,7 +1914,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.StartScanning.verify(message.startScanning);
+                        let error = $root.Buttplug.ClientMessage.StartScanning.verify(message.startScanning);
                         if (error)
                             return "startScanning." + error;
                     }
@@ -1922,7 +1924,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.StopScanning.verify(message.stopScanning);
+                        let error = $root.Buttplug.ClientMessage.StopScanning.verify(message.stopScanning);
                         if (error)
                             return "stopScanning." + error;
                     }
@@ -1932,7 +1934,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.StopAllDevices.verify(message.stopAllDevices);
+                        let error = $root.Buttplug.ClientMessage.StopAllDevices.verify(message.stopAllDevices);
                         if (error)
                             return "stopAllDevices." + error;
                     }
@@ -1942,7 +1944,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.Disconnect.verify(message.disconnect);
+                        let error = $root.Buttplug.ClientMessage.Disconnect.verify(message.disconnect);
                         if (error)
                             return "disconnect." + error;
                     }
@@ -1952,7 +1954,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ClientMessage.Ping.verify(message.ping);
+                        let error = $root.Buttplug.ClientMessage.Ping.verify(message.ping);
                         if (error)
                             return "ping." + error;
                     }
@@ -1971,7 +1973,7 @@ $root.Buttplug = (function() {
             FFIMessage.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ClientMessage.FFIMessage)
                     return object;
-                var message = new $root.Buttplug.ClientMessage.FFIMessage();
+                let message = new $root.Buttplug.ClientMessage.FFIMessage();
                 if (object.connectLocal != null) {
                     if (typeof object.connectLocal !== "object")
                         throw TypeError(".Buttplug.ClientMessage.FFIMessage.connectLocal: object expected");
@@ -2022,7 +2024,7 @@ $root.Buttplug = (function() {
             FFIMessage.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (message.connectLocal != null && message.hasOwnProperty("connectLocal")) {
                     object.connectLocal = $root.Buttplug.ClientMessage.ConnectLocal.toObject(message.connectLocal, options);
                     if (options.oneofs)
@@ -2099,7 +2101,7 @@ $root.Buttplug = (function() {
          */
         function DeviceMessage(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -2188,9 +2190,9 @@ $root.Buttplug = (function() {
         DeviceMessage.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.id = reader.uint32();
@@ -2243,7 +2245,7 @@ $root.Buttplug = (function() {
                 if (!$util.isInteger(message.index))
                     return "index: integer expected";
             if (message.message != null && message.hasOwnProperty("message")) {
-                var error = $root.Buttplug.DeviceMessage.FFIMessage.verify(message.message);
+                let error = $root.Buttplug.DeviceMessage.FFIMessage.verify(message.message);
                 if (error)
                     return "message." + error;
             }
@@ -2261,7 +2263,7 @@ $root.Buttplug = (function() {
         DeviceMessage.fromObject = function fromObject(object) {
             if (object instanceof $root.Buttplug.DeviceMessage)
                 return object;
-            var message = new $root.Buttplug.DeviceMessage();
+            let message = new $root.Buttplug.DeviceMessage();
             if (object.id != null)
                 message.id = object.id >>> 0;
             if (object.index != null)
@@ -2286,7 +2288,7 @@ $root.Buttplug = (function() {
         DeviceMessage.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (options.defaults) {
                 object.id = 0;
                 object.index = 0;
@@ -2332,7 +2334,7 @@ $root.Buttplug = (function() {
              */
             function VibrateComponent(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -2411,9 +2413,9 @@ $root.Buttplug = (function() {
             VibrateComponent.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.VibrateComponent();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.VibrateComponent();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -2476,7 +2478,7 @@ $root.Buttplug = (function() {
             VibrateComponent.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.VibrateComponent)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.VibrateComponent();
+                let message = new $root.Buttplug.DeviceMessage.VibrateComponent();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 if (object.speed != null)
@@ -2496,7 +2498,7 @@ $root.Buttplug = (function() {
             VibrateComponent.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.index = 0;
                     object.speed = 0;
@@ -2542,7 +2544,7 @@ $root.Buttplug = (function() {
             function VibrateCmd(properties) {
                 this.speeds = [];
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -2580,7 +2582,7 @@ $root.Buttplug = (function() {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.speeds != null && message.speeds.length)
-                    for (var i = 0; i < message.speeds.length; ++i)
+                    for (let i = 0; i < message.speeds.length; ++i)
                         $root.Buttplug.DeviceMessage.VibrateComponent.encode(message.speeds[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 return writer;
             };
@@ -2612,9 +2614,9 @@ $root.Buttplug = (function() {
             VibrateCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.VibrateCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.VibrateCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         if (!(message.speeds && message.speeds.length))
@@ -2659,8 +2661,8 @@ $root.Buttplug = (function() {
                 if (message.speeds != null && message.hasOwnProperty("speeds")) {
                     if (!Array.isArray(message.speeds))
                         return "speeds: array expected";
-                    for (var i = 0; i < message.speeds.length; ++i) {
-                        var error = $root.Buttplug.DeviceMessage.VibrateComponent.verify(message.speeds[i]);
+                    for (let i = 0; i < message.speeds.length; ++i) {
+                        let error = $root.Buttplug.DeviceMessage.VibrateComponent.verify(message.speeds[i]);
                         if (error)
                             return "speeds." + error;
                     }
@@ -2679,12 +2681,12 @@ $root.Buttplug = (function() {
             VibrateCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.VibrateCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.VibrateCmd();
+                let message = new $root.Buttplug.DeviceMessage.VibrateCmd();
                 if (object.speeds) {
                     if (!Array.isArray(object.speeds))
                         throw TypeError(".Buttplug.DeviceMessage.VibrateCmd.speeds: array expected");
                     message.speeds = [];
-                    for (var i = 0; i < object.speeds.length; ++i) {
+                    for (let i = 0; i < object.speeds.length; ++i) {
                         if (typeof object.speeds[i] !== "object")
                             throw TypeError(".Buttplug.DeviceMessage.VibrateCmd.speeds: object expected");
                         message.speeds[i] = $root.Buttplug.DeviceMessage.VibrateComponent.fromObject(object.speeds[i]);
@@ -2705,12 +2707,12 @@ $root.Buttplug = (function() {
             VibrateCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.arrays || options.defaults)
                     object.speeds = [];
                 if (message.speeds && message.speeds.length) {
                     object.speeds = [];
-                    for (var j = 0; j < message.speeds.length; ++j)
+                    for (let j = 0; j < message.speeds.length; ++j)
                         object.speeds[j] = $root.Buttplug.DeviceMessage.VibrateComponent.toObject(message.speeds[j], options);
                 }
                 return object;
@@ -2751,7 +2753,7 @@ $root.Buttplug = (function() {
              */
             function RotateComponent(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -2840,9 +2842,9 @@ $root.Buttplug = (function() {
             RotateComponent.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RotateComponent();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RotateComponent();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -2911,7 +2913,7 @@ $root.Buttplug = (function() {
             RotateComponent.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.RotateComponent)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.RotateComponent();
+                let message = new $root.Buttplug.DeviceMessage.RotateComponent();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 if (object.speed != null)
@@ -2933,7 +2935,7 @@ $root.Buttplug = (function() {
             RotateComponent.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.index = 0;
                     object.speed = 0;
@@ -2982,7 +2984,7 @@ $root.Buttplug = (function() {
             function RotateCmd(properties) {
                 this.rotations = [];
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -3020,7 +3022,7 @@ $root.Buttplug = (function() {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.rotations != null && message.rotations.length)
-                    for (var i = 0; i < message.rotations.length; ++i)
+                    for (let i = 0; i < message.rotations.length; ++i)
                         $root.Buttplug.DeviceMessage.RotateComponent.encode(message.rotations[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 return writer;
             };
@@ -3052,9 +3054,9 @@ $root.Buttplug = (function() {
             RotateCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RotateCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RotateCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         if (!(message.rotations && message.rotations.length))
@@ -3099,8 +3101,8 @@ $root.Buttplug = (function() {
                 if (message.rotations != null && message.hasOwnProperty("rotations")) {
                     if (!Array.isArray(message.rotations))
                         return "rotations: array expected";
-                    for (var i = 0; i < message.rotations.length; ++i) {
-                        var error = $root.Buttplug.DeviceMessage.RotateComponent.verify(message.rotations[i]);
+                    for (let i = 0; i < message.rotations.length; ++i) {
+                        let error = $root.Buttplug.DeviceMessage.RotateComponent.verify(message.rotations[i]);
                         if (error)
                             return "rotations." + error;
                     }
@@ -3119,12 +3121,12 @@ $root.Buttplug = (function() {
             RotateCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.RotateCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.RotateCmd();
+                let message = new $root.Buttplug.DeviceMessage.RotateCmd();
                 if (object.rotations) {
                     if (!Array.isArray(object.rotations))
                         throw TypeError(".Buttplug.DeviceMessage.RotateCmd.rotations: array expected");
                     message.rotations = [];
-                    for (var i = 0; i < object.rotations.length; ++i) {
+                    for (let i = 0; i < object.rotations.length; ++i) {
                         if (typeof object.rotations[i] !== "object")
                             throw TypeError(".Buttplug.DeviceMessage.RotateCmd.rotations: object expected");
                         message.rotations[i] = $root.Buttplug.DeviceMessage.RotateComponent.fromObject(object.rotations[i]);
@@ -3145,12 +3147,12 @@ $root.Buttplug = (function() {
             RotateCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.arrays || options.defaults)
                     object.rotations = [];
                 if (message.rotations && message.rotations.length) {
                     object.rotations = [];
-                    for (var j = 0; j < message.rotations.length; ++j)
+                    for (let j = 0; j < message.rotations.length; ++j)
                         object.rotations[j] = $root.Buttplug.DeviceMessage.RotateComponent.toObject(message.rotations[j], options);
                 }
                 return object;
@@ -3191,7 +3193,7 @@ $root.Buttplug = (function() {
              */
             function LinearComponent(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -3280,9 +3282,9 @@ $root.Buttplug = (function() {
             LinearComponent.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.LinearComponent();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.LinearComponent();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -3351,7 +3353,7 @@ $root.Buttplug = (function() {
             LinearComponent.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.LinearComponent)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.LinearComponent();
+                let message = new $root.Buttplug.DeviceMessage.LinearComponent();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 if (object.duration != null)
@@ -3373,7 +3375,7 @@ $root.Buttplug = (function() {
             LinearComponent.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.index = 0;
                     object.duration = 0;
@@ -3422,7 +3424,7 @@ $root.Buttplug = (function() {
             function LinearCmd(properties) {
                 this.movements = [];
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -3460,7 +3462,7 @@ $root.Buttplug = (function() {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.movements != null && message.movements.length)
-                    for (var i = 0; i < message.movements.length; ++i)
+                    for (let i = 0; i < message.movements.length; ++i)
                         $root.Buttplug.DeviceMessage.LinearComponent.encode(message.movements[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 return writer;
             };
@@ -3492,9 +3494,9 @@ $root.Buttplug = (function() {
             LinearCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.LinearCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.LinearCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         if (!(message.movements && message.movements.length))
@@ -3539,8 +3541,8 @@ $root.Buttplug = (function() {
                 if (message.movements != null && message.hasOwnProperty("movements")) {
                     if (!Array.isArray(message.movements))
                         return "movements: array expected";
-                    for (var i = 0; i < message.movements.length; ++i) {
-                        var error = $root.Buttplug.DeviceMessage.LinearComponent.verify(message.movements[i]);
+                    for (let i = 0; i < message.movements.length; ++i) {
+                        let error = $root.Buttplug.DeviceMessage.LinearComponent.verify(message.movements[i]);
                         if (error)
                             return "movements." + error;
                     }
@@ -3559,12 +3561,12 @@ $root.Buttplug = (function() {
             LinearCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.LinearCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.LinearCmd();
+                let message = new $root.Buttplug.DeviceMessage.LinearCmd();
                 if (object.movements) {
                     if (!Array.isArray(object.movements))
                         throw TypeError(".Buttplug.DeviceMessage.LinearCmd.movements: array expected");
                     message.movements = [];
-                    for (var i = 0; i < object.movements.length; ++i) {
+                    for (let i = 0; i < object.movements.length; ++i) {
                         if (typeof object.movements[i] !== "object")
                             throw TypeError(".Buttplug.DeviceMessage.LinearCmd.movements: object expected");
                         message.movements[i] = $root.Buttplug.DeviceMessage.LinearComponent.fromObject(object.movements[i]);
@@ -3585,12 +3587,12 @@ $root.Buttplug = (function() {
             LinearCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.arrays || options.defaults)
                     object.movements = [];
                 if (message.movements && message.movements.length) {
                     object.movements = [];
-                    for (var j = 0; j < message.movements.length; ++j)
+                    for (let j = 0; j < message.movements.length; ++j)
                         object.movements[j] = $root.Buttplug.DeviceMessage.LinearComponent.toObject(message.movements[j], options);
                 }
                 return object;
@@ -3628,7 +3630,7 @@ $root.Buttplug = (function() {
              */
             function StopDeviceCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -3687,9 +3689,9 @@ $root.Buttplug = (function() {
             StopDeviceCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.StopDeviceCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.StopDeviceCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -3792,7 +3794,7 @@ $root.Buttplug = (function() {
              */
             function RawReadCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -3891,9 +3893,9 @@ $root.Buttplug = (function() {
             RawReadCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawReadCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawReadCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.endpoint = reader.int32();
@@ -4016,7 +4018,7 @@ $root.Buttplug = (function() {
             RawReadCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.RawReadCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.RawReadCmd();
+                let message = new $root.Buttplug.DeviceMessage.RawReadCmd();
                 switch (object.endpoint) {
                 case "Command":
                 case 0:
@@ -4223,7 +4225,7 @@ $root.Buttplug = (function() {
             RawReadCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.endpoint = options.enums === String ? "Command" : 0;
                     if (options.bytes === String)
@@ -4282,7 +4284,7 @@ $root.Buttplug = (function() {
              */
             function RawWriteCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -4371,9 +4373,9 @@ $root.Buttplug = (function() {
             RawWriteCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawWriteCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawWriteCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.endpoint = reader.int32();
@@ -4490,7 +4492,7 @@ $root.Buttplug = (function() {
             RawWriteCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.RawWriteCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.RawWriteCmd();
+                let message = new $root.Buttplug.DeviceMessage.RawWriteCmd();
                 switch (object.endpoint) {
                 case "Command":
                 case 0:
@@ -4695,7 +4697,7 @@ $root.Buttplug = (function() {
             RawWriteCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.endpoint = options.enums === String ? "Command" : 0;
                     if (options.bytes === String)
@@ -4749,7 +4751,7 @@ $root.Buttplug = (function() {
              */
             function RawSubscribeCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -4818,9 +4820,9 @@ $root.Buttplug = (function() {
             RawSubscribeCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawSubscribeCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawSubscribeCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.endpoint = reader.int32();
@@ -4925,7 +4927,7 @@ $root.Buttplug = (function() {
             RawSubscribeCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.RawSubscribeCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.RawSubscribeCmd();
+                let message = new $root.Buttplug.DeviceMessage.RawSubscribeCmd();
                 switch (object.endpoint) {
                 case "Command":
                 case 0:
@@ -5123,7 +5125,7 @@ $root.Buttplug = (function() {
             RawSubscribeCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults)
                     object.endpoint = options.enums === String ? "Command" : 0;
                 if (message.endpoint != null && message.hasOwnProperty("endpoint"))
@@ -5164,7 +5166,7 @@ $root.Buttplug = (function() {
              */
             function RawUnsubscribeCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -5233,9 +5235,9 @@ $root.Buttplug = (function() {
             RawUnsubscribeCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawUnsubscribeCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RawUnsubscribeCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.endpoint = reader.int32();
@@ -5340,7 +5342,7 @@ $root.Buttplug = (function() {
             RawUnsubscribeCmd.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.RawUnsubscribeCmd)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.RawUnsubscribeCmd();
+                let message = new $root.Buttplug.DeviceMessage.RawUnsubscribeCmd();
                 switch (object.endpoint) {
                 case "Command":
                 case 0:
@@ -5538,7 +5540,7 @@ $root.Buttplug = (function() {
             RawUnsubscribeCmd.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults)
                     object.endpoint = options.enums === String ? "Command" : 0;
                 if (message.endpoint != null && message.hasOwnProperty("endpoint"))
@@ -5578,7 +5580,7 @@ $root.Buttplug = (function() {
              */
             function BatteryLevelCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -5637,9 +5639,9 @@ $root.Buttplug = (function() {
             BatteryLevelCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.BatteryLevelCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.BatteryLevelCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -5738,7 +5740,7 @@ $root.Buttplug = (function() {
              */
             function RSSILevelCmd(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -5797,9 +5799,9 @@ $root.Buttplug = (function() {
             RSSILevelCmd.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RSSILevelCmd();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.RSSILevelCmd();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -5908,7 +5910,7 @@ $root.Buttplug = (function() {
              */
             function FFIMessage(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -5994,7 +5996,7 @@ $root.Buttplug = (function() {
             FFIMessage.prototype.rssiLevelCmd = null;
 
             // OneOf field names bound to virtual getters and setters
-            var $oneOfFields;
+            let $oneOfFields;
 
             /**
              * FFIMessage msg.
@@ -6081,9 +6083,9 @@ $root.Buttplug = (function() {
             FFIMessage.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.FFIMessage();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceMessage.FFIMessage();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.vibrateCmd = $root.Buttplug.DeviceMessage.VibrateCmd.decode(reader, reader.uint32());
@@ -6150,11 +6152,11 @@ $root.Buttplug = (function() {
             FFIMessage.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                var properties = {};
+                let properties = {};
                 if (message.vibrateCmd != null && message.hasOwnProperty("vibrateCmd")) {
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.VibrateCmd.verify(message.vibrateCmd);
+                        let error = $root.Buttplug.DeviceMessage.VibrateCmd.verify(message.vibrateCmd);
                         if (error)
                             return "vibrateCmd." + error;
                     }
@@ -6164,7 +6166,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.RotateCmd.verify(message.rotateCmd);
+                        let error = $root.Buttplug.DeviceMessage.RotateCmd.verify(message.rotateCmd);
                         if (error)
                             return "rotateCmd." + error;
                     }
@@ -6174,7 +6176,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.LinearCmd.verify(message.linearCmd);
+                        let error = $root.Buttplug.DeviceMessage.LinearCmd.verify(message.linearCmd);
                         if (error)
                             return "linearCmd." + error;
                     }
@@ -6184,7 +6186,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.StopDeviceCmd.verify(message.stopDeviceCmd);
+                        let error = $root.Buttplug.DeviceMessage.StopDeviceCmd.verify(message.stopDeviceCmd);
                         if (error)
                             return "stopDeviceCmd." + error;
                     }
@@ -6194,7 +6196,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.RawReadCmd.verify(message.rawReadCmd);
+                        let error = $root.Buttplug.DeviceMessage.RawReadCmd.verify(message.rawReadCmd);
                         if (error)
                             return "rawReadCmd." + error;
                     }
@@ -6204,7 +6206,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.RawWriteCmd.verify(message.rawWriteCmd);
+                        let error = $root.Buttplug.DeviceMessage.RawWriteCmd.verify(message.rawWriteCmd);
                         if (error)
                             return "rawWriteCmd." + error;
                     }
@@ -6214,7 +6216,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.RawSubscribeCmd.verify(message.rawSubscribeCmd);
+                        let error = $root.Buttplug.DeviceMessage.RawSubscribeCmd.verify(message.rawSubscribeCmd);
                         if (error)
                             return "rawSubscribeCmd." + error;
                     }
@@ -6224,7 +6226,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.RawUnsubscribeCmd.verify(message.rawUnsubscribeCmd);
+                        let error = $root.Buttplug.DeviceMessage.RawUnsubscribeCmd.verify(message.rawUnsubscribeCmd);
                         if (error)
                             return "rawUnsubscribeCmd." + error;
                     }
@@ -6234,7 +6236,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.BatteryLevelCmd.verify(message.batteryLevelCmd);
+                        let error = $root.Buttplug.DeviceMessage.BatteryLevelCmd.verify(message.batteryLevelCmd);
                         if (error)
                             return "batteryLevelCmd." + error;
                     }
@@ -6244,7 +6246,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceMessage.RSSILevelCmd.verify(message.rssiLevelCmd);
+                        let error = $root.Buttplug.DeviceMessage.RSSILevelCmd.verify(message.rssiLevelCmd);
                         if (error)
                             return "rssiLevelCmd." + error;
                     }
@@ -6263,7 +6265,7 @@ $root.Buttplug = (function() {
             FFIMessage.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceMessage.FFIMessage)
                     return object;
-                var message = new $root.Buttplug.DeviceMessage.FFIMessage();
+                let message = new $root.Buttplug.DeviceMessage.FFIMessage();
                 if (object.vibrateCmd != null) {
                     if (typeof object.vibrateCmd !== "object")
                         throw TypeError(".Buttplug.DeviceMessage.FFIMessage.vibrateCmd: object expected");
@@ -6329,7 +6331,7 @@ $root.Buttplug = (function() {
             FFIMessage.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (message.vibrateCmd != null && message.hasOwnProperty("vibrateCmd")) {
                     object.vibrateCmd = $root.Buttplug.DeviceMessage.VibrateCmd.toObject(message.vibrateCmd, options);
                     if (options.oneofs)
@@ -6424,7 +6426,7 @@ $root.Buttplug = (function() {
          */
         function ServerMessage(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -6478,7 +6480,7 @@ $root.Buttplug = (function() {
         ServerMessage.prototype.disconnect = null;
 
         // OneOf field names bound to virtual getters and setters
-        var $oneOfFields;
+        let $oneOfFields;
 
         /**
          * ServerMessage msg.
@@ -6557,9 +6559,9 @@ $root.Buttplug = (function() {
         ServerMessage.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.ok = $root.Buttplug.ServerMessage.Ok.decode(reader, reader.uint32());
@@ -6614,11 +6616,11 @@ $root.Buttplug = (function() {
         ServerMessage.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            var properties = {};
+            let properties = {};
             if (message.ok != null && message.hasOwnProperty("ok")) {
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.ServerMessage.Ok.verify(message.ok);
+                    let error = $root.Buttplug.ServerMessage.Ok.verify(message.ok);
                     if (error)
                         return "ok." + error;
                 }
@@ -6628,7 +6630,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.ServerMessage.Error.verify(message.error);
+                    let error = $root.Buttplug.ServerMessage.Error.verify(message.error);
                     if (error)
                         return "error." + error;
                 }
@@ -6638,7 +6640,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.ServerMessage.ScanningFinished.verify(message.scanningFinished);
+                    let error = $root.Buttplug.ServerMessage.ScanningFinished.verify(message.scanningFinished);
                     if (error)
                         return "scanningFinished." + error;
                 }
@@ -6648,7 +6650,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.ServerMessage.DeviceAdded.verify(message.deviceAdded);
+                    let error = $root.Buttplug.ServerMessage.DeviceAdded.verify(message.deviceAdded);
                     if (error)
                         return "deviceAdded." + error;
                 }
@@ -6658,7 +6660,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.ServerMessage.DeviceRemoved.verify(message.deviceRemoved);
+                    let error = $root.Buttplug.ServerMessage.DeviceRemoved.verify(message.deviceRemoved);
                     if (error)
                         return "deviceRemoved." + error;
                 }
@@ -6668,7 +6670,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.ServerMessage.Disconnect.verify(message.disconnect);
+                    let error = $root.Buttplug.ServerMessage.Disconnect.verify(message.disconnect);
                     if (error)
                         return "disconnect." + error;
                 }
@@ -6687,7 +6689,7 @@ $root.Buttplug = (function() {
         ServerMessage.fromObject = function fromObject(object) {
             if (object instanceof $root.Buttplug.ServerMessage)
                 return object;
-            var message = new $root.Buttplug.ServerMessage();
+            let message = new $root.Buttplug.ServerMessage();
             if (object.ok != null) {
                 if (typeof object.ok !== "object")
                     throw TypeError(".Buttplug.ServerMessage.ok: object expected");
@@ -6733,7 +6735,7 @@ $root.Buttplug = (function() {
         ServerMessage.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (message.ok != null && message.hasOwnProperty("ok")) {
                 object.ok = $root.Buttplug.ServerMessage.Ok.toObject(message.ok, options);
                 if (options.oneofs)
@@ -6790,7 +6792,7 @@ $root.Buttplug = (function() {
          * @property {number} ButtplugUnknownError=5 ButtplugUnknownError value
          */
         ServerMessage.ButtplugErrorType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "ButtplugConnectorError"] = 0;
             values[valuesById[1] = "ButtplugHandshakeError"] = 1;
             values[valuesById[2] = "ButtplugDeviceError"] = 2;
@@ -6816,7 +6818,7 @@ $root.Buttplug = (function() {
          * @property {number} RSSILevelCmd=9 RSSILevelCmd value
          */
         ServerMessage.MessageAttributeType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "VibrateCmd"] = 0;
             values[valuesById[1] = "RotateCmd"] = 1;
             values[valuesById[2] = "LinearCmd"] = 2;
@@ -6856,7 +6858,7 @@ $root.Buttplug = (function() {
                 this.endpoints = [];
                 this.maxDuration = [];
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -6931,19 +6933,19 @@ $root.Buttplug = (function() {
                     writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.featureCount);
                 if (message.stepCount != null && message.stepCount.length) {
                     writer.uint32(/* id 3, wireType 2 =*/26).fork();
-                    for (var i = 0; i < message.stepCount.length; ++i)
+                    for (let i = 0; i < message.stepCount.length; ++i)
                         writer.uint32(message.stepCount[i]);
                     writer.ldelim();
                 }
                 if (message.endpoints != null && message.endpoints.length) {
                     writer.uint32(/* id 4, wireType 2 =*/34).fork();
-                    for (var i = 0; i < message.endpoints.length; ++i)
+                    for (let i = 0; i < message.endpoints.length; ++i)
                         writer.int32(message.endpoints[i]);
                     writer.ldelim();
                 }
                 if (message.maxDuration != null && message.maxDuration.length) {
                     writer.uint32(/* id 5, wireType 2 =*/42).fork();
-                    for (var i = 0; i < message.maxDuration.length; ++i)
+                    for (let i = 0; i < message.maxDuration.length; ++i)
                         writer.uint32(message.maxDuration[i]);
                     writer.ldelim();
                 }
@@ -6977,9 +6979,9 @@ $root.Buttplug = (function() {
             MessageAttributes.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.MessageAttributes();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.MessageAttributes();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.messageType = reader.int32();
@@ -6991,7 +6993,7 @@ $root.Buttplug = (function() {
                         if (!(message.stepCount && message.stepCount.length))
                             message.stepCount = [];
                         if ((tag & 7) === 2) {
-                            var end2 = reader.uint32() + reader.pos;
+                            let end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
                                 message.stepCount.push(reader.uint32());
                         } else
@@ -7001,7 +7003,7 @@ $root.Buttplug = (function() {
                         if (!(message.endpoints && message.endpoints.length))
                             message.endpoints = [];
                         if ((tag & 7) === 2) {
-                            var end2 = reader.uint32() + reader.pos;
+                            let end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
                                 message.endpoints.push(reader.int32());
                         } else
@@ -7011,7 +7013,7 @@ $root.Buttplug = (function() {
                         if (!(message.maxDuration && message.maxDuration.length))
                             message.maxDuration = [];
                         if ((tag & 7) === 2) {
-                            var end2 = reader.uint32() + reader.pos;
+                            let end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
                                 message.maxDuration.push(reader.uint32());
                         } else
@@ -7074,14 +7076,14 @@ $root.Buttplug = (function() {
                 if (message.stepCount != null && message.hasOwnProperty("stepCount")) {
                     if (!Array.isArray(message.stepCount))
                         return "stepCount: array expected";
-                    for (var i = 0; i < message.stepCount.length; ++i)
+                    for (let i = 0; i < message.stepCount.length; ++i)
                         if (!$util.isInteger(message.stepCount[i]))
                             return "stepCount: integer[] expected";
                 }
                 if (message.endpoints != null && message.hasOwnProperty("endpoints")) {
                     if (!Array.isArray(message.endpoints))
                         return "endpoints: array expected";
-                    for (var i = 0; i < message.endpoints.length; ++i)
+                    for (let i = 0; i < message.endpoints.length; ++i)
                         switch (message.endpoints[i]) {
                         default:
                             return "endpoints: enum value[] expected";
@@ -7136,7 +7138,7 @@ $root.Buttplug = (function() {
                 if (message.maxDuration != null && message.hasOwnProperty("maxDuration")) {
                     if (!Array.isArray(message.maxDuration))
                         return "maxDuration: array expected";
-                    for (var i = 0; i < message.maxDuration.length; ++i)
+                    for (let i = 0; i < message.maxDuration.length; ++i)
                         if (!$util.isInteger(message.maxDuration[i]))
                             return "maxDuration: integer[] expected";
                 }
@@ -7154,7 +7156,7 @@ $root.Buttplug = (function() {
             MessageAttributes.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ServerMessage.MessageAttributes)
                     return object;
-                var message = new $root.Buttplug.ServerMessage.MessageAttributes();
+                let message = new $root.Buttplug.ServerMessage.MessageAttributes();
                 switch (object.messageType) {
                 case "VibrateCmd":
                 case 0:
@@ -7203,14 +7205,14 @@ $root.Buttplug = (function() {
                     if (!Array.isArray(object.stepCount))
                         throw TypeError(".Buttplug.ServerMessage.MessageAttributes.stepCount: array expected");
                     message.stepCount = [];
-                    for (var i = 0; i < object.stepCount.length; ++i)
+                    for (let i = 0; i < object.stepCount.length; ++i)
                         message.stepCount[i] = object.stepCount[i] >>> 0;
                 }
                 if (object.endpoints) {
                     if (!Array.isArray(object.endpoints))
                         throw TypeError(".Buttplug.ServerMessage.MessageAttributes.endpoints: array expected");
                     message.endpoints = [];
-                    for (var i = 0; i < object.endpoints.length; ++i)
+                    for (let i = 0; i < object.endpoints.length; ++i)
                         switch (object.endpoints[i]) {
                         default:
                         case "Command":
@@ -7399,7 +7401,7 @@ $root.Buttplug = (function() {
                     if (!Array.isArray(object.maxDuration))
                         throw TypeError(".Buttplug.ServerMessage.MessageAttributes.maxDuration: array expected");
                     message.maxDuration = [];
-                    for (var i = 0; i < object.maxDuration.length; ++i)
+                    for (let i = 0; i < object.maxDuration.length; ++i)
                         message.maxDuration[i] = object.maxDuration[i] >>> 0;
                 }
                 return message;
@@ -7417,7 +7419,7 @@ $root.Buttplug = (function() {
             MessageAttributes.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.arrays || options.defaults) {
                     object.stepCount = [];
                     object.endpoints = [];
@@ -7433,17 +7435,17 @@ $root.Buttplug = (function() {
                     object.featureCount = message.featureCount;
                 if (message.stepCount && message.stepCount.length) {
                     object.stepCount = [];
-                    for (var j = 0; j < message.stepCount.length; ++j)
+                    for (let j = 0; j < message.stepCount.length; ++j)
                         object.stepCount[j] = message.stepCount[j];
                 }
                 if (message.endpoints && message.endpoints.length) {
                     object.endpoints = [];
-                    for (var j = 0; j < message.endpoints.length; ++j)
+                    for (let j = 0; j < message.endpoints.length; ++j)
                         object.endpoints[j] = options.enums === String ? $root.Buttplug.Endpoint[message.endpoints[j]] : message.endpoints[j];
                 }
                 if (message.maxDuration && message.maxDuration.length) {
                     object.maxDuration = [];
-                    for (var j = 0; j < message.maxDuration.length; ++j)
+                    for (let j = 0; j < message.maxDuration.length; ++j)
                         object.maxDuration[j] = message.maxDuration[j];
                 }
                 return object;
@@ -7481,7 +7483,7 @@ $root.Buttplug = (function() {
              */
             function Ok(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -7540,9 +7542,9 @@ $root.Buttplug = (function() {
             Ok.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.Ok();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.Ok();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -7644,7 +7646,7 @@ $root.Buttplug = (function() {
              */
             function Error(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -7733,9 +7735,9 @@ $root.Buttplug = (function() {
             Error.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.Error();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.Error();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.errorType = reader.int32();
@@ -7813,7 +7815,7 @@ $root.Buttplug = (function() {
             Error.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ServerMessage.Error)
                     return object;
-                var message = new $root.Buttplug.ServerMessage.Error();
+                let message = new $root.Buttplug.ServerMessage.Error();
                 switch (object.errorType) {
                 case "ButtplugConnectorError":
                 case 0:
@@ -7859,7 +7861,7 @@ $root.Buttplug = (function() {
             Error.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.errorType = options.enums === String ? "ButtplugConnectorError" : 0;
                     object.message = "";
@@ -7906,7 +7908,7 @@ $root.Buttplug = (function() {
              */
             function ScanningFinished(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -7965,9 +7967,9 @@ $root.Buttplug = (function() {
             ScanningFinished.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.ScanningFinished();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.ScanningFinished();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -8070,7 +8072,7 @@ $root.Buttplug = (function() {
             function DeviceAdded(properties) {
                 this.messageAttributes = [];
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -8128,7 +8130,7 @@ $root.Buttplug = (function() {
                 if (message.index != null && Object.hasOwnProperty.call(message, "index"))
                     writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.index);
                 if (message.messageAttributes != null && message.messageAttributes.length)
-                    for (var i = 0; i < message.messageAttributes.length; ++i)
+                    for (let i = 0; i < message.messageAttributes.length; ++i)
                         $root.Buttplug.ServerMessage.MessageAttributes.encode(message.messageAttributes[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 return writer;
             };
@@ -8160,9 +8162,9 @@ $root.Buttplug = (function() {
             DeviceAdded.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.DeviceAdded();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.DeviceAdded();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.name = reader.string();
@@ -8219,8 +8221,8 @@ $root.Buttplug = (function() {
                 if (message.messageAttributes != null && message.hasOwnProperty("messageAttributes")) {
                     if (!Array.isArray(message.messageAttributes))
                         return "messageAttributes: array expected";
-                    for (var i = 0; i < message.messageAttributes.length; ++i) {
-                        var error = $root.Buttplug.ServerMessage.MessageAttributes.verify(message.messageAttributes[i]);
+                    for (let i = 0; i < message.messageAttributes.length; ++i) {
+                        let error = $root.Buttplug.ServerMessage.MessageAttributes.verify(message.messageAttributes[i]);
                         if (error)
                             return "messageAttributes." + error;
                     }
@@ -8239,7 +8241,7 @@ $root.Buttplug = (function() {
             DeviceAdded.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ServerMessage.DeviceAdded)
                     return object;
-                var message = new $root.Buttplug.ServerMessage.DeviceAdded();
+                let message = new $root.Buttplug.ServerMessage.DeviceAdded();
                 if (object.name != null)
                     message.name = String(object.name);
                 if (object.index != null)
@@ -8248,7 +8250,7 @@ $root.Buttplug = (function() {
                     if (!Array.isArray(object.messageAttributes))
                         throw TypeError(".Buttplug.ServerMessage.DeviceAdded.messageAttributes: array expected");
                     message.messageAttributes = [];
-                    for (var i = 0; i < object.messageAttributes.length; ++i) {
+                    for (let i = 0; i < object.messageAttributes.length; ++i) {
                         if (typeof object.messageAttributes[i] !== "object")
                             throw TypeError(".Buttplug.ServerMessage.DeviceAdded.messageAttributes: object expected");
                         message.messageAttributes[i] = $root.Buttplug.ServerMessage.MessageAttributes.fromObject(object.messageAttributes[i]);
@@ -8269,7 +8271,7 @@ $root.Buttplug = (function() {
             DeviceAdded.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.arrays || options.defaults)
                     object.messageAttributes = [];
                 if (options.defaults) {
@@ -8282,7 +8284,7 @@ $root.Buttplug = (function() {
                     object.index = message.index;
                 if (message.messageAttributes && message.messageAttributes.length) {
                     object.messageAttributes = [];
-                    for (var j = 0; j < message.messageAttributes.length; ++j)
+                    for (let j = 0; j < message.messageAttributes.length; ++j)
                         object.messageAttributes[j] = $root.Buttplug.ServerMessage.MessageAttributes.toObject(message.messageAttributes[j], options);
                 }
                 return object;
@@ -8321,7 +8323,7 @@ $root.Buttplug = (function() {
              */
             function DeviceRemoved(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -8390,9 +8392,9 @@ $root.Buttplug = (function() {
             DeviceRemoved.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.DeviceRemoved();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.DeviceRemoved();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -8449,7 +8451,7 @@ $root.Buttplug = (function() {
             DeviceRemoved.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ServerMessage.DeviceRemoved)
                     return object;
-                var message = new $root.Buttplug.ServerMessage.DeviceRemoved();
+                let message = new $root.Buttplug.ServerMessage.DeviceRemoved();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 return message;
@@ -8467,7 +8469,7 @@ $root.Buttplug = (function() {
             DeviceRemoved.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults)
                     object.index = 0;
                 if (message.index != null && message.hasOwnProperty("index"))
@@ -8507,7 +8509,7 @@ $root.Buttplug = (function() {
              */
             function Disconnect(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -8566,9 +8568,9 @@ $root.Buttplug = (function() {
             Disconnect.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.Disconnect();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ServerMessage.Disconnect();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     default:
                         reader.skipType(tag & 7);
@@ -8674,7 +8676,7 @@ $root.Buttplug = (function() {
          */
         function DeviceEvent(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -8712,7 +8714,7 @@ $root.Buttplug = (function() {
         DeviceEvent.prototype.rawReading = null;
 
         // OneOf field names bound to virtual getters and setters
-        var $oneOfFields;
+        let $oneOfFields;
 
         /**
          * DeviceEvent msg.
@@ -8787,9 +8789,9 @@ $root.Buttplug = (function() {
         DeviceEvent.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.disconnect = $root.Buttplug.DeviceEvent.Disconnect.decode(reader, reader.uint32());
@@ -8838,11 +8840,11 @@ $root.Buttplug = (function() {
         DeviceEvent.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            var properties = {};
+            let properties = {};
             if (message.disconnect != null && message.hasOwnProperty("disconnect")) {
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.DeviceEvent.Disconnect.verify(message.disconnect);
+                    let error = $root.Buttplug.DeviceEvent.Disconnect.verify(message.disconnect);
                     if (error)
                         return "disconnect." + error;
                 }
@@ -8852,7 +8854,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.DeviceEvent.BatteryLevelReading.verify(message.batteryLevelReading);
+                    let error = $root.Buttplug.DeviceEvent.BatteryLevelReading.verify(message.batteryLevelReading);
                     if (error)
                         return "batteryLevelReading." + error;
                 }
@@ -8862,7 +8864,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.DeviceEvent.RSSILevelReading.verify(message.rssiLevelReading);
+                    let error = $root.Buttplug.DeviceEvent.RSSILevelReading.verify(message.rssiLevelReading);
                     if (error)
                         return "rssiLevelReading." + error;
                 }
@@ -8872,7 +8874,7 @@ $root.Buttplug = (function() {
                     return "msg: multiple values";
                 properties.msg = 1;
                 {
-                    var error = $root.Buttplug.DeviceEvent.RawReading.verify(message.rawReading);
+                    let error = $root.Buttplug.DeviceEvent.RawReading.verify(message.rawReading);
                     if (error)
                         return "rawReading." + error;
                 }
@@ -8891,7 +8893,7 @@ $root.Buttplug = (function() {
         DeviceEvent.fromObject = function fromObject(object) {
             if (object instanceof $root.Buttplug.DeviceEvent)
                 return object;
-            var message = new $root.Buttplug.DeviceEvent();
+            let message = new $root.Buttplug.DeviceEvent();
             if (object.disconnect != null) {
                 if (typeof object.disconnect !== "object")
                     throw TypeError(".Buttplug.DeviceEvent.disconnect: object expected");
@@ -8927,7 +8929,7 @@ $root.Buttplug = (function() {
         DeviceEvent.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (message.disconnect != null && message.hasOwnProperty("disconnect")) {
                 object.disconnect = $root.Buttplug.DeviceEvent.Disconnect.toObject(message.disconnect, options);
                 if (options.oneofs)
@@ -8981,7 +8983,7 @@ $root.Buttplug = (function() {
              */
             function Disconnect(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -9050,9 +9052,9 @@ $root.Buttplug = (function() {
             Disconnect.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.Disconnect();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.Disconnect();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -9109,7 +9111,7 @@ $root.Buttplug = (function() {
             Disconnect.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceEvent.Disconnect)
                     return object;
-                var message = new $root.Buttplug.DeviceEvent.Disconnect();
+                let message = new $root.Buttplug.DeviceEvent.Disconnect();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 return message;
@@ -9127,7 +9129,7 @@ $root.Buttplug = (function() {
             Disconnect.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults)
                     object.index = 0;
                 if (message.index != null && message.hasOwnProperty("index"))
@@ -9170,7 +9172,7 @@ $root.Buttplug = (function() {
              */
             function RawReading(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -9259,9 +9261,9 @@ $root.Buttplug = (function() {
             RawReading.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.RawReading();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.RawReading();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -9378,7 +9380,7 @@ $root.Buttplug = (function() {
             RawReading.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceEvent.RawReading)
                     return object;
-                var message = new $root.Buttplug.DeviceEvent.RawReading();
+                let message = new $root.Buttplug.DeviceEvent.RawReading();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 switch (object.endpoint) {
@@ -9583,7 +9585,7 @@ $root.Buttplug = (function() {
             RawReading.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.index = 0;
                     object.endpoint = options.enums === String ? "Command" : 0;
@@ -9638,7 +9640,7 @@ $root.Buttplug = (function() {
              */
             function BatteryLevelReading(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -9717,9 +9719,9 @@ $root.Buttplug = (function() {
             BatteryLevelReading.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.BatteryLevelReading();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.BatteryLevelReading();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -9782,7 +9784,7 @@ $root.Buttplug = (function() {
             BatteryLevelReading.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceEvent.BatteryLevelReading)
                     return object;
-                var message = new $root.Buttplug.DeviceEvent.BatteryLevelReading();
+                let message = new $root.Buttplug.DeviceEvent.BatteryLevelReading();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 if (object.reading != null)
@@ -9802,7 +9804,7 @@ $root.Buttplug = (function() {
             BatteryLevelReading.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.index = 0;
                     object.reading = 0;
@@ -9848,7 +9850,7 @@ $root.Buttplug = (function() {
              */
             function RSSILevelReading(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -9927,9 +9929,9 @@ $root.Buttplug = (function() {
             RSSILevelReading.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.RSSILevelReading();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.DeviceEvent.RSSILevelReading();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.index = reader.uint32();
@@ -9992,7 +9994,7 @@ $root.Buttplug = (function() {
             RSSILevelReading.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.DeviceEvent.RSSILevelReading)
                     return object;
-                var message = new $root.Buttplug.DeviceEvent.RSSILevelReading();
+                let message = new $root.Buttplug.DeviceEvent.RSSILevelReading();
                 if (object.index != null)
                     message.index = object.index >>> 0;
                 if (object.reading != null)
@@ -10012,7 +10014,7 @@ $root.Buttplug = (function() {
             RSSILevelReading.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (options.defaults) {
                     object.index = 0;
                     object.reading = 0;
@@ -10061,7 +10063,7 @@ $root.Buttplug = (function() {
          */
         function ButtplugFFIServerMessage(properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
                         this[keys[i]] = properties[keys[i]];
         }
@@ -10140,9 +10142,9 @@ $root.Buttplug = (function() {
         ButtplugFFIServerMessage.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ButtplugFFIServerMessage();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ButtplugFFIServerMessage();
             while (reader.pos < end) {
-                var tag = reader.uint32();
+                let tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
                     message.id = reader.uint32();
@@ -10189,7 +10191,7 @@ $root.Buttplug = (function() {
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
             if (message.message != null && message.hasOwnProperty("message")) {
-                var error = $root.Buttplug.ButtplugFFIServerMessage.FFIMessage.verify(message.message);
+                let error = $root.Buttplug.ButtplugFFIServerMessage.FFIMessage.verify(message.message);
                 if (error)
                     return "message." + error;
             }
@@ -10207,7 +10209,7 @@ $root.Buttplug = (function() {
         ButtplugFFIServerMessage.fromObject = function fromObject(object) {
             if (object instanceof $root.Buttplug.ButtplugFFIServerMessage)
                 return object;
-            var message = new $root.Buttplug.ButtplugFFIServerMessage();
+            let message = new $root.Buttplug.ButtplugFFIServerMessage();
             if (object.id != null)
                 message.id = object.id >>> 0;
             if (object.message != null) {
@@ -10230,7 +10232,7 @@ $root.Buttplug = (function() {
         ButtplugFFIServerMessage.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
-            var object = {};
+            let object = {};
             if (options.defaults) {
                 object.id = 0;
                 object.message = null;
@@ -10273,7 +10275,7 @@ $root.Buttplug = (function() {
              */
             function FFIMessage(properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
@@ -10295,7 +10297,7 @@ $root.Buttplug = (function() {
             FFIMessage.prototype.deviceEvent = null;
 
             // OneOf field names bound to virtual getters and setters
-            var $oneOfFields;
+            let $oneOfFields;
 
             /**
              * FFIMessage msg.
@@ -10366,9 +10368,9 @@ $root.Buttplug = (function() {
             FFIMessage.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ButtplugFFIServerMessage.FFIMessage();
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Buttplug.ButtplugFFIServerMessage.FFIMessage();
                 while (reader.pos < end) {
-                    var tag = reader.uint32();
+                    let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
                         message.serverMessage = $root.Buttplug.ServerMessage.decode(reader, reader.uint32());
@@ -10411,11 +10413,11 @@ $root.Buttplug = (function() {
             FFIMessage.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                var properties = {};
+                let properties = {};
                 if (message.serverMessage != null && message.hasOwnProperty("serverMessage")) {
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.ServerMessage.verify(message.serverMessage);
+                        let error = $root.Buttplug.ServerMessage.verify(message.serverMessage);
                         if (error)
                             return "serverMessage." + error;
                     }
@@ -10425,7 +10427,7 @@ $root.Buttplug = (function() {
                         return "msg: multiple values";
                     properties.msg = 1;
                     {
-                        var error = $root.Buttplug.DeviceEvent.verify(message.deviceEvent);
+                        let error = $root.Buttplug.DeviceEvent.verify(message.deviceEvent);
                         if (error)
                             return "deviceEvent." + error;
                     }
@@ -10444,7 +10446,7 @@ $root.Buttplug = (function() {
             FFIMessage.fromObject = function fromObject(object) {
                 if (object instanceof $root.Buttplug.ButtplugFFIServerMessage.FFIMessage)
                     return object;
-                var message = new $root.Buttplug.ButtplugFFIServerMessage.FFIMessage();
+                let message = new $root.Buttplug.ButtplugFFIServerMessage.FFIMessage();
                 if (object.serverMessage != null) {
                     if (typeof object.serverMessage !== "object")
                         throw TypeError(".Buttplug.ButtplugFFIServerMessage.FFIMessage.serverMessage: object expected");
@@ -10470,7 +10472,7 @@ $root.Buttplug = (function() {
             FFIMessage.toObject = function toObject(message, options) {
                 if (!options)
                     options = {};
-                var object = {};
+                let object = {};
                 if (message.serverMessage != null && message.hasOwnProperty("serverMessage")) {
                     object.serverMessage = $root.Buttplug.ServerMessage.toObject(message.serverMessage, options);
                     if (options.oneofs)
@@ -10504,4 +10506,4 @@ $root.Buttplug = (function() {
     return Buttplug;
 })();
 
-module.exports = $root;
+export { $root as default };

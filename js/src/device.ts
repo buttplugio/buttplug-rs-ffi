@@ -7,12 +7,12 @@
  */
 
 "use strict";
-import { Buttplug } from "./buttplug_ffi";
-import { ButtplugDeviceError } from "./errors";
+import { Buttplug } from "./buttplug_ffi.js";
+import { ButtplugDeviceError } from "./errors.js";
 import { EventEmitter } from "events";
 import { vibrate, rotate, stopDevice, linear, batteryLevel,
-  rssiLevel, rawRead, rawWrite, rawSubscribe, rawUnsubscribe } from "./ffi";
-import { ButtplugMessageSorter } from "./sorter";
+  rssiLevel, rawRead, rawWrite, rawSubscribe, rawUnsubscribe } from "./ffi.js";
+import { ButtplugMessageSorter } from "./sorter.js";
 
 // Re-export the protobuf enum, so we don't require users to have to know the
 // full resolution path.

@@ -1,7 +1,7 @@
 
-import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
-import { ButtplugMessageSorter } from "./sorter";
-import { Buttplug } from "./buttplug_ffi";
+import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors.js";
+import { ButtplugMessageSorter } from "./sorter.js";
+import { Buttplug } from "./buttplug_ffi.js";
 
 function must_run_init_1(a: any | undefined): any {
   throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
@@ -34,7 +34,7 @@ export async function buttplugInit() {
     console.log("buttplugInit function has already run successfully. This only needs to be run once, but doesn't affect anything (other than printing this message) if called again.");
     return;
   }
-  let index = await import(/* webpackPrefetch: 1 */ "./buttplug-rs-ffi/buttplug_rs_ffi").catch((e) => {
+  let index = await import(/* webpackPrefetch: 1 */ "./buttplug-rs-ffi/buttplug_rs_ffi.js").catch((e) => {
     console.log(e);
     return Promise.reject(e);
   });

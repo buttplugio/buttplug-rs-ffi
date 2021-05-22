@@ -6,8 +6,8 @@
  * @copyright Copyright (c) Nonpolynomial Labs LLC. All rights reserved.
  */
 
-import { Buttplug } from "./buttplug_ffi";
-import { convertPBufError } from "./errors";
+import { Buttplug } from "./buttplug_ffi.js";
+import { convertPBufError } from "./errors.js";
 
 export class ButtplugMessageSorter {
   protected _counter: number = 1;

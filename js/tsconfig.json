@@ -13,7 +13,6 @@
     "declaration": true,
     "outDir": "./dist/module",
     "esModuleInterop": true,
-    "allowJs": true
   },
   "include": [
     "./src/**/*",
