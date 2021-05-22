@@ -1,4 +1,4 @@
-import { Buttplug } from "./buttplug_ffi";
+import { Buttplug } from "./buttplug_ffi.js";
 
 export class ButtplugError extends Error {
   /*

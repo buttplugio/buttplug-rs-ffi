@@ -6,12 +6,11 @@
  * @copyright Copyright 2020-2021 (c) Nonpolynomial Labs LLC. All rights reserved.
  */
 
-export * from "./client";
-export * from "./connectors";
-export * from "./device";
-export * from "./errors";
-export * from "./ffi";
-export * from "./sorter";
-
-import { Buttplug } from "./buttplug_ffi";
+export * from "./client.js";
+export * from "./connectors.js";
+export * from "./device.js";
+export * from "./errors.js";
+export * from "./ffi.js";
+export * from "./sorter.js";
+import { Buttplug } from "./buttplug_ffi.js";
 export import Endpoint = Buttplug.Endpoint;

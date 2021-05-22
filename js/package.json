@@ -17,17 +17,28 @@
   "scripts": {
     "dev": "webpack-dev-server --hot --config webpack.base.js --env development",
     "build:publish": "rimraf dist && yarn build:rust && yarn build:webpack && yarn build:webpack:production",
-    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
-    "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
-    "build:proto": "pbjs -t static-module -w commonjs -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
-    "build:webpack": "yarn build:main && webpack --progress --config webpack.base.js --env development",
-    "build:webpack:production": "webpack --progress --config webpack.base.js --env production"
+    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && node scripts/modularize.cjs wasm-pack && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
+    "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.js\" dist/module && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
+    "build:proto": "pbjs -t static-module -w es6 -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && node scripts/modularize.cjs pbjs && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
+    "build:webpack": "yarn build:main && webpack --progress --config webpack.base.cjs --env development",
+    "build:webpack:production": "webpack --progress --config webpack.base.cjs --env production"
   },
   "sideEffects": "false",
+  "type": "module",
   "main": "./dist/module/index.js",
+  "exports": {
+    "node": "./dist/module/index.js",
+    "browser": "./dist/web/buttplug.min.js"
+  },
+  "imports": {
+    "#buttplug_rs_ffi_bg": {
+      "node": "./dist/module/buttplug-rs-ffi/buttplug_rs_ffi_bg_node.js"
+    }
+  },
   "types": "./dist/module/index.d.ts",
   "dependencies": {
-    "protobufjs": "^6.10.2"    
+    "protobufjs": "^6.10.2",
+    "websocket": "^1.0.34"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
@@ -35,9 +46,9 @@
     "fork-ts-checker-webpack-plugin": "^6.1.0",
     "html-loader": "^1.3.2",
     "rimraf": "^3.0.2",
-    "ts-loader": "^8.0.17",
+    "ts-loader": "^8",
     "ts-node": "^9.1.1",
-    "ts-proto": "^1.55.0",
+    "ts-proto": "^1.80.1",
     "typescript": "^4.1.5",
     "uglify-js": "^3.12.7",
     "webpack": "^4",

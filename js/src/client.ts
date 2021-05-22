@@ -9,12 +9,12 @@
 "use strict";
 
 import { EventEmitter } from "events";
-import { Buttplug } from "./buttplug_ffi";
-import { ButtplugClientConnectorError } from "./errors";
-import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices, disconnect } from "./ffi";
-import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors";
-import { ButtplugMessageSorter } from "./sorter";
-import { ButtplugClientDevice } from "./device";
+import { Buttplug } from "./buttplug_ffi.js";
+import { ButtplugClientConnectorError } from "./errors.js";
+import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices, disconnect } from "./ffi.js";
+import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors.js";
+import { ButtplugMessageSorter } from "./sorter.js";
+import { ButtplugClientDevice } from "./device.js";
 export class ButtplugClient extends EventEmitter {
   protected _devices: Map<number, ButtplugClientDevice> = new Map();
   protected _clientName: string;

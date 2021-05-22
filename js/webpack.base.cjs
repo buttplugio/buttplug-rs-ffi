@@ -1,5 +1,6 @@
 'use strict';
 var path = require('path');
+var fs = require('fs');
 var webpack = require('webpack');
 const { merge } = require('webpack-merge');
 
@@ -25,6 +26,9 @@ const base = {
       amd: "buttplug-amd",
       commonjs: "buttplug-commonjs"
     }
+  },
+  externals: {
+    websocket: 'commonjs websocket'
   },
   module: {
     rules: [
@@ -52,17 +56,37 @@ const base = {
   },
   devtool: 'inline-source-map',
   plugins: [
-    new webpack.NamedModulesPlugin()
-  ],
-  node: {
-    fs: 'empty'
-  }
+    // ES Module imports require file extensions, but Webpack 4.x/ts-loader doesn't understand
+    // how to handle that. Instead, we rewrite those imports to use a '.ts' extension instead,
+    // if one exists.
+    new webpack.NormalModuleReplacementPlugin(/\.js$/, resource => {
+      if (resource.request.startsWith("./") && resource.request.endsWith(".js")) {
+        if (fs.existsSync(path.join(resource.context, resource.request.slice(0, -3) + ".ts"))) {
+          resource.request = resource.request.slice(0, -3) + ".ts";
+          return;
+        }
+      }
+    }),
+
+    // Webpack 4.x/ts-loader doesn't understand NodeJS import maps, which we use to
+    // redirect the wasm->js interop script into different variations based on whether
+    // we are running in NodeJS or in the browser. The following rewrites the import
+    // mapping for '#buttplug_rs_ffi_bg' to point to the webpack-compatible version.
+    new webpack.NormalModuleReplacementPlugin(/^#/, resource => {
+      if (resource.request === "#buttplug_rs_ffi_bg") {
+        resource.request = path.join(__dirname, "src/buttplug-rs-ffi/buttplug_rs_ffi_bg_web.js");
+      }
+    }),
+  ]
 };
 
-const production =   {
+const production = {
   mode: "production",
   output: {
     filename: `buttplug.min.js`
+  },
+  externals: {
+    websocket: 'commonjs websocket'
   },
   optimization: {
     minimize: true,

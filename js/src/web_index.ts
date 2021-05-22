@@ -28,4 +28,4 @@ var scripts = document.getElementsByTagName( "script" );
 var lastScript = scripts[scripts.length - 1].src;
 __webpack_public_path__ = lastScript.substr(0, lastScript.lastIndexOf('/') + 1);
 
-export * from "./index";
+export * from "./index.js";
