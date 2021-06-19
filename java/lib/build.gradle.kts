@@ -23,6 +23,14 @@ java {
     targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
 }
 
+// Workaround for JDK16+ issues with gradle
+// Taken from https://github.com/gradle/gradle/issues/15538#issuecomment-852939797
+tasks {
+    withType<JavaCompile> {
+        options.fork(mapOf(Pair("jvmArgs", listOf("--add-opens", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED"))))
+    }
+}
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
