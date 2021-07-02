@@ -11,7 +11,7 @@ import { Buttplug } from "./buttplug_ffi.js";
 import { ButtplugDeviceError } from "./errors.js";
 import { EventEmitter } from "events";
 import { vibrate, rotate, stopDevice, linear, batteryLevel,
-  rssiLevel, rawRead, rawWrite, rawSubscribe, rawUnsubscribe } from "./ffi.js";
+  rssiLevel, rawRead, rawWrite, rawSubscribe, rawUnsubscribe, freeDevicePtr } from "./ffi.js";
 import { ButtplugMessageSorter } from "./sorter.js";
 
 // Re-export the protobuf enum, so we don't require users to have to know the
@@ -73,6 +73,11 @@ export class VectorCmd {
   }
 }
 
+const deviceFinalizer = typeof FinalizationRegistry !== "function" ? undefined : new FinalizationRegistry((devicePtr: number) => {
+  freeDevicePtr(devicePtr);
+});
+
+
 /**
  * Represents an abstract device, capable of taking certain kinds of messages.
  */
@@ -80,10 +85,12 @@ export class ButtplugClientDevice extends EventEmitter {
 
   private _name: string;
   private _index: number;
-  private _devicePtr: number;
+  private _devicePtr: number
+  private _disposed = false;
   private _messageAttributes: Map<ButtplugDeviceMessageType, MessageAttributes> = new Map();
   private _sorter: ButtplugMessageSorter;
-  private _sorterCallback: Function;
+  private _sorterCallback: (buf: Uint8Array) => void;
+  private _unregisterToken = {};
 
   /**
    * Return the name of the device.
@@ -114,12 +121,13 @@ export class ButtplugClientDevice extends EventEmitter {
   constructor(
     devicePtr: number,
     sorter: ButtplugMessageSorter,
-    sorter_callback: Function,
+    sorter_callback: (buf: Uint8Array) => void,
     index: number,
     name: string,
     allowedMsgsObj: Buttplug.ServerMessage.IMessageAttributes[]) {
     super();
     this._devicePtr = devicePtr;
+    deviceFinalizer?.register(this, devicePtr, this._unregisterToken);
     this._sorter = sorter;
     this._index = index;
     this._name = name;
@@ -143,6 +151,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async vibrate(speeds: number | Array<VibrationCmd | number>): Promise<void> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.VibrateCmd);
     let msgSpeeds: Buttplug.DeviceMessage.VibrateComponent[];
     if (typeof (speeds) === "number") {
@@ -169,6 +178,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rotate(speeds: number | RotationCmd[], clockwise: boolean | undefined): Promise<void> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RotateCmd);
     let msgRotations: Buttplug.DeviceMessage.RotateComponent[];
     if (typeof (speeds) === "number" && clockwise !== undefined) {
@@ -192,6 +202,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async linear(position: number | VectorCmd[], duration: number | undefined): Promise<void> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.LinearCmd);
     let msgVectors: Buttplug.DeviceMessage.LinearComponent[];
     if (typeof (position) === "number" && duration !== undefined) {
@@ -215,6 +226,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async batteryLevel(): Promise<number> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.BatteryLevelCmd);
     let batteryMsg = await batteryLevel(this._sorter, this._devicePtr, this._sorterCallback);
     if (batteryMsg.message?.deviceEvent?.batteryLevelReading) {
@@ -225,6 +237,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rssiLevel(): Promise<number> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RSSILevelCmd);
     let rssiMsg = await rssiLevel(this._sorter, this._devicePtr, this._sorterCallback);
     if (rssiMsg.message?.deviceEvent?.rssiLevelReading) {
@@ -234,6 +247,7 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rawRead(endpoint: Buttplug.Endpoint, expectedLength: number, timeout: number): Promise<Uint8Array> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawReadCmd);
     let readingMsg = await rawRead(this._sorter, this._devicePtr, endpoint, expectedLength, timeout, this._sorterCallback);
     if (readingMsg.message?.deviceEvent?.rawReading) {
@@ -243,25 +257,44 @@ export class ButtplugClientDevice extends EventEmitter {
   }
 
   public async rawWrite(endpoint: Buttplug.Endpoint, data: Uint8Array, writeWithResponse: boolean): Promise<void> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawWriteCmd);
     await rawWrite(this._sorter, this._devicePtr, endpoint, data, writeWithResponse, this._sorterCallback);
   }
 
   public async rawSubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawSubscribeCmd);
     await rawSubscribe(this._sorter, this._devicePtr, endpoint, this._sorterCallback);
   }
 
   public async rawUnsubscribe(endpoint: Buttplug.Endpoint): Promise<void> {
+    this.throwIfDisposed();
     this.checkAllowedMessageType(ButtplugDeviceMessageType.RawUnsubscribeCmd);
     await rawUnsubscribe(this._sorter, this._devicePtr, endpoint, this._sorterCallback);
   }
 
   public async stop(): Promise<void> {
+    this.throwIfDisposed();
     await stopDevice(this._sorter, this._devicePtr, this._sorterCallback);
   }
 
   public emitDisconnected() {
     this.emit("deviceremoved");
+  }
+
+  private throwIfDisposed() {
+    if (this._disposed) {
+      throw new ReferenceError();
+    }
+  }
+
+  public dispose() {
+    if (!this._disposed) {
+      deviceFinalizer?.unregister(this._unregisterToken);
+      freeDevicePtr(this._devicePtr);
+      this._devicePtr = 0;
+      this._disposed = true;
+    }
   }
 }

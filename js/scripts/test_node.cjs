@@ -1,32 +1,27 @@
 const socketAddress = process.argv[2];
-if (!socketAddress) {
-    console.error("Expected a websocket address as the first argument");
-    process.exit(-1);
-}
-
-if (!process.execArgv.includes("--experimental-wasm-modules")) {
-    if (process.env["TEST_NODE_RESTART"]) {
-        console.error("Something went wrong.");
-        process.exit(-1);
-    }
-
-    const { spawnSync } = require("child_process");
-    console.log("Restarting with --experimental-wasm-modules ...");
-    process.env["TEST_NODE_RESTART"] = "1";
-    spawnSync(process.execPath, ["--experimental-wasm-modules", ...process.argv.slice(1)], { stdio: "inherit" });
-    process.env["TEST_NODE_RESTART"] = "";
-    return;
-}
-
 
 async function main() {
-    const { buttplugInit, ButtplugWebsocketConnectorOptions, ButtplugClient } = await import("../dist/module/index.js");
-    await buttplugInit();
-    const connector = new ButtplugWebsocketConnectorOptions(socketAddress);
+    const { ButtplugWebsocketConnectorOptions, ButtplugEmbeddedConnectorOptions, ButtplugClient } = await import("../dist/node/index.js");
+    console.log("finished import");
+
+    const connector = socketAddress ?
+        new ButtplugWebsocketConnectorOptions(socketAddress) :
+        new ButtplugEmbeddedConnectorOptions();
+    console.log("created connector");
+
     const client = new ButtplugClient("test_node");
+    client.on("error", e => console.error(e));
+    console.log("created client.");
+
+    console.log("connecting...");
     await client.connect(connector);
     console.log("connection successful.");
+
+    console.log("disconnecting...");
     await client.disconnect();
+    console.log("disconnected.");
+
+    client.dispose();
 }
 
 main().catch(e => {

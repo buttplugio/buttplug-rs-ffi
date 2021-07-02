@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions" : {
+    "outDir": "./dist/node",
+  },
+  "include": [
+    "./src/**/*",
+    "./tests/**/*.ts"
+  ],
+  "exclude": [
+    "./src/web_index.ts",
+    "./src/browser"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "compilerOptions" : {
+    "lib": ["esnext"],
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "declaration": true,
+    "noEmit": true,
+  }
+}

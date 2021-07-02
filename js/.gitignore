@@ -1,1 +1,5 @@
-src/buttplug-rs-ffi
+src/browser/buttplug-rs-ffi
+build/
+prebuilds/
+bin/
+yarn.error.log
