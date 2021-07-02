@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions" : {
+    "outDir": "./dist/browser",
+  },
+  "include": [
+    "./src/**/*",
+    "./tests/**/*.ts"
+  ],
+  "exclude": [
+    "./src/node"
+  ]
+}

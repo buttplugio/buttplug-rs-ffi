@@ -11,23 +11,31 @@
 import { EventEmitter } from "events";
 import { Buttplug } from "./buttplug_ffi.js";
 import { ButtplugClientConnectorError } from "./errors.js";
-import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices, disconnect } from "./ffi.js";
+import { createClientPtr, createDevicePtr, connectEmbedded, connectWebsocket, startScanning, stopScanning, stopAllDevices, disconnect, freeClientPtr } from "./ffi.js";
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors.js";
 import { ButtplugMessageSorter } from "./sorter.js";
 import { ButtplugClientDevice } from "./device.js";
+
+const clientFinalizer = typeof FinalizationRegistry !== "function" ? undefined : new FinalizationRegistry((clientPtr: number) => {
+  freeClientPtr(clientPtr);
+});
+
 export class ButtplugClient extends EventEmitter {
   protected _devices: Map<number, ButtplugClientDevice> = new Map();
   protected _clientName: string;
   // This will either be null, or our WASM heap pointer for our connected client object.
-  private _clientPtr?: number = undefined;
+  private _clientPtr: number;
   protected _isScanning = false;
   private _connected = false;
+  private _disposed = false;
   private _sorter: ButtplugMessageSorter = new ButtplugMessageSorter();
+  private _unregisterToken = {};
 
   constructor(clientName: string = "Generic Buttplug Client") {
     super();
     this._clientName = clientName;
     this._clientPtr = createClientPtr(this.sorterCallback, clientName);
+    clientFinalizer?.register(this, this._clientPtr, this._unregisterToken);
   }
 
   public get Connected(): boolean {
@@ -50,6 +58,7 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public connect = async (options: ButtplugEmbeddedConnectorOptions | ButtplugWebsocketConnectorOptions): Promise<void> => {
+    this.throwIfDisposed();
     if (this._connected) {
       throw new ButtplugClientConnectorError("Client already connected.");
     }
@@ -64,13 +73,15 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public disconnect = async () => {
-    if (!this._clientPtr) {
+    this.throwIfDisposed();
+    if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
-    await disconnect(this._sorter, this._clientPtr, this.sorterCallback);
+    await disconnect(this._sorter, this._clientPtr!, this.sorterCallback);
   }
 
   public startScanning = async () => {
+    this.throwIfDisposed();
     if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
@@ -79,6 +90,7 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public stopScanning = async () => {
+    this.throwIfDisposed();
     if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
@@ -87,6 +99,7 @@ export class ButtplugClient extends EventEmitter {
   }
 
   public stopAllDevices = async () => {
+    this.throwIfDisposed();
     if (!this._connected) {
       throw new ButtplugClientConnectorError("Not connected.");
     }
@@ -94,43 +107,72 @@ export class ButtplugClient extends EventEmitter {
   }
 
   protected CheckConnector() {
+    this.throwIfDisposed();
     if (!this.Connected) {
       throw new ButtplugClientConnectorError("ButtplugClient not connected");
     }
   }
 
   private sorterCallback = (buf: Uint8Array) => {
-    const msg = Buttplug.ButtplugFFIServerMessage.decode(buf);
-    if (msg.id > 0) {
-      this._sorter.ParseIncomingMessages(msg);
-      return;
-    }
-    if (msg.message?.serverMessage?.deviceAdded) {
-      const addedMsg = msg.message?.serverMessage?.deviceAdded;
-      const devicePtr = createDevicePtr(this._clientPtr!, addedMsg.index!);
-      const device = new ButtplugClientDevice(devicePtr!, this._sorter, this.sorterCallback, addedMsg.index!, addedMsg.name!, addedMsg.messageAttributes!);
-      this._devices.set(addedMsg.index!, device);
-      this.emit("deviceadded", device);
-      return;
-    }
-    if (msg.message?.serverMessage?.deviceRemoved) {
-      const removedMsg = msg.message?.serverMessage?.deviceRemoved;
-      if (this._devices.has(removedMsg.index!)) {
-        const removedDevice = this._devices.get(removedMsg.index!);
-        removedDevice?.emitDisconnected();
-        this._devices.delete(removedMsg.index!);
-        this.emit("deviceremoved", removedDevice);
+    try {
+      this.throwIfDisposed();
+      const msg = Buttplug.ButtplugFFIServerMessage.decode(buf);
+      if (msg.id > 0) {
+        this._sorter.ParseIncomingMessages(msg);
+        return;
       }
-      return;
+      if (msg.message?.serverMessage?.deviceAdded) {
+        const addedMsg = msg.message?.serverMessage?.deviceAdded;
+        const devicePtr = createDevicePtr(this._clientPtr!, addedMsg.index!);
+        const device = new ButtplugClientDevice(devicePtr!, this._sorter, this.sorterCallback, addedMsg.index!, addedMsg.name!, addedMsg.messageAttributes!);
+        this._devices.set(addedMsg.index!, device);
+        this.emit("deviceadded", device);
+        return;
+      }
+      if (msg.message?.serverMessage?.deviceRemoved) {
+        const removedMsg = msg.message?.serverMessage?.deviceRemoved;
+        if (this._devices.has(removedMsg.index!)) {
+          const removedDevice = this._devices.get(removedMsg.index!);
+          removedDevice?.emitDisconnected();
+          this._devices.delete(removedMsg.index!);
+          this.emit("deviceremoved", removedDevice);
+        }
+        return;
+      }
+      if (msg.message?.serverMessage?.scanningFinished) {
+        this._isScanning = false;
+        this.emit("scanningfinished");
+        return;
+      }
+      if (msg.message?.serverMessage?.disconnect) {
+        this._connected = false;
+        this.emit("serverdisconnect");
+      }
     }
-    if (msg.message?.serverMessage?.scanningFinished) {
-      this._isScanning = false;
-      this.emit("scanningfinished");
-      return;
+    catch (e) {
+      this.emit("error", e);
     }
-    if (msg.message?.serverMessage?.disconnect) {
-      this._connected = false;
-      this.emit("serverdisconnect");
+  };
+
+  private throwIfDisposed() {
+    if (this._clientPtr === undefined) {
+      throw new ReferenceError();
+    }
+  }
+
+  dispose() {
+    if (!this._disposed) {
+      this._disposed = true;
+      clientFinalizer?.unregister(this._unregisterToken);
+      try {
+        for (const device of this._devices.values()) {
+          device.dispose();
+        }
+      }
+      finally {
+        freeClientPtr(this._clientPtr);
+        this._clientPtr = 0;
+      }
     }
   }
 }

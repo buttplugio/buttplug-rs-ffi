@@ -14,42 +14,70 @@
   "bugs": {
     "url": "https://github.com/buttplugio/buttplug-rs-ffi/issues"
   },
+  "ffi-version": "2.0.2",
   "scripts": {
+    "install": "node-gyp-build && node scripts/install_core.js",
+    "prebuild:win32": "prebuildify --napi --tag-uv --tag-armv --platform win32 && rimraf build",
+    "prebuild:darwin": "prebuildify --napi --tag-uv --tag-armv --platform darwin && rimraf build",
+    "prebuild:linux": "prebuildify --napi --tag-uv --tag-armv --platform linux && rimraf build",
+    "prebuild:all": "yarn prebuild:win32 && yarn prebuild:darwin && yarn prebuild:linux",
+    "prebuild": "prebuildify --napi --tag-uv --tag-armv",
     "dev": "webpack-dev-server --hot --config webpack.base.js --env development",
-    "build:publish": "rimraf dist && yarn build:rust && yarn build:webpack && yarn build:webpack:production",
-    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && node scripts/modularize.cjs wasm-pack && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
-    "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.js\" dist/module && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
+    "build:rust:node": "cd ../ffi && cargo build --release && cd ../js && node scripts/install_core.js --from ../ffi/target/release",
+    "build:rust:browser": "rimraf src/browser/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/browser/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && rimraf src/browser/buttplug-rs-ffi/.gitignore src/browser/buttplug-rs-ffi/package.json src/browser/buttplug-rs-ffi/README.md",
+    "build:rust": "yarn build:rust:node && yarn build:rust:browser",
     "build:proto": "pbjs -t static-module -w es6 -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && node scripts/modularize.cjs pbjs && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
-    "build:webpack": "yarn build:main && webpack --progress --config webpack.base.cjs --env development",
-    "build:webpack:production": "webpack --progress --config webpack.base.cjs --env production"
+    "build:node:rust": "node scripts/install_core.js",
+    "build:node:gyp": "node-gyp-build",
+    "build:node:tsc": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.{js,d.ts}\" --exclude \"src/browser/**/*.*\" dist/node",
+    "build:node": "yarn build:node:rust && yarn build:node:gyp && yarn build:node:tsc",
+    "clean:node:gyp": "rimraf build && rimraf prebuilds",
+    "clean:node": "rimraf dist/node && rimraf bin && yarn clean:node:gyp",
+    "test:node": "yarn build:node && node scripts/test_node.cjs",
+    "build:browser:rust": "yarn build:rust:browser && copyfiles -u 1 \"src/**/*.wasm\" dist/browser",
+    "build:browser:webpack": "yarn build:webpack",
+    "build:browser:webpack:production": "yarn build:webpack:production",
+    "build:browser": "yarn build:browser:rust && yarn build:browser:webpack",
+    "build:browser:production": "yarn build:browser:rust && yarn build:browser:webpack:production",
+    "clean:browser": "rimraf dist/browser && rimraf src/browser/buttplug-rs-ffi",
+    "build:webpack": "webpack --progress --config webpack.base.cjs --env development",
+    "build:webpack:production": "webpack --progress --config webpack.base.cjs --env production",
+    "build": "yarn build:proto && yarn build:node && yarn build:webpack",
+    "build:production": "yarn build:proto && yarn build:node && yarn build:webpack:production",
+    "build:publish": "rimraf dist && rimraf bin && rimraf build && yarn build:production",
+    "clean": "yarn clean:node && yarn clean:browser && rimraf dist"
   },
   "sideEffects": "false",
   "type": "module",
-  "main": "./dist/module/index.js",
+  "main": "./dist/node/index.js",
   "exports": {
-    "node": "./dist/module/index.js",
-    "browser": "./dist/web/buttplug.min.js"
+    "node": "./dist/node/index.js",
+    "browser": "./dist/browser/buttplug.min.js"
   },
   "imports": {
-    "#buttplug_rs_ffi_bg": {
-      "node": "./dist/module/buttplug-rs-ffi/buttplug_rs_ffi_bg_node.js"
+    "#ffi_wrap": {
+      "node": "./dist/node/node/ffi_wrap.js"
     }
   },
-  "types": "./dist/module/index.d.ts",
+  "types": "./dist/node/index.d.ts",
   "dependencies": {
+    "node-addon-api": "^4.0.0",
+    "node-gyp-build": "^4.2.3",
     "protobufjs": "^6.10.2",
     "websocket": "^1.0.34"
   },
   "devDependencies": {
+    "@types/node": "15",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "fork-ts-checker-webpack-plugin": "^6.1.0",
     "html-loader": "^1.3.2",
+    "prebuildify": "^4.1.2",
     "rimraf": "^3.0.2",
     "ts-loader": "^8",
     "ts-node": "^9.1.1",
     "ts-proto": "^1.80.1",
-    "typescript": "^4.1.5",
+    "typescript": "4.3",
     "uglify-js": "^3.12.7",
     "webpack": "^4",
     "webpack-cli": "^3",

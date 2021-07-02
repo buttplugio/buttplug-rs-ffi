@@ -1,61 +1,30 @@
+/// <reference path="./ffi_wrap.d.ts" />
 
 import { ButtplugEmbeddedConnectorOptions, ButtplugWebsocketConnectorOptions } from "./connectors.js";
 import { ButtplugMessageSorter } from "./sorter.js";
 import { Buttplug } from "./buttplug_ffi.js";
 
-function must_run_init_1(a: any | undefined): any {
-  throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
-}
+import {
+  buttplug_create_protobuf_client,
+  buttplug_free_client,
+  buttplug_client_protobuf_message,
+  buttplug_create_device,
+  buttplug_device_protobuf_message,
+  buttplug_free_device,
+  buttplug_activate_env_logger,
+  buttplugInit,
+} from "#ffi_wrap";
 
-function must_run_init_2(a: any | undefined, b: any | undefined): any {
-  throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
-}
+export { buttplugInit };
 
-function must_run_init_3(a: any | undefined, b: any | undefined, c: any | undefined): any {
-  throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
-}
-
-function must_run_init_4(a: any | undefined, b: any | undefined, c: any | undefined, d: any | undefined): any {
-  throw new Error("Must run buttplugInit() async before calling any Buttplug methods!");
-}
-// import { buttplug_create_protobuf_client, buttplug_free_client, buttplug_client_protobuf_message, buttplug_activate_env_logger, buttplug_free_device, buttplug_create_device, buttplug_device_protobuf_message } from "./buttplug-rs-ffi/buttplug_rs_ffi";
-
-let buttplug_create_protobuf_client = must_run_init_3;
-let buttplug_free_client = must_run_init_1;
-let buttplug_client_protobuf_message = must_run_init_4;
-let buttplug_activate_env_logger = must_run_init_1;
-let buttplug_free_device = must_run_init_1;
-let buttplug_create_device = must_run_init_2;
-let buttplug_device_protobuf_message = must_run_init_4;
-let buttplug_has_init_run = false;
-
-export async function buttplugInit() {
-  if (buttplug_has_init_run) {
-    console.log("buttplugInit function has already run successfully. This only needs to be run once, but doesn't affect anything (other than printing this message) if called again.");
-    return;
-  }
-  let index = await import(/* webpackPrefetch: 1 */ "./buttplug-rs-ffi/buttplug_rs_ffi.js").catch((e) => {
-    console.log(e);
-    return Promise.reject(e);
-  });
-  buttplug_create_protobuf_client = index.buttplug_create_protobuf_client;
-  buttplug_free_client = index.buttplug_free_client;
-  buttplug_client_protobuf_message = index.buttplug_client_protobuf_message;
-  buttplug_activate_env_logger = index.buttplug_activate_env_logger;
-  buttplug_free_device = index.buttplug_free_device;
-  buttplug_create_device = index.buttplug_create_device;
-  buttplug_device_protobuf_message = index.buttplug_device_protobuf_message;
-  buttplug_has_init_run = true;
-}
-
-function sendClientMessage(sorter: ButtplugMessageSorter, clientPtr: number, message: Buttplug.ClientMessage, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+function sendClientMessage(sorter: ButtplugMessageSorter, clientPtr: number, message: Buttplug.ClientMessage, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let promise = sorter.PrepareOutgoingMessage(message);
   let buffer = Buffer.from(Buttplug.ClientMessage.encode(message).finish())
-  buttplug_client_protobuf_message(clientPtr, buffer, callback, 0);
+  buttplug_client_protobuf_message(clientPtr, buffer, callback);
   return promise;
 }
 
-export function connectEmbedded(sorter: ButtplugMessageSorter, clientPtr: number, options: ButtplugEmbeddedConnectorOptions, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function connectEmbedded(sorter: ButtplugMessageSorter, clientPtr: number, options: ButtplugEmbeddedConnectorOptions, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.ClientMessage.create({
     message: Buttplug.ClientMessage.FFIMessage.create({
       connectLocal: Buttplug.ClientMessage.ConnectLocal.create({
@@ -72,7 +41,7 @@ export function connectEmbedded(sorter: ButtplugMessageSorter, clientPtr: number
   return sendClientMessage(sorter, clientPtr, msg, callback);
 }
 
-export function connectWebsocket(sorter: ButtplugMessageSorter, clientPtr: number, options: ButtplugWebsocketConnectorOptions, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function connectWebsocket(sorter: ButtplugMessageSorter, clientPtr: number, options: ButtplugWebsocketConnectorOptions, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.ClientMessage.create({
     message: Buttplug.ClientMessage.FFIMessage.create({
       connectWebsocket: Buttplug.ClientMessage.ConnectWebsocket.create({
@@ -84,7 +53,7 @@ export function connectWebsocket(sorter: ButtplugMessageSorter, clientPtr: numbe
   return sendClientMessage(sorter, clientPtr, msg, callback);
 }
 
-export function disconnect(sorter: ButtplugMessageSorter, clientPtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function disconnect(sorter: ButtplugMessageSorter, clientPtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.ClientMessage.create({
     message: Buttplug.ClientMessage.FFIMessage.create({
       disconnect: Buttplug.ClientMessage.Disconnect.create({})
@@ -93,7 +62,7 @@ export function disconnect(sorter: ButtplugMessageSorter, clientPtr: number, cal
   return sendClientMessage(sorter, clientPtr, msg, callback);
 }
 
-export function startScanning(sorter: ButtplugMessageSorter, clientPtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function startScanning(sorter: ButtplugMessageSorter, clientPtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.ClientMessage.create({
     message: Buttplug.ClientMessage.FFIMessage.create({
       startScanning: Buttplug.ClientMessage.StartScanning.create({})
@@ -103,7 +72,7 @@ export function startScanning(sorter: ButtplugMessageSorter, clientPtr: number, 
   return sendClientMessage(sorter, clientPtr, msg, callback);
 }
 
-export function stopScanning(sorter: ButtplugMessageSorter, clientPtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function stopScanning(sorter: ButtplugMessageSorter, clientPtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.ClientMessage.create({
     message: Buttplug.ClientMessage.FFIMessage.create({
       stopScanning: Buttplug.ClientMessage.StopScanning.create({})
@@ -113,7 +82,7 @@ export function stopScanning(sorter: ButtplugMessageSorter, clientPtr: number, c
   return sendClientMessage(sorter, clientPtr, msg, callback);
 }
 
-export function stopAllDevices(sorter: ButtplugMessageSorter, clientPtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function stopAllDevices(sorter: ButtplugMessageSorter, clientPtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.ClientMessage.create({
     message: Buttplug.ClientMessage.FFIMessage.create({
       stopAllDevices: Buttplug.ClientMessage.StopAllDevices.create({})
@@ -123,14 +92,14 @@ export function stopAllDevices(sorter: ButtplugMessageSorter, clientPtr: number,
   return sendClientMessage(sorter, clientPtr, msg, callback);
 }
 
-function sendDeviceMessage(sorter: ButtplugMessageSorter, devicePtr: number, message: Buttplug.DeviceMessage, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+function sendDeviceMessage(sorter: ButtplugMessageSorter, devicePtr: number, message: Buttplug.DeviceMessage, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let promise = sorter.PrepareOutgoingMessage(message);
   let buffer = Buffer.from(Buttplug.DeviceMessage.encode(message).finish())
-  buttplug_device_protobuf_message(devicePtr, buffer, callback, 0);
+  buttplug_device_protobuf_message(devicePtr, buffer, callback);
   return promise;
 }
 
-export function vibrate(sorter: ButtplugMessageSorter, devicePtr: number, speeds: Buttplug.DeviceMessage.VibrateComponent[], callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function vibrate(sorter: ButtplugMessageSorter, devicePtr: number, speeds: Buttplug.DeviceMessage.VibrateComponent[], callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       vibrateCmd: Buttplug.DeviceMessage.VibrateCmd.create({
@@ -142,7 +111,7 @@ export function vibrate(sorter: ButtplugMessageSorter, devicePtr: number, speeds
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function rotate(sorter: ButtplugMessageSorter, devicePtr: number, rotations: Buttplug.DeviceMessage.RotateComponent[], callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function rotate(sorter: ButtplugMessageSorter, devicePtr: number, rotations: Buttplug.DeviceMessage.RotateComponent[], callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       rotateCmd: Buttplug.DeviceMessage.RotateCmd.create({
@@ -154,7 +123,7 @@ export function rotate(sorter: ButtplugMessageSorter, devicePtr: number, rotatio
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function linear(sorter: ButtplugMessageSorter, devicePtr: number, vectors: Buttplug.DeviceMessage.LinearComponent[], callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function linear(sorter: ButtplugMessageSorter, devicePtr: number, vectors: Buttplug.DeviceMessage.LinearComponent[], callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       linearCmd: Buttplug.DeviceMessage.LinearCmd.create({
@@ -166,7 +135,7 @@ export function linear(sorter: ButtplugMessageSorter, devicePtr: number, vectors
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function stopDevice(sorter: ButtplugMessageSorter, devicePtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function stopDevice(sorter: ButtplugMessageSorter, devicePtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       stopDeviceCmd: Buttplug.DeviceMessage.StopDeviceCmd.create({
@@ -177,7 +146,7 @@ export function stopDevice(sorter: ButtplugMessageSorter, devicePtr: number, cal
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function batteryLevel(sorter: ButtplugMessageSorter, devicePtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function batteryLevel(sorter: ButtplugMessageSorter, devicePtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       batteryLevelCmd: Buttplug.DeviceMessage.BatteryLevelCmd.create({
@@ -188,7 +157,7 @@ export function batteryLevel(sorter: ButtplugMessageSorter, devicePtr: number, c
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function rssiLevel(sorter: ButtplugMessageSorter, devicePtr: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function rssiLevel(sorter: ButtplugMessageSorter, devicePtr: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       rssiLevelCmd: Buttplug.DeviceMessage.RSSILevelCmd.create({
@@ -199,7 +168,7 @@ export function rssiLevel(sorter: ButtplugMessageSorter, devicePtr: number, call
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function rawRead(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, expectedLength: number, timeout: number, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function rawRead(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, expectedLength: number, timeout: number, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       rawReadCmd: Buttplug.DeviceMessage.RawReadCmd.create({
@@ -213,7 +182,7 @@ export function rawRead(sorter: ButtplugMessageSorter, devicePtr: number, endpoi
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function rawWrite(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, data: Uint8Array, writeWithResponse: boolean, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function rawWrite(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, data: Uint8Array, writeWithResponse: boolean, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       rawWriteCmd: Buttplug.DeviceMessage.RawWriteCmd.create({
@@ -227,7 +196,7 @@ export function rawWrite(sorter: ButtplugMessageSorter, devicePtr: number, endpo
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function rawSubscribe(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function rawSubscribe(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       rawSubscribeCmd: Buttplug.DeviceMessage.RawSubscribeCmd.create({
@@ -239,7 +208,7 @@ export function rawSubscribe(sorter: ButtplugMessageSorter, devicePtr: number, e
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function rawUnsubscribe(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, callback: Function): Promise<Buttplug.ButtplugFFIServerMessage> {
+export function rawUnsubscribe(sorter: ButtplugMessageSorter, devicePtr: number, endpoint: Buttplug.Endpoint, callback: (buf: Buffer) => void): Promise<Buttplug.ButtplugFFIServerMessage> {
   let msg = Buttplug.DeviceMessage.create({
     message: Buttplug.DeviceMessage.FFIMessage.create({
       rawUnsubscribeCmd: Buttplug.DeviceMessage.RawUnsubscribeCmd.create({
@@ -251,8 +220,8 @@ export function rawUnsubscribe(sorter: ButtplugMessageSorter, devicePtr: number,
   return sendDeviceMessage(sorter, devicePtr, msg, callback);
 }
 
-export function createClientPtr(eventCallback: Function, clientName: string): number {
-  return buttplug_create_protobuf_client(clientName, eventCallback, 0);
+export function createClientPtr(eventCallback: (buf: Buffer) => void, clientName: string): number {
+  return buttplug_create_protobuf_client(clientName, eventCallback);
 }
 
 export function createDevicePtr(clientPtr: number, deviceIndex: number): number | null {
@@ -272,7 +241,7 @@ export function activateConsoleLogger(logLevel: "error" | "warn" | "info" | "deb
 }
 
 /*
-export function addLogHandler(logCallback: Function, logLevel: "error" | "warn" | "info" | "debug" | "trace", useJSON: boolean) {
+export function addLogHandler(logCallback: (buf: Buffer) => void, logLevel: "error" | "warn" | "info" | "debug" | "trace", useJSON: boolean) {
   buttplug_add_log_handler(logCallback, logLevel, useJSON);
 }
 */
