@@ -18,20 +18,19 @@
   "scripts": {
     "install": "node-gyp-build && node scripts/install_core.js",
 
-    "prebuild:win32": "prebuildify --napi --tag-uv --tag-armv --platform win32 && rimraf build",
-    "prebuild:darwin": "prebuildify --napi --tag-uv --tag-armv --platform darwin && rimraf build",
-    "prebuild:linux": "prebuildify --napi --tag-uv --tag-armv --platform linux && rimraf build",
-    "prebuild:all": "yarn prebuild:win32 && yarn prebuild:darwin && yarn prebuild:linux",
-    "prebuild": "prebuildify --napi --tag-uv --tag-armv",
+    "prebuild:win32": "prebuildify --napi --tag-uv --tag-armv --platform win32",
+    "prebuild:darwin": "prebuildify --napi --tag-uv --tag-armv --platform darwin",
+    "prebuild:linux": "prebuildify --napi --tag-uv --tag-armv --platform linux",
+    "prebuild": "yarn prebuild:win32 && yarn prebuild:darwin && yarn prebuild:linux",
 
-    "build:rust:node": "cd ../ffi && cargo build --release && cd ../js && node scripts/install_core.js --from ../ffi/target/release",
+    "build:rust:node": "node scripts/install_core.js --build",
     "build:rust:web": "rimraf src/web/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/web/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && rimraf src/web/buttplug-rs-ffi/.gitignore src/web/buttplug-rs-ffi/package.json src/web/buttplug-rs-ffi/README.md",
     "build:rust": "yarn build:rust:node && yarn build:rust:web",
 
     "build:proto": "pbjs -t static-module -w es6 -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && node scripts/modularize.cjs && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
 
     "build:node:rust": "node scripts/install_core.js",
-    "build:node:gyp": "node-gyp-build",
+    "build:node:gyp": "yarn prebuild",
     "build:node:tsc": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.{js,d.ts}\" --exclude \"src/web/**/*.*\" dist/node",
     "build:node": "yarn build:node:rust && yarn build:node:gyp && yarn build:node:tsc",
 
@@ -46,6 +45,9 @@
     "build": "yarn build:proto && yarn build:node && yarn build:web",
     "build:production": "yarn build:proto && yarn build:node && yarn build:webpack:production",
     "build:publish": "rimraf dist && rimraf bin && rimraf build && yarn build:production",
+
+    "build:local": "cross-env BUTTPLUG_FFI_INSTALL_CORE_BUILD=true yarn build",
+    "build:local:production": "cross-env BUTTPLUG_FFI_INSTALL_CORE_BUILD=true yarn build:production",
 
     "clean:node:gyp": "rimraf build && rimraf prebuilds",
     "clean:node": "rimraf dist/node && rimraf bin && yarn clean:node:gyp",

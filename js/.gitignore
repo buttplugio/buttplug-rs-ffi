@@ -3,3 +3,4 @@ build/
 prebuilds/
 bin/
 yarn.error.log
+buttplug-*.tgz
