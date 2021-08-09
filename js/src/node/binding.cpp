@@ -331,13 +331,13 @@ Value ButtplugAddon::ButtplugCreateProtobufClient(const CallbackInfo& args) {
     if (!args[0].IsString()) throw TypeError::New(env, "Invalid argument: client_name. String expected.");
     if (!args[1].IsFunction()) throw TypeError::New(env, "Invalid argument: callback. Function expected.");
 
-    PCSTR client_name = args[0].ToString().Utf8Value().c_str();
+    const std::string client_name = args[0].ToString().Utf8Value();
     Function callback = args[1].As<Function>();
 
     // The callback passed to `buttplug_create_protobuf_client` is persistent until the client is freed.
     Callback* cb = new Callback(env, callback, "buttplug_create_protobuf_client", /*persistent*/ true);
 
-    void* client_ptr = _buttplug_create_protobuf_client(client_name, MessageCallback, cb);
+    void* client_ptr = _buttplug_create_protobuf_client(client_name.c_str(), MessageCallback, cb);
     uint32_t client_id = AddClient(client_ptr, cb);
 
     return Number::New(env, client_id);
