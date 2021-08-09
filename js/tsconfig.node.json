@@ -9,6 +9,6 @@
   ],
   "exclude": [
     "./src/web_index.ts",
-    "./src/browser"
+    "./src/web"
   ]
 }

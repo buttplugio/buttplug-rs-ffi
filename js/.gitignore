@@ -1,4 +1,4 @@
-src/browser/buttplug-rs-ffi
+src/web/buttplug-rs-ffi
 build/
 prebuilds/
 bin/

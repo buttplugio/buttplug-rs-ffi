@@ -185,7 +185,7 @@ async function downloadPackage(response, releaseFile) {
  */
 async function unzipPackage(releaseFile, releaseOutDir) {
     console.log(`Extracting '${path.basename(releaseFile)}...`);
-    await execAsync(`npx extract-zip "${releaseFile}" "${releaseOutDir}"`);
+    await execAsync(`npx --yes extract-zip@2.0.1 "${releaseFile}" "${releaseOutDir}"`);
 }
 
 /**

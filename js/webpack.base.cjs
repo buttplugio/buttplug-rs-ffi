@@ -18,7 +18,7 @@ const base = {
   },
   entry: path.resolve('./src/web_index.ts'),
   output: {
-    path: path.resolve('./dist/browser'),
+    path: path.resolve('./dist/web'),
     filename: 'buttplug.js',
     libraryTarget: 'umd',
     library: {
@@ -39,7 +39,7 @@ const base = {
           loader: 'ts-loader',
           options: {
             transpileOnly: true,
-            configFile: "tsconfig.browser.json"
+            configFile: "tsconfig.web.json"
           }
         }]
       }
@@ -75,7 +75,7 @@ const base = {
     // mapping for '#buttplug_rs_ffi_bg' to point to the webpack-compatible version.
     new webpack.NormalModuleReplacementPlugin(/^#/, resource => {
       if (resource.request === "#ffi_wrap") {
-        resource.request = path.join(__dirname, "src/browser/ffi_wrap.ts");
+        resource.request = path.join(__dirname, "src/web/ffi_wrap.ts");
       }
     }),
   ]
