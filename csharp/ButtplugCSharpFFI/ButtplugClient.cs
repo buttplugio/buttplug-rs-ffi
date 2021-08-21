@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
@@ -17,7 +18,7 @@ namespace Buttplug
         /// <summary>
         /// Stores information about devices currently connected to the server.
         /// </summary>
-        private readonly Dictionary<uint, ButtplugClientDevice> _devices;
+        private readonly ConcurrentDictionary<uint, ButtplugClientDevice> _devices;
         private readonly ButtplugCallback _sorterCallbackDelegate;
 
         // To detect redundant calls
@@ -79,7 +80,7 @@ namespace Buttplug
             _disposeLock = new object();
 
             _messageSorter = new ButtplugFFIMessageSorter();
-            _devices = new Dictionary<uint, ButtplugClientDevice>();
+            _devices = new ConcurrentDictionary<uint, ButtplugClientDevice>();
 
             var context = new WeakReference(this);
             var clientIndex = _clientCounter;
@@ -187,7 +188,7 @@ namespace Buttplug
                         }
 
                         var device = new ButtplugClientDevice(_messageSorter, device_handle, device_added_message.Index, device_added_message.Name, attribute_dict, _sorterCallbackDelegate, GCHandle.ToIntPtr(_indexHandle));
-                        _devices.Add(device_added_message.Index, device);
+                        _devices.TryAdd(device_added_message.Index, device);
                         DeviceAdded?.Invoke(this, new DeviceAddedEventArgs(device));
                     }
                     else if (server_message.Message.ServerMessage.MsgCase == ServerMessage.MsgOneofCase.DeviceRemoved)
@@ -202,7 +203,7 @@ namespace Buttplug
                         try
                         {
                             var device = _devices[device_removed_message.Index];
-                            _devices.Remove(device_removed_message.Index);
+                            _devices.TryRemove(device_removed_message.Index, out _);
                             DeviceRemoved?.Invoke(this, new DeviceRemovedEventArgs(device));
                         }
                         catch (KeyNotFoundException)
