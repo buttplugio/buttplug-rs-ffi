@@ -1,3 +1,9 @@
+# 2.0.4 (2021-08-21)
+
+## Bugfixes
+
+- #87: Update ButtplugClient to use ConcurrentDictionary for device storage
+
 # 2.0.3 (2021-05-17)
 
 ## Bugfixes
