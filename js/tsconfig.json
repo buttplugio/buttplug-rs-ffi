@@ -1,21 +1,3 @@
 {
-  "compilerOptions" : {
-    "baseUrl": "./src",
-    "lib": ["es2015", "dom", "es6"],
-    "target": "es2018",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "declaration": true,
-    "outDir": "./dist/module",
-    "esModuleInterop": true,
-  },
-  "include": [
-    "./src/**/*",
-    "./tests/**/*.ts"
-  ]
+  "extends": "./tsconfig.node.json"
 }

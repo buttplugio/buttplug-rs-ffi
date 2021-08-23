@@ -38,7 +38,8 @@ const base = {
         use: [{
           loader: 'ts-loader',
           options: {
-            transpileOnly: true
+            transpileOnly: true,
+            configFile: "tsconfig.web.json"
           }
         }]
       }
@@ -73,8 +74,8 @@ const base = {
     // we are running in NodeJS or in the browser. The following rewrites the import
     // mapping for '#buttplug_rs_ffi_bg' to point to the webpack-compatible version.
     new webpack.NormalModuleReplacementPlugin(/^#/, resource => {
-      if (resource.request === "#buttplug_rs_ffi_bg") {
-        resource.request = path.join(__dirname, "src/buttplug-rs-ffi/buttplug_rs_ffi_bg_web.js");
+      if (resource.request === "#ffi_wrap") {
+        resource.request = path.join(__dirname, "src/web/ffi_wrap.ts");
       }
     }),
   ]

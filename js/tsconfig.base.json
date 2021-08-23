@@ -1,0 +1,17 @@
+{
+  "compilerOptions" : {
+    "baseUrl": "./src",
+    "lib": ["esnext", "dom"],
+    "target": "es2018",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "declaration": true,
+    "outDir": "./dist/node",
+    "esModuleInterop": true,
+  }
+}

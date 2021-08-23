@@ -1,4 +1,12 @@
-dist/module/buttplug_rs_ffi_bg_web.js
+bin
+build
 node_modules
-src
 scripts
+!scripts/install_core.js
+src
+buttplug-*.tgz
+index.html
+tsconfig.*.json
+tsconfig.json
+tsfmt.json
+webpack.base.cjs
