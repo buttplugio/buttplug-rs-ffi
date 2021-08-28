@@ -11,9 +11,11 @@ use super::{
 };
 use std::sync::Arc;
 use buttplug::{
-  client::ButtplugClient, connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugRemoteClientConnector}, 
+  client::ButtplugClient, 
+  connector::{ButtplugInProcessClientConnector, ButtplugConnector, ButtplugRemoteClientConnector},
   core::{messages::{ButtplugCurrentSpecClientMessage, ButtplugCurrentSpecServerMessage, serializer::ButtplugClientJSONSerializer}}, 
-  server::ButtplugServerOptions, util::async_manager
+  server::{ButtplugServerBuilder}, 
+  util::async_manager
 };
 #[cfg(feature = "wasm")]
 use super::wasm::{
@@ -25,16 +27,16 @@ use buttplug::{
   connector::ButtplugWebsocketClientTransport,
   server::{
     comm_managers::{
-      btleplug::BtlePlugCommunicationManager,
+      btleplug::BtlePlugCommunicationManagerBuilder,
       lovense_dongle::{
-        LovenseHIDDongleCommunicationManager, LovenseSerialDongleCommunicationManager,
+        LovenseHIDDongleCommunicationManagerBuilder, LovenseSerialDongleCommunicationManagerBuilder
       },
-      serialport::SerialPortCommunicationManager,
+      serialport::SerialPortCommunicationManagerBuilder,
     }
   }
 };
 #[cfg(all(target_os = "windows", not(feature = "wasm")))]
-use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManager;
+use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManagerBuilder;
 use futures::StreamExt;
 use prost::Message;
 #[cfg(not(feature = "wasm"))]
@@ -119,37 +121,51 @@ impl ButtplugFFIClient {
   }
 
   fn connect_local(&self, msg_id: u32, connect_local_msg: &ConnectLocal, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
-    let mut options = ButtplugServerOptions::default();
-    options.name = connect_local_msg.server_name.clone();
-    options.max_ping_time = connect_local_msg.max_ping_time.into();
-    options.allow_raw_messages = connect_local_msg.allow_raw_messages;
-    options.device_configuration_json = if connect_local_msg.device_configuration_json.is_empty() { None } else { Some(connect_local_msg.device_configuration_json.clone()) };
-    options.user_device_configuration_json = if connect_local_msg.user_device_configuration_json.is_empty() { None } else { Some(connect_local_msg.user_device_configuration_json.clone()) };
-    let connector = ButtplugInProcessClientConnector::new_with_options(&options).unwrap();
+    let mut builder = ButtplugServerBuilder::default();
+    builder
+      .name(&connect_local_msg.server_name.clone())
+      .max_ping_time(connect_local_msg.max_ping_time.into())
+      .allow_raw_messages(connect_local_msg.allow_raw_messages);
+    if !connect_local_msg.device_configuration_json.is_empty() {
+      builder.device_configuration_json( Some(connect_local_msg.device_configuration_json.clone()));
+    }
+    if !connect_local_msg.user_device_configuration_json.is_empty() { 
+      builder.user_device_configuration_json(Some(connect_local_msg.user_device_configuration_json.clone()));
+    }
+    
+    let server = match builder.finish() {
+      Ok(server) => server,
+      Err(e) => {
+        return_error(msg_id, &e.into(), &callback, callback_context);
+        return;
+      }
+    };
+
     let device_mgrs = connect_local_msg.comm_manager_types;
     #[cfg(not(feature = "wasm"))]
     {
       if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0 || device_mgrs == 0 {
-        connector.server_ref().add_comm_manager::<LovenseHIDDongleCommunicationManager>().unwrap(); 
+        server.device_manager().add_comm_manager(LovenseHIDDongleCommunicationManagerBuilder::default());
       }
       if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0 || device_mgrs == 0 {
-        connector.server_ref().add_comm_manager::<LovenseSerialDongleCommunicationManager>().unwrap(); 
+        server.device_manager().add_comm_manager(LovenseSerialDongleCommunicationManagerBuilder::default()); 
       }
       if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u32 > 0 || device_mgrs == 0 {
-        connector.server_ref().add_comm_manager::<BtlePlugCommunicationManager>().unwrap(); 
+        server.device_manager().add_comm_manager(BtlePlugCommunicationManagerBuilder::default());
       }
       #[cfg(target_os="windows")]
       if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
-        connector.server_ref().add_comm_manager::<XInputDeviceCommunicationManager>().unwrap(); 
+        server.device_manager().add_comm_manager(XInputDeviceCommunicationManagerBuilder::default());
       }
       if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
-        connector.server_ref().add_comm_manager::<SerialPortCommunicationManager>().unwrap(); 
+        server.device_manager().add_comm_manager(SerialPortCommunicationManagerBuilder::default());
       }
     }
     #[cfg(feature = "wasm")] 
     {
-      connector.server_ref().add_comm_manager::<WebBluetoothCommunicationManager>().unwrap(); 
+      server.device_manager().add_comm_manager::<WebBluetoothCommunicationManager>().unwrap(); 
     }
+    let connector = ButtplugInProcessClientConnector::new(Some(server));
     self.connect(msg_id, connector, callback, callback_context);
   }
 

@@ -49,6 +49,7 @@ enum Endpoint {
   Generic29 = 42;
   Generic30 = 43;
   Generic31 = 44;
+  RxBLEModel = 45;
 }
 
 message ClientMessage {

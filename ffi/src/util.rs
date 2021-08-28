@@ -132,6 +132,7 @@ impl Into<Endpoint> for SerializedEndpoint {
     match self {
       SerializedEndpoint::Rx => Endpoint::Rx,
       SerializedEndpoint::RxAccel => Endpoint::RxAccel,
+      SerializedEndpoint::RxBleModel => Endpoint::RxBLEModel,
       SerializedEndpoint::RxPressure => Endpoint::RxPressure,
       SerializedEndpoint::RxTouch => Endpoint::RxTouch,
       SerializedEndpoint::Tx => Endpoint::Tx,
@@ -185,6 +186,7 @@ impl From<&Endpoint> for SerializedEndpoint {
     match endpoint_type {
       Endpoint::Rx => SerializedEndpoint::Rx,
       Endpoint::RxAccel => SerializedEndpoint::RxAccel,
+      Endpoint::RxBLEModel => SerializedEndpoint::RxBleModel,
       Endpoint::RxPressure => SerializedEndpoint::RxPressure,
       Endpoint::RxTouch => SerializedEndpoint::RxTouch,
       Endpoint::Tx => SerializedEndpoint::Tx,
