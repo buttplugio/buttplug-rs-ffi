@@ -6,7 +6,7 @@ use buttplug::{
   server::comm_managers::{
     DeviceCommunicationEvent,
     DeviceCommunicationManager,
-    DeviceCommunicationManagerCreator,
+    DeviceCommunicationManagerBuilder,
   },
 };
 use futures::future;
@@ -15,14 +15,34 @@ use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::BluetoothDevice;
 use wasm_bindgen::prelude::*;
 
-pub struct WebBluetoothCommunicationManager {
+pub struct WebBluetoothCommunicationManagerBuilder {
   sender: Sender<DeviceCommunicationEvent>,
 }
 
-impl DeviceCommunicationManagerCreator for WebBluetoothCommunicationManager {
-  fn new(sender: Sender<DeviceCommunicationEvent>) -> Self {
-    Self { sender }
+impl Default for WebBluetoothCommunicationManagerBuilder {
+  fn default() -> Self {
+    // This will just be overwritten
+    let (sender, _) = tokio::sync::mpsc::channel(256);
+    Self {
+      sender
+    }
   }
+}
+
+impl DeviceCommunicationManagerBuilder for WebBluetoothCommunicationManagerBuilder {
+  fn event_sender(mut self, sender: Sender<DeviceCommunicationEvent>) -> Self {
+    self.sender = sender;
+    self
+  }
+  fn finish(self) -> Box<dyn DeviceCommunicationManager> {
+    Box::new(WebBluetoothCommunicationManager {
+      sender: self.sender
+    })
+  }
+}
+
+pub struct WebBluetoothCommunicationManager {
+  sender: Sender<DeviceCommunicationEvent>,
 }
 
 #[wasm_bindgen]
@@ -54,7 +74,8 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
       let mut options = web_sys::RequestDeviceOptions::new();
       let filters = Array::new();
       let optional_services = Array::new();
-      for (_, configs) in config_manager.protocol_configurations() {
+      for vals in config_manager.protocol_definitions().iter() {
+        let configs = vals.value();
         if let Some(btle) = &configs.btle {
           for name in &btle.names {
             let mut filter = web_sys::BluetoothLeScanFilterInit::new();

@@ -19,7 +19,7 @@ use buttplug::{
 };
 #[cfg(feature = "wasm")]
 use super::wasm::{
-  webbluetooth_manager::WebBluetoothCommunicationManager,
+  webbluetooth_manager::WebBluetoothCommunicationManagerBuilder,
   websocket_client_connector::ButtplugBrowserWebsocketClientTransport
 };
 #[cfg(not(feature = "wasm"))]
@@ -145,25 +145,25 @@ impl ButtplugFFIClient {
     #[cfg(not(feature = "wasm"))]
     {
       if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0 || device_mgrs == 0 {
-        server.device_manager().add_comm_manager(LovenseHIDDongleCommunicationManagerBuilder::default());
+        server.device_manager().add_comm_manager(LovenseHIDDongleCommunicationManagerBuilder::default()).unwrap();
       }
       if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0 || device_mgrs == 0 {
-        server.device_manager().add_comm_manager(LovenseSerialDongleCommunicationManagerBuilder::default()); 
+        server.device_manager().add_comm_manager(LovenseSerialDongleCommunicationManagerBuilder::default()).unwrap(); 
       }
       if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u32 > 0 || device_mgrs == 0 {
-        server.device_manager().add_comm_manager(BtlePlugCommunicationManagerBuilder::default());
+        server.device_manager().add_comm_manager(BtlePlugCommunicationManagerBuilder::default()).unwrap();
       }
       #[cfg(target_os="windows")]
       if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
-        server.device_manager().add_comm_manager(XInputDeviceCommunicationManagerBuilder::default());
+        server.device_manager().add_comm_manager(XInputDeviceCommunicationManagerBuilder::default()).unwrap();
       }
       if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
-        server.device_manager().add_comm_manager(SerialPortCommunicationManagerBuilder::default());
+        server.device_manager().add_comm_manager(SerialPortCommunicationManagerBuilder::default()).unwrap();
       }
     }
     #[cfg(feature = "wasm")] 
     {
-      server.device_manager().add_comm_manager::<WebBluetoothCommunicationManager>().unwrap(); 
+      server.device_manager().add_comm_manager(WebBluetoothCommunicationManagerBuilder::default()).unwrap();
     }
     let connector = ButtplugInProcessClientConnector::new(Some(server));
     self.connect(msg_id, connector, callback, callback_context);
