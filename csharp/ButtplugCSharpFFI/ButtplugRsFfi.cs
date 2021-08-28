@@ -125,7 +125,7 @@ namespace Buttplug {
             "c3NhZ2UuRkZJTWVzc2FnZRp1CgpGRklNZXNzYWdlEjEKDnNlcnZlcl9tZXNz",
             "YWdlGAEgASgLMhcuQnV0dHBsdWcuU2VydmVyTWVzc2FnZUgAEi0KDGRldmlj",
             "ZV9ldmVudBgCIAEoCzIVLkJ1dHRwbHVnLkRldmljZUV2ZW50SABCBQoDbXNn",
-            "KpMFCghFbmRwb2ludBILCgdDb21tYW5kEAASDAoIRmlybXdhcmUQARIGCgJS",
+            "KqMFCghFbmRwb2ludBILCgdDb21tYW5kEAASDAoIRmlybXdhcmUQARIGCgJS",
             "eBACEgsKB1J4QWNjZWwQAxIQCgxSeEJMRUJhdHRlcnkQBBIOCgpSeFByZXNz",
             "dXJlEAUSCwoHUnhUb3VjaBAGEgYKAlR4EAcSCgoGVHhNb2RlEAgSCwoHVHhT",
             "aG9jaxAJEg0KCVR4VmlicmF0ZRAKEhMKD1R4VmVuZG9yQ29udHJvbBALEg0K",
@@ -139,7 +139,8 @@ namespace Buttplug {
             "ECESDQoJR2VuZXJpYzIxECISDQoJR2VuZXJpYzIyECMSDQoJR2VuZXJpYzIz",
             "ECQSDQoJR2VuZXJpYzI0ECUSDQoJR2VuZXJpYzI1ECYSDQoJR2VuZXJpYzI2",
             "ECcSDQoJR2VuZXJpYzI3ECgSDQoJR2VuZXJpYzI4ECkSDQoJR2VuZXJpYzI5",
-            "ECoSDQoJR2VuZXJpYzMwECsSDQoJR2VuZXJpYzMxECxiBnByb3RvMw=="));
+            "ECoSDQoJR2VuZXJpYzMwECsSDQoJR2VuZXJpYzMxECwSDgoKUnhCTEVNb2Rl",
+            "bBAtQhQKEmlvLmJ1dHRwbHVnLnByb3Rvc2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Buttplug.Endpoint), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -229,6 +230,7 @@ namespace Buttplug {
     [pbr::OriginalName("Generic29")] Generic29 = 42,
     [pbr::OriginalName("Generic30")] Generic30 = 43,
     [pbr::OriginalName("Generic31")] Generic31 = 44,
+    [pbr::OriginalName("RxBLEModel")] RxBlemodel = 45,
   }
 
   #endregion
