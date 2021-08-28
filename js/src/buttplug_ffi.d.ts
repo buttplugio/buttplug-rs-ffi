@@ -48,7 +48,8 @@ export namespace Buttplug {
         Generic28 = 41,
         Generic29 = 42,
         Generic30 = 43,
-        Generic31 = 44
+        Generic31 = 44,
+        RxBLEModel = 45
     }
 
     /** Properties of a ClientMessage. */

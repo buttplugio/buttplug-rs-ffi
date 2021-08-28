@@ -69,6 +69,7 @@ export const Buttplug = $root.Buttplug = (() => {
      * @property {number} Generic29=42 Generic29 value
      * @property {number} Generic30=43 Generic30 value
      * @property {number} Generic31=44 Generic31 value
+     * @property {number} RxBLEModel=45 RxBLEModel value
      */
     Buttplug.Endpoint = (function() {
         const valuesById = {}, values = Object.create(valuesById);
@@ -117,6 +118,7 @@ export const Buttplug = $root.Buttplug = (() => {
         values[valuesById[42] = "Generic29"] = 42;
         values[valuesById[43] = "Generic30"] = 43;
         values[valuesById[44] = "Generic31"] = 44;
+        values[valuesById[45] = "RxBLEModel"] = 45;
         return values;
     })();
 
@@ -3993,6 +3995,7 @@ export const Buttplug = $root.Buttplug = (() => {
                     case 42:
                     case 43:
                     case 44:
+                    case 45:
                         break;
                     }
                 if (message.data != null && message.hasOwnProperty("data"))
@@ -4199,6 +4202,10 @@ export const Buttplug = $root.Buttplug = (() => {
                 case "Generic31":
                 case 44:
                     message.endpoint = 44;
+                    break;
+                case "RxBLEModel":
+                case 45:
+                    message.endpoint = 45;
                     break;
                 }
                 if (object.data != null)
@@ -4470,6 +4477,7 @@ export const Buttplug = $root.Buttplug = (() => {
                     case 42:
                     case 43:
                     case 44:
+                    case 45:
                         break;
                     }
                 if (message.data != null && message.hasOwnProperty("data"))
@@ -4673,6 +4681,10 @@ export const Buttplug = $root.Buttplug = (() => {
                 case "Generic31":
                 case 44:
                     message.endpoint = 44;
+                    break;
+                case "RxBLEModel":
+                case 45:
+                    message.endpoint = 45;
                     break;
                 }
                 if (object.data != null)
@@ -4911,6 +4923,7 @@ export const Buttplug = $root.Buttplug = (() => {
                     case 42:
                     case 43:
                     case 44:
+                    case 45:
                         break;
                     }
                 return null;
@@ -5108,6 +5121,10 @@ export const Buttplug = $root.Buttplug = (() => {
                 case "Generic31":
                 case 44:
                     message.endpoint = 44;
+                    break;
+                case "RxBLEModel":
+                case 45:
+                    message.endpoint = 45;
                     break;
                 }
                 return message;
@@ -5326,6 +5343,7 @@ export const Buttplug = $root.Buttplug = (() => {
                     case 42:
                     case 43:
                     case 44:
+                    case 45:
                         break;
                     }
                 return null;
@@ -5523,6 +5541,10 @@ export const Buttplug = $root.Buttplug = (() => {
                 case "Generic31":
                 case 44:
                     message.endpoint = 44;
+                    break;
+                case "RxBLEModel":
+                case 45:
+                    message.endpoint = 45;
                     break;
                 }
                 return message;
@@ -7132,6 +7154,7 @@ export const Buttplug = $root.Buttplug = (() => {
                         case 42:
                         case 43:
                         case 44:
+                        case 45:
                             break;
                         }
                 }
@@ -7394,6 +7417,10 @@ export const Buttplug = $root.Buttplug = (() => {
                         case "Generic31":
                         case 44:
                             message.endpoints[i] = 44;
+                            break;
+                        case "RxBLEModel":
+                        case 45:
+                            message.endpoints[i] = 45;
                             break;
                         }
                 }
@@ -9361,6 +9388,7 @@ export const Buttplug = $root.Buttplug = (() => {
                     case 42:
                     case 43:
                     case 44:
+                    case 45:
                         break;
                     }
                 if (message.data != null && message.hasOwnProperty("data"))
@@ -9563,6 +9591,10 @@ export const Buttplug = $root.Buttplug = (() => {
                 case "Generic31":
                 case 44:
                     message.endpoint = 44;
+                    break;
+                case "RxBLEModel":
+                case 45:
+                    message.endpoint = 45;
                     break;
                 }
                 if (object.data != null)
