@@ -15,7 +15,7 @@
     "url": "https://github.com/buttplugio/buttplug-rs-ffi/issues"
   },
   "scripts": {
-    "dev": "webpack-dev-server --hot --config webpack.base.js --env development",
+    "dev": "webpack-dev-server --hot --config webpack.base.cjs --env development",
     "build:publish": "rimraf dist && yarn build:rust && yarn build:webpack && yarn build:webpack:production",
     "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && node scripts/modularize.cjs wasm-pack && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
     "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.js\" dist/module && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
