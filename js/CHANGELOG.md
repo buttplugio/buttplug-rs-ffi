@@ -1,3 +1,14 @@
+# v1.0.15 (2021/08/29)
+
+## Features
+
+- Update to buttplug v5
+
+## Bugfixes
+
+- Allow specification of WASM loading source for buttplug_init()
+- ButtplugClientDevice equality testing now works as expected
+
 # v1.0.14 (2021/03/21)
 
 ## Bugfixes
