@@ -114,6 +114,14 @@ jobs:
          targetFolder: "$(System.DefaultWorkingDirectory)/ffi/nuget/runtimes/win-x64/native"
          flattenFolders: true
          cleanTargetFolder: true
+     - task: CopyFiles@2
+       displayName: "Copy lib (Windows NuGet)"
+       condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))       
+       inputs:
+         contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.lib"
+         targetFolder: "$(System.DefaultWorkingDirectory)/ffi/nuget/runtimes/win-x64/native"
+         flattenFolders: true
+         cleanTargetFolder: true         
      - task: CopyFiles@2         
        displayName: "Copy DLL (Windows)"
        condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))       
@@ -121,7 +129,13 @@ jobs:
          contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.dll"
          targetFolder: "$(Build.ArtifactStagingDirectory)"
          flattenFolders: true
-
+     - task: CopyFiles@2         
+       displayName: "Copy lib (Windows)"
+       condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))       
+       inputs:
+         contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.lib"
+         targetFolder: "$(Build.ArtifactStagingDirectory)"
+         flattenFolders: true
      - task: CopyFiles@2
        displayName: "Copy DLL (macOS)"
        condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin'))
@@ -143,7 +157,7 @@ jobs:
        inputs:
          rootFolderOrFile: "$(System.DefaultWorkingDirectory)/ffi/nuget/"
          archiveType: "zip"
-         archiveFile: "$(Build.ArtifactStagingDirectory)/ButtplugRustFFI.2.0.2.nupkg"
+         archiveFile: "$(Build.ArtifactStagingDirectory)/ButtplugRustFFI.2.0.3.nupkg"
          includeRootFolder: false
      - task: PowerShell@2
        displayName: 'Sign Exported Nuget Packages'
