@@ -1,3 +1,9 @@
+# 2.0.4 (2021/08/28)
+
+## Features
+
+- Version roll to fix nuget issue for Windows packaging, no code changes.
+
 # 2.0.3 (2021/08/28)
 
 ## Features
