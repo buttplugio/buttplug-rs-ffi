@@ -1,3 +1,11 @@
+# 2.0.5 (2021-08-29)
+
+## Features
+
+- Update to Buttplug v5
+  - New version of btleplug
+  - New comm managers and other features that need to be ported to FFI
+
 # 2.0.4 (2021-08-21)
 
 ## Bugfixes
