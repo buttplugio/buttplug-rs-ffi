@@ -121,7 +121,6 @@ jobs:
          contents: "$(System.DefaultWorkingDirectory)/ffi/target/release/*.lib"
          targetFolder: "$(System.DefaultWorkingDirectory)/ffi/nuget/runtimes/win-x64/native"
          flattenFolders: true
-         cleanTargetFolder: true         
      - task: CopyFiles@2         
        displayName: "Copy DLL (Windows)"
        condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))       
@@ -157,7 +156,7 @@ jobs:
        inputs:
          rootFolderOrFile: "$(System.DefaultWorkingDirectory)/ffi/nuget/"
          archiveType: "zip"
-         archiveFile: "$(Build.ArtifactStagingDirectory)/ButtplugRustFFI.2.0.3.nupkg"
+         archiveFile: "$(Build.ArtifactStagingDirectory)/ButtplugRustFFI.2.0.4.nupkg"
          includeRootFolder: false
      - task: PowerShell@2
        displayName: 'Sign Exported Nuget Packages'
