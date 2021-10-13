@@ -29,12 +29,12 @@ let buttplug_create_device = must_run_init_2;
 let buttplug_device_protobuf_message = must_run_init_4;
 let buttplug_has_init_run = false;
 
-export async function buttplugInit(url: string = "./buttplug-rs-ffi/buttplug_rs_ffi.js") {
+export async function buttplugInit() {
   if (buttplug_has_init_run) {
     console.log("buttplugInit function has already run successfully. This only needs to be run once, but doesn't affect anything (other than printing this message) if called again.");
     return;
   }
-  let index = await import(/* webpackPrefetch: 1 */ url).catch((e) => {
+  let index = await import(/* webpackPrefetch: 1 */ "./buttplug-rs-ffi/buttplug_rs_ffi.js").catch((e) => {
     console.log(e);
     return Promise.reject(e);
   });
