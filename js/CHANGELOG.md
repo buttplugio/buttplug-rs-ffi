@@ -1,3 +1,9 @@
+# v1.0.16 (2021/10/16)
+
+## Bugfixes
+
+- Revert WASM loading specification to fix webpack/MIME issues
+
 # v1.0.15 (2021/08/29)
 
 ## Features
