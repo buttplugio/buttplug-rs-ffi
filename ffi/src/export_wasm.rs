@@ -1,28 +1,32 @@
 use super::{
-  client::ButtplugFFIClient, 
-  device::ButtplugFFIDevice, 
+  client::ButtplugFFIClient,
+  device::ButtplugFFIDevice,
+  logging::LogFFICallback,
+  wasm_types::c_char,
   FFICallback,
   FFICallbackContextWrapper,
-  wasm_types::c_char,
-  logging::{LogFFICallback}
 };
-use tracing_subscriber::{Registry, EnvFilter, layer::SubscriberExt};
+use console_error_panic_hook;
+use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Registry};
 use tracing_wasm::{WASMLayer, WASMLayerConfig};
 use wasm_bindgen::prelude::*;
-use console_error_panic_hook;
 
 #[no_mangle]
 #[wasm_bindgen]
 pub fn buttplug_create_protobuf_client(
   client_name: &str,
   callback: &FFICallback,
-  callback_context: u32
+  callback_context: u32,
 ) -> *mut ButtplugFFIClient {
   console_error_panic_hook::set_once();
 
   // If we were handed a wrong client name, just panic.
 
-  Box::into_raw(Box::new(ButtplugFFIClient::new(client_name, callback.clone(), callback_context)))
+  Box::into_raw(Box::new(ButtplugFFIClient::new(
+    client_name,
+    callback.clone(),
+    callback_context,
+  )))
 }
 
 #[no_mangle]
@@ -41,7 +45,7 @@ pub fn buttplug_client_protobuf_message(
   client_ptr: *mut ButtplugFFIClient,
   buf: &[u8],
   callback: FFICallback,
-  callback_context: u32
+  callback_context: u32,
 ) {
   let client = unsafe {
     assert!(!client_ptr.is_null());
@@ -96,7 +100,9 @@ pub fn buttplug_free_device(ptr: *mut ButtplugFFIDevice) {
 #[wasm_bindgen]
 pub fn buttplug_activate_env_logger(max_level: &str) {
   tracing::subscriber::set_global_default(
-    Registry::default().with(EnvFilter::new(max_level)).with(WASMLayer::new(WASMLayerConfig::default())),
+    Registry::default()
+      .with(EnvFilter::new(max_level))
+      .with(WASMLayer::new(WASMLayerConfig::default())),
   )
   .expect("default global");
 }

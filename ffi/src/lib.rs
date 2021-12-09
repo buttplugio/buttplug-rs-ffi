@@ -11,15 +11,15 @@ mod client;
 mod device;
 #[cfg(not(feature = "wasm"))]
 mod export;
-mod util;
-mod pbufs;
-mod logging;
-#[cfg(feature = "wasm")]
-mod wasm_types;
 #[cfg(feature = "wasm")]
 mod export_wasm;
+mod logging;
+mod pbufs;
+mod util;
 #[cfg(feature = "wasm")]
 mod wasm;
+#[cfg(feature = "wasm")]
+mod wasm_types;
 
 #[cfg(not(feature = "wasm"))]
 pub use export::*;
@@ -43,5 +43,7 @@ type FFICallbackContext = u32;
 #[derive(Clone, Copy)]
 pub struct FFICallbackContextWrapper(FFICallbackContext);
 
-unsafe impl Send for FFICallbackContextWrapper {}
-unsafe impl Sync for FFICallbackContextWrapper {}
+unsafe impl Send for FFICallbackContextWrapper {
+}
+unsafe impl Sync for FFICallbackContextWrapper {
+}

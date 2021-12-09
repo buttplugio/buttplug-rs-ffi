@@ -1,16 +1,16 @@
 use super::{
+  client::ButtplugFFIClient,
+  device::ButtplugFFIDevice,
+  logging::{ButtplugFFILogHandle, LogFFICallback},
+  FFICallback,
   FFICallbackContext,
   FFICallbackContextWrapper,
-  client::ButtplugFFIClient,
-  device::ButtplugFFIDevice, 
-  FFICallback,
-  logging::{LogFFICallback, ButtplugFFILogHandle}
 };
 use libc::c_char;
 use std::{
   ffi::CStr,
   slice,
-  sync::{Arc, Weak, Mutex}
+  sync::{Arc, Mutex, Weak},
 };
 use tokio::runtime::Runtime;
 
@@ -24,9 +24,7 @@ fn get_or_create_runtime() -> Arc<Runtime> {
   // Weak<> just in case someone tries to create multiple clients.
   let mut static_runtime = RUNTIME.lock().unwrap();
   match static_runtime.upgrade() {
-    Some(rt) => {
-      rt
-    },
+    Some(rt) => rt,
     None => {
       let new_runtime = Arc::new(tokio::runtime::Runtime::new().unwrap());
       *static_runtime = Arc::downgrade(&new_runtime);
@@ -39,14 +37,19 @@ fn get_or_create_runtime() -> Arc<Runtime> {
 pub unsafe extern "C" fn buttplug_create_protobuf_client(
   client_name_ptr: *const c_char,
   callback: FFICallback,
-  callback_context: FFICallbackContext
+  callback_context: FFICallbackContext,
 ) -> *mut ButtplugFFIClient {
   assert!(!client_name_ptr.is_null());
   let c_str = CStr::from_ptr(client_name_ptr);
   // If we were handed a wrong client name, just panic.
   let client_name = c_str.to_str().unwrap();
 
-  Box::into_raw(Box::new(ButtplugFFIClient::new(get_or_create_runtime(), client_name, callback, callback_context)))
+  Box::into_raw(Box::new(ButtplugFFIClient::new(
+    get_or_create_runtime(),
+    client_name,
+    callback,
+    callback_context,
+  )))
 }
 
 #[no_mangle]
@@ -62,12 +65,16 @@ pub unsafe extern "C" fn buttplug_client_protobuf_message(
   buf: *const u8,
   buf_len: i32,
   callback: FFICallback,
-  callback_context: FFICallbackContext
+  callback_context: FFICallbackContext,
 ) {
   assert!(!client_ptr.is_null());
   let client = &mut *client_ptr;
   let msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
-  client.parse_message(msg_ptr, callback, FFICallbackContextWrapper(callback_context));
+  client.parse_message(
+    msg_ptr,
+    callback,
+    FFICallbackContextWrapper(callback_context),
+  );
 }
 
 #[no_mangle]
@@ -90,12 +97,16 @@ pub unsafe extern "C" fn buttplug_device_protobuf_message(
   buf: *const u8,
   buf_len: i32,
   callback: FFICallback,
-  callback_context: FFICallbackContext
+  callback_context: FFICallbackContext,
 ) {
   assert!(!device_ptr.is_null());
   let device = &mut *device_ptr;
   let msg_ptr = slice::from_raw_parts(buf, buf_len as usize);
-  device.parse_message(msg_ptr, callback, FFICallbackContextWrapper(callback_context));
+  device.parse_message(
+    msg_ptr,
+    callback,
+    FFICallbackContextWrapper(callback_context),
+  );
 }
 
 #[no_mangle]
@@ -113,13 +124,24 @@ pub extern "C" fn buttplug_activate_env_logger() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn buttplug_create_log_handle(callback: LogFFICallback, ctx: FFICallbackContext, max_level: *const c_char, use_json: bool) -> *mut ButtplugFFILogHandle {
+pub unsafe extern "C" fn buttplug_create_log_handle(
+  callback: LogFFICallback,
+  ctx: FFICallbackContext,
+  max_level: *const c_char,
+  use_json: bool,
+) -> *mut ButtplugFFILogHandle {
   assert!(!max_level.is_null());
   let max_level_cstr = CStr::from_ptr(max_level);
 
   // If we were handed a wrong client name, just panic.
   let max_level_str = max_level_cstr.to_str().unwrap();
-  Box::into_raw(Box::new(ButtplugFFILogHandle::new(get_or_create_runtime(), callback, ctx, max_level_str, use_json)))
+  Box::into_raw(Box::new(ButtplugFFILogHandle::new(
+    get_or_create_runtime(),
+    callback,
+    ctx,
+    max_level_str,
+    use_json,
+  )))
 }
 
 #[no_mangle]

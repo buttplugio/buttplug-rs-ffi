@@ -1,5 +1,4 @@
 use super::webbluetooth_device::WebBluetoothDeviceImplCreator;
-use tokio::sync::mpsc::Sender;
 use buttplug::{
   core::ButtplugResultFuture,
   device::configuration_manager::DeviceConfigurationManager,
@@ -8,13 +7,14 @@ use buttplug::{
     DeviceCommunicationManager,
     DeviceCommunicationManagerBuilder,
   },
-  util::device_configuration::create_test_dcm
+  util::device_configuration::create_test_dcm,
 };
 use futures::future;
 use js_sys::{Array, Reflect};
+use tokio::sync::mpsc::Sender;
+use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::BluetoothDevice;
-use wasm_bindgen::prelude::*;
 
 pub struct WebBluetoothCommunicationManagerBuilder {
   sender: Sender<DeviceCommunicationEvent>,
@@ -24,9 +24,7 @@ impl Default for WebBluetoothCommunicationManagerBuilder {
   fn default() -> Self {
     // This will just be overwritten
     let (sender, _) = tokio::sync::mpsc::channel(256);
-    Self {
-      sender
-    }
+    Self { sender }
   }
 }
 
@@ -37,7 +35,7 @@ impl DeviceCommunicationManagerBuilder for WebBluetoothCommunicationManagerBuild
   }
   fn finish(self) -> Box<dyn DeviceCommunicationManager> {
     Box::new(WebBluetoothCommunicationManager {
-      sender: self.sender
+      sender: self.sender,
     })
   }
 }
@@ -48,10 +46,10 @@ pub struct WebBluetoothCommunicationManager {
 
 #[wasm_bindgen]
 extern "C" {
-    // Use `js_namespace` here to bind `console.log(..)` instead of just
-    // `log(..)`
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
+  // Use `js_namespace` here to bind `console.log(..)` instead of just
+  // `log(..)`
+  #[wasm_bindgen(js_namespace = console)]
+  fn log(s: &str);
 }
 
 impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
@@ -115,7 +113,7 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
             .send(DeviceCommunicationEvent::DeviceFound {
               name,
               address,
-              creator: device_creator
+              creator: device_creator,
             })
             .await
             .is_err()
@@ -126,7 +124,10 @@ impl DeviceCommunicationManager for WebBluetoothCommunicationManager {
           }
         }
         Err(e) => {
-          log(&format!("Error while trying to start bluetooth scan: {:?}", e));
+          log(&format!(
+            "Error while trying to start bluetooth scan: {:?}",
+            e
+          ));
           error!("Error while trying to start bluetooth scan: {:?}", e);
         }
       };

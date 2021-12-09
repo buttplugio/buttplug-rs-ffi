@@ -7,7 +7,6 @@
 
 //! Handling of websockets using async-tungstenite
 
-use tokio::sync::{mpsc, Mutex, Notify};
 use buttplug::{
   connector::{
     transport::{
@@ -21,8 +20,13 @@ use buttplug::{
   core::messages::serializer::ButtplugSerializedMessage,
   util::async_manager,
 };
-use futures::{future::{self, BoxFuture}, FutureExt, select};
+use futures::{
+  future::{self, BoxFuture},
+  select,
+  FutureExt,
+};
 use std::sync::Arc;
+use tokio::sync::{mpsc, Mutex, Notify};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::spawn_local;
@@ -32,7 +36,7 @@ use web_sys::{self, ErrorEvent, MessageEvent, WebSocket};
 pub struct ButtplugBrowserWebsocketClientTransport {
   /// Address of the server we'll connect to.
   address: String,
-  disconnect_notifier: Arc<Notify>
+  disconnect_notifier: Arc<Notify>,
 }
 
 impl ButtplugBrowserWebsocketClientTransport {
@@ -44,7 +48,7 @@ impl ButtplugBrowserWebsocketClientTransport {
   pub fn new(address: &str) -> Self {
     Self {
       address: address.to_owned(),
-      disconnect_notifier: Arc::new(Notify::new())
+      disconnect_notifier: Arc::new(Notify::new()),
     }
   }
 }
@@ -65,7 +69,14 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
     let ws;
     match WebSocket::new(&self.address) {
       Ok(websocket) => ws = websocket,
-      Err(e) => return Box::pin(future::ready(Err(ButtplugConnectorError::ConnectorGenericError(format!("Could not connect to websocket, possibly due to URL issue: {:?}", e)))))
+      Err(e) => {
+        return Box::pin(future::ready(Err(
+          ButtplugConnectorError::ConnectorGenericError(format!(
+            "Could not connect to websocket, possibly due to URL issue: {:?}",
+            e
+          )),
+        )))
+      }
     }
     let response_sender_clone = incoming_sender.clone();
     let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
@@ -114,7 +125,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
                 }
               } else {
                 info!("Connector client disappeared, ");
-                break;  
+                break;
               }
             }
             _ = notifier.notified().fuse() => {
@@ -129,7 +140,8 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       let ssc = success_sender.clone();
       async_manager::spawn(async move {
         ssc.send(true).await;
-      }).unwrap();
+      })
+      .unwrap();
     }) as Box<dyn FnMut(JsValue)>);
     ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
     onopen_callback.forget();
@@ -139,17 +151,19 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       let fsc = failure_sender.clone();
       async_manager::spawn(async move {
         fsc.send(false).await;
-      }).unwrap();
+      })
+      .unwrap();
     }) as Box<dyn FnMut(ErrorEvent)>);
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
     onerror_callback.forget();
 
-
-    Box::pin(async move{
+    Box::pin(async move {
       if connect_receiver.recv().await.unwrap() {
         Ok(())
       } else {
-        Err(ButtplugConnectorError::ConnectorGenericError("Could not connect to websocket, possibly due to server issue.".to_owned()))
+        Err(ButtplugConnectorError::ConnectorGenericError(
+          "Could not connect to websocket, possibly due to server issue.".to_owned(),
+        ))
       }
     })
   }

@@ -1,4 +1,3 @@
-use tokio::sync::{mpsc, broadcast};
 use async_trait::async_trait;
 use buttplug::{
   core::{
@@ -21,8 +20,13 @@ use buttplug::{
   util::future::{ButtplugFuture, ButtplugFutureStateShared},
 };
 use futures::future::{self, BoxFuture};
-use js_sys::{Uint8Array, DataView};
-use std::{fmt::{self, Debug}, convert::TryFrom, collections::HashMap};
+use js_sys::{DataView, Uint8Array};
+use std::{
+  collections::HashMap,
+  convert::TryFrom,
+  fmt::{self, Debug},
+};
+use tokio::sync::{broadcast, mpsc};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
@@ -149,9 +153,7 @@ async fn run_webbluetooth_loop(
         debug!("Writing to endpoint {:?}", read_cmd.endpoint);
         let chr = char_map.get(&read_cmd.endpoint).unwrap().clone();
         spawn_local(async move {
-          let read_value = JsFuture::from(chr.read_value())
-            .await
-            .unwrap();
+          let read_value = JsFuture::from(chr.read_value()).await.unwrap();
           let data_view = DataView::try_from(read_value).unwrap();
           let mut body = vec![0; data_view.byte_length() as usize];
           Uint8Array::new(&data_view).copy_to(&mut body[..]);
@@ -168,8 +170,10 @@ async fn run_webbluetooth_loop(
         let onchange_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
           let event_chr: BluetoothRemoteGattCharacteristic =
             BluetoothRemoteGattCharacteristic::from(JsValue::from(e.target().unwrap()));
-          let value =
-            Uint8Array::new_with_byte_offset(&JsValue::from(event_chr.value().unwrap().buffer()), 0);
+          let value = Uint8Array::new_with_byte_offset(
+            &JsValue::from(event_chr.value().unwrap().buffer()),
+            0,
+          );
           let value_vec = value.to_vec();
           debug!("Subscription notification from {}: {:?}", ep, value_vec);
           event_sender
@@ -270,12 +274,7 @@ impl ButtplugDeviceImplCreator for WebBluetoothDeviceImplCreator {
           receiver,
           command_sender,
         ));
-        Ok(DeviceImpl::new(
-          &name,
-          &address,
-          &endpoints,
-          device_impl
-        ))
+        Ok(DeviceImpl::new(&name, &address, &endpoints, device_impl))
       }
       WebBluetoothEvent::Disconnected => Err(
         ButtplugDeviceError::DeviceCommunicationError(
