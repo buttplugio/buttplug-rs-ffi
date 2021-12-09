@@ -210,6 +210,7 @@ impl WebBluetoothDeviceImplCreator {
     debug!("Emitting a new webbluetooth device impl creator!");
     let specifier = DeviceSpecifier::BluetoothLE(BluetoothLESpecifier::new_from_device(
       &device.name().unwrap(),
+      &[]
     ));
     Self {
       device: Some(device),

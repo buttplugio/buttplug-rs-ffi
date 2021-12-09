@@ -140,8 +140,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       let ssc = success_sender.clone();
       async_manager::spawn(async move {
         ssc.send(true).await;
-      })
-      .unwrap();
+      });
     }) as Box<dyn FnMut(JsValue)>);
     ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
     onopen_callback.forget();
@@ -151,8 +150,7 @@ impl ButtplugConnectorTransport for ButtplugBrowserWebsocketClientTransport {
       let fsc = failure_sender.clone();
       async_manager::spawn(async move {
         fsc.send(false).await;
-      })
-      .unwrap();
+      });
     }) as Box<dyn FnMut(ErrorEvent)>);
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
     onerror_callback.forget();
