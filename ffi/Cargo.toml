@@ -12,32 +12,32 @@ default = ["buttplug/tokio-runtime",  "buttplug/websockets", "buttplug/btleplug-
 wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures", "console_error_panic_hook"]
 
 [dependencies]
-buttplug = { version = "5.0.0", default-features = false, features = ["client", "server", "serialize-json"] }
+buttplug = { version = "5.1.3", default-features = false, features = ["client", "server", "serialize-json"] }
 # buttplug = { path = "../../buttplug-rs/buttplug", default-features = false, features = ["client", "server", "serialize-json"] }
-tracing-subscriber = "0.2.20"
-futures = "0.3.16"
-tracing = "0.1.26"
+tracing-subscriber = {version = "0.3.3", features = ["env-filter"]}
+futures = "0.3.18"
+tracing = "0.1.29"
 dashmap = "4.0.2"
-libc = "0.2.101"
-prost = "0.8.0"
+libc = "0.2.109"
+prost = "0.9.0"
 lazy_static = "1.4.0"
-wasm-bindgen = { version = "0.2.76", features = ["serde-serialize"], optional = true }
+wasm-bindgen = { version = "0.2.78", features = ["serde-serialize"], optional = true }
 # Needed to build valico with wasm-bindgen
 uuid = { version = "0.8.2", features = ["wasm-bindgen"], optional = true }
 async-lock = "2.4.0"
-js-sys = { version = "0.3.53", optional = true }
-tracing-wasm = { version = "0.2.0", optional = true }
+js-sys = { version = "0.3.55", optional = true }
+tracing-wasm = { version = "0.2.1", optional = true }
 async-trait = { version = "0.1.51", optional = true }
-wasm-bindgen-futures = { version = "0.4.26", optional = true }
-tokio = { version = "1.10.1", features = ["sync", "rt-multi-thread"] }
+wasm-bindgen-futures = { version = "0.4.28", optional = true }
+tokio = { version = "1.14.0", features = ["sync", "rt-multi-thread"] }
 log-panics = { version = "2.0.0", optional = true, features = ["with-backtrace"] }
-console_error_panic_hook = { version = "0.1.6", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
 futures-timer = "3.0.2"
 
 [build-dependencies]
-prost-build = "0.8.0"
-vergen = "5.1.15"
-anyhow = "1.0.43"
+prost-build = "0.9.0"
+vergen = "5.2.0"
+anyhow = "1.0.51"
 
 [lib]
 name = "buttplug_rs_ffi"
@@ -45,7 +45,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies.web-sys]
-version = "0.3.53"
+version = "0.3.55"
 # path = "../../wasm-bindgen/crates/web-sys"
 #git = "https://github.com/rustwasm/wasm-bindgen"
 optional = true
