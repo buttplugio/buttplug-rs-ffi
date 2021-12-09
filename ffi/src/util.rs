@@ -21,7 +21,7 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "wasm")]
 use js_sys::Uint8Array;
 use std::{
-  convert::{TryFrom, TryInto},
+  convert::TryFrom,
   error::Error,
 };
 
@@ -127,9 +127,9 @@ impl From<ButtplugClientDeviceMessageType> for MessageAttributeType {
   }
 }
 
-impl Into<Endpoint> for SerializedEndpoint {
-  fn into(self) -> Endpoint {
-    match self {
+impl From<SerializedEndpoint> for Endpoint {
+  fn from(endpoint: SerializedEndpoint) -> Endpoint {
+    match endpoint {
       SerializedEndpoint::Rx => Endpoint::Rx,
       SerializedEndpoint::RxAccel => Endpoint::RxAccel,
       SerializedEndpoint::RxBleModel => Endpoint::RxBLEModel,
@@ -243,11 +243,6 @@ pub fn send_event(event: ButtplugClientEvent, callback: &FFICallback, callback_c
       for (message_type, message_attrs) in &device.allowed_messages {
         // If we can't convert, this means we don't support the message type in
         // the FFI layer. Good way to deprecate messages.
-        let attr_type: ButtplugClientDeviceMessageType = if let Ok(attr) = message_type.clone().try_into() {
-          attr
-        } else {
-          continue;
-        };
         let step_count = if message_attrs.step_count.is_some() {
           message_attrs.step_count.clone().unwrap()
         } else {
@@ -265,9 +260,9 @@ pub fn send_event(event: ButtplugClientEvent, callback: &FFICallback, callback_c
           vec![]
         };
         let attrs = MessageAttributes {
-            message_type: MessageAttributeType::try_from(attr_type).unwrap() as i32,
+            message_type: MessageAttributeType::try_from(*message_type).unwrap() as i32,
             feature_count: message_attrs.feature_count.unwrap_or(0),
-            step_count: step_count,
+            step_count,
             endpoints: serialized_endpoints,
             max_duration: vec![],
         };

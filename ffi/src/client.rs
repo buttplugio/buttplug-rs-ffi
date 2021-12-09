@@ -56,9 +56,9 @@ impl ButtplugFFIClient {
     event_callback: FFICallback,
     event_callback_context: FFICallbackContext) -> Self {
     let client = Arc::new(ButtplugClient::new(name));
-    let event_callback = event_callback.clone();
+    let event_callback = event_callback;
     let context_wrapper = FFICallbackContextWrapper(event_callback_context);
-    let context_wrapper_clone = context_wrapper.clone();
+    let context_wrapper_clone = context_wrapper;
     let mut event_stream = client.event_stream();
     #[cfg(not(feature = "wasm"))]
     let _guard = runtime.enter();
@@ -124,7 +124,7 @@ impl ButtplugFFIClient {
     let mut builder = ButtplugServerBuilder::default();
     builder
       .name(&connect_local_msg.server_name.clone())
-      .max_ping_time(connect_local_msg.max_ping_time.into())
+      .max_ping_time(connect_local_msg.max_ping_time)
       .allow_raw_messages(connect_local_msg.allow_raw_messages);
     if !connect_local_msg.device_configuration_json.is_empty() {
       builder.device_configuration_json( Some(connect_local_msg.device_configuration_json.clone()));

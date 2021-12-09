@@ -32,7 +32,7 @@ impl ButtplugFFIDevice {
   pub fn new(runtime: Arc<Runtime>, device: Arc<ButtplugClientDevice>) -> Self {
     Self {
       runtime,
-      device: device,
+      device,
     }
   }
 

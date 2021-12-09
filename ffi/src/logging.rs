@@ -20,8 +20,6 @@ use tokio::{runtime::Runtime, sync::mpsc};
 //use tracing::{Level};
 use tracing::Instrument;
 use tracing_subscriber::filter::{EnvFilter, LevelFilter};
-#[cfg(not(feature="wasm"))]
-use log_panics;
 
 #[cfg(not(feature="wasm"))]
 pub type LogFFICallback = extern "C" fn(FFICallbackContext, *const c_char);
@@ -78,8 +76,7 @@ impl ButtplugFFILogHandle {
         .is_err() {
           error!("Log handler already set, cannot currently change log levels.");
       }
-    } else {
-      if tracing_subscriber::fmt()
+    } else if tracing_subscriber::fmt()
         .with_ansi(false)
         .with_writer(ChannelWriter::new(sender))
         .with_env_filter(filter)
@@ -87,7 +84,6 @@ impl ButtplugFFILogHandle {
         .try_init()
         .is_err() {
           error!("Log handler already set, cannot currently change log levels.");
-      }
     };
     Self {
       _runtime: runtime,
