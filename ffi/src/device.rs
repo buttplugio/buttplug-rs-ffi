@@ -73,8 +73,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.vibrate(params).await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_rotate_cmd(&self, id: u32, rotate_msg: RotateCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
@@ -87,8 +86,7 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.rotate(params).await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_linear_cmd(&self, id: u32, linear_msg: LinearCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
@@ -102,16 +100,14 @@ impl ButtplugFFIDevice {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.linear(params).await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_stop_device_cmd(&self, id: u32, _msg: StopDeviceCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.stop().await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_raw_read_cmd(&self, id: u32, msg: RawReadCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
@@ -138,32 +134,28 @@ impl ButtplugFFIDevice {
           return_error(id, &e, &callback, callback_context);
         }
       }
-    })
-    .unwrap();
+    });
   }
 
   fn send_raw_write_cmd(&self, id: u32, msg: RawWriteCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.raw_write(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into(), msg.data, msg.write_with_response).await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_raw_subscribe_cmd(&self, id: u32, msg: RawSubscribeCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.raw_subscribe(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into()).await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_raw_unsubscribe_cmd(&self, id: u32, msg: RawUnsubscribeCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let device = self.device.clone();
     async_manager::spawn(async move {
       return_client_result(id, &device.raw_unsubscribe(SerializedEndpoint::from_i32(msg.endpoint).unwrap().into()).await, &callback, callback_context);
-    })
-    .unwrap();
+    });
   }
 
   fn send_battery_level_cmd(&self, id: u32, _msg: BatteryLevelCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
@@ -189,8 +181,7 @@ impl ButtplugFFIDevice {
           return_error(id, &e, &callback, callback_context);
         }
       }
-    })
-    .unwrap();
+    });
   }
 
   fn send_rssi_level_cmd(&self, id: u32, _msg: RssiLevelCmd, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
@@ -216,7 +207,6 @@ impl ButtplugFFIDevice {
           return_error(id, &e, &callback, callback_context);
         }
       }
-    })
-    .unwrap();
+    });
   }
 }

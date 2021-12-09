@@ -66,7 +66,7 @@ impl ButtplugFFIClient {
       while let Some(e) = event_stream.next().await {
         send_event(e, &event_callback, context_wrapper_clone);
       }
-    }).unwrap();
+    });
     Self {
       client,
       #[cfg(not(feature = "wasm"))]
@@ -117,7 +117,7 @@ impl ButtplugFFIClient {
           return_error(client_msg_id, &e, &callback, callback_context);
         }
       }
-    }).unwrap();
+    });
   }
 
   fn connect_local(&self, msg_id: u32, connect_local_msg: &ConnectLocal, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
@@ -198,34 +198,34 @@ impl ButtplugFFIClient {
     let client = self.client.clone();
     async_manager::spawn(async move {
       return_client_result(msg_id, &client.disconnect().await, &callback, callback_context);
-    }).unwrap();
+    });
   }
 
   fn start_scanning(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
     async_manager::spawn(async move {
       return_client_result(msg_id, &client.start_scanning().await, &callback, callback_context);
-    }).unwrap();
+    });
   }
 
   fn stop_scanning(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
     async_manager::spawn(async move {
       return_client_result(msg_id, &client.stop_scanning().await, &callback, callback_context);
-    }).unwrap();
+    });
   }
 
   fn ping(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
     async_manager::spawn(async move {
       return_client_result(msg_id, &client.ping().await, &callback, callback_context);
-    }).unwrap();
+    });
   }
 
   fn stop_all_devices(&self, msg_id: u32, callback: FFICallback, callback_context: FFICallbackContextWrapper) {
     let client = self.client.clone();
     async_manager::spawn(async move {
       return_client_result(msg_id, &client.stop_all_devices().await, &callback, callback_context);
-    }).unwrap();
+    });
   }
 }

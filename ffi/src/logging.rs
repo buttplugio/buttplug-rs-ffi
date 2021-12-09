@@ -63,8 +63,7 @@ impl ButtplugFFILogHandle {
           callback.clone().call1(&this, &JsValue::from_str(&str));
         }
       }
-    }.instrument(info_span!("Client Logging Loop")))
-    .unwrap();
+    }.instrument(info_span!("Client Logging Loop")));
     //let max_level_cstr: &CStr = unsafe { CStr::from_ptr(max_level_cchar) };
     let filter =
       EnvFilter::from_default_env().add_directive(LevelFilter::from_str(max_level).unwrap().into());
