@@ -12,7 +12,7 @@ default = ["buttplug/tokio-runtime",  "buttplug/websockets", "buttplug/btleplug-
 wasm = ["wasm-bindgen", "uuid", "web-sys", "js-sys", "tracing-wasm", "buttplug/wasm-bindgen-runtime", "async-trait", "wasm-bindgen-futures", "console_error_panic_hook"]
 
 [dependencies]
-buttplug = { version = "5.1.3", default-features = false, features = ["client", "server", "serialize-json"] }
+buttplug = { version = "5.1.4", default-features = false, features = ["client", "server", "serialize-json"] }
 # buttplug = { path = "../../buttplug-rs/buttplug", default-features = false, features = ["client", "server", "serialize-json"] }
 tracing-subscriber = {version = "0.3.3", features = ["env-filter"]}
 futures = "0.3.18"
