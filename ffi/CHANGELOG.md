@@ -1,3 +1,9 @@
+# 2.0.5 (2021/12/08)
+
+## Features
+
+- Update to Buttplug v5.1 (No named pipe support via FFI yet though.)
+
 # 2.0.4 (2021/08/28)
 
 ## Features
