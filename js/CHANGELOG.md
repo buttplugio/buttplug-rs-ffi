@@ -1,3 +1,9 @@
+# v1.0.17 (2021/12/09)
+
+## Features
+
+- Update to Buttplug v5.1
+
 # v1.0.16 (2021/10/16)
 
 ## Bugfixes
