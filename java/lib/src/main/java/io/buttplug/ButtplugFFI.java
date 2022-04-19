@@ -5,6 +5,11 @@ import com.sun.jna.*;
 import java.lang.FunctionalInterface;
 import java.lang.reflect.Method;
 
+//import android.os.Handler;
+//import android.os.Looper;
+
+//import ButtplugFFIInit;
+
 /**
  * Class representing the C FFI.
  *
@@ -47,7 +52,7 @@ public class ButtplugFFI {
     }
 
     // ButtplugClient
-    static native Pointer buttplug_create_protobuf_client(String client_name, FFICallback callback, Pointer ctx);
+    static native Pointer buttplug_create_protobuf_client(JNIEnv env, String client_name, FFICallback callback, Pointer ctx);
     static native void buttplug_free_client(Pointer client);
     static native void buttplug_client_protobuf_message(Pointer client, byte[] buf, int32_t buf_len, FFICallback callback, Pointer ctx);
 
@@ -64,7 +69,7 @@ public class ButtplugFFI {
 
     static {
         try {
-            Native.register("buttplug_rs_ffi");
+            Native.register(ButtplugFFI.class, "buttplug_rs_ffi");
         } catch (Throwable ex) {
             throw new RuntimeException("Missing natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
         }

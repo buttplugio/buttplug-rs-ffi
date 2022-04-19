@@ -1,4 +1,4 @@
-#[cfg(feature = "wasm")]
+#[cfg(feature = "wasm-backend")]
 use super::wasm::{
   webbluetooth_manager::WebBluetoothCommunicationManagerBuilder,
   websocket_client_connector::ButtplugBrowserWebsocketClientTransport,
@@ -19,8 +19,6 @@ use super::{
   FFICallbackContext,
   FFICallbackContextWrapper,
 };
-#[cfg(all(target_os = "windows", not(feature = "wasm")))]
-use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManagerBuilder;
 use buttplug::{
   client::ButtplugClient,
   connector::{ButtplugConnector, ButtplugInProcessClientConnector, ButtplugRemoteClientConnector},
@@ -32,11 +30,17 @@ use buttplug::{
   server::ButtplugServerBuilder,
   util::async_manager,
 };
-#[cfg(not(feature = "wasm"))]
+#[cfg(not(feature = "wasm-backend"))]
 use buttplug::{
-  connector::ButtplugWebsocketClientTransport,
   server::comm_managers::{
     btleplug::BtlePlugCommunicationManagerBuilder,
+    lovense_connect_service::LovenseConnectServiceCommunicationManagerBuilder,
+  },
+  connector::ButtplugWebsocketClientTransport
+};
+#[cfg(feature = "tokio-backend")]
+use buttplug::{
+  server::comm_managers::{
     lovense_dongle::{
       LovenseHIDDongleCommunicationManagerBuilder,
       LovenseSerialDongleCommunicationManagerBuilder,
@@ -44,21 +48,25 @@ use buttplug::{
     serialport::SerialPortCommunicationManagerBuilder,
   },
 };
+#[cfg(all(target_os = "windows", feature = "tokio-backend"))]
+use buttplug::server::comm_managers::xinput::XInputDeviceCommunicationManagerBuilder;
 use futures::StreamExt;
+use tracing::Instrument;
 use prost::Message;
 use std::sync::Arc;
-#[cfg(not(feature = "wasm"))]
+#[cfg(not(feature = "wasm-backend"))]
 use tokio::runtime::Runtime;
 
 pub struct ButtplugFFIClient {
   client: Arc<ButtplugClient>,
-  #[cfg(not(feature = "wasm"))]
+  #[cfg(not(feature = "wasm-backend"))]
   runtime: Arc<Runtime>,
 }
 
 impl ButtplugFFIClient {
   pub fn new(
-    #[cfg(not(feature = "wasm"))] runtime: Arc<tokio::runtime::Runtime>,
+    #[cfg(not(feature = "wasm-backend"))]
+    runtime: Arc<tokio::runtime::Runtime>,
     name: &str,
     event_callback: FFICallback,
     event_callback_context: FFICallbackContext,
@@ -68,16 +76,16 @@ impl ButtplugFFIClient {
     let context_wrapper = FFICallbackContextWrapper(event_callback_context);
     let context_wrapper_clone = context_wrapper;
     let mut event_stream = client.event_stream();
-    #[cfg(not(feature = "wasm"))]
+    #[cfg(not(feature = "wasm-backend"))]
     let _guard = runtime.enter();
     async_manager::spawn(async move {
       while let Some(e) = event_stream.next().await {
-        send_event(e, &event_callback, context_wrapper_clone);
+        send_event(e, &event_callback, context_wrapper_clone.clone());
       }
     });
     Self {
       client,
-      #[cfg(not(feature = "wasm"))]
+      #[cfg(not(feature = "wasm-backend"))]
       runtime,
     }
   }
@@ -85,10 +93,10 @@ impl ButtplugFFIClient {
   pub fn get_device(&self, device_index: u32) -> Option<ButtplugFFIDevice> {
     let devices = self.client.devices();
     if let Some(device) = devices.iter().find(|device| device.index() == device_index) {
-      #[cfg(not(feature = "wasm"))]
+      #[cfg(not(feature = "wasm-backend"))]
       return Some(ButtplugFFIDevice::new(self.runtime.clone(), device.clone()));
 
-      #[cfg(feature = "wasm")]
+      #[cfg(feature = "wasm-backend")]
       return Some(ButtplugFFIDevice::new(device.clone()));
     } else {
       error!("Device id {} not available.", device_index);
@@ -102,7 +110,7 @@ impl ButtplugFFIClient {
     callback: FFICallback,
     callback_context: FFICallbackContextWrapper,
   ) {
-    #[cfg(not(feature = "wasm"))]
+    #[cfg(not(feature = "wasm-backend"))]
     let _guard = self.runtime.enter();
     let client_msg = ClientMessage::decode(msg_ptr).unwrap();
     let msg_id = client_msg.id;
@@ -146,7 +154,7 @@ impl ButtplugFFIClient {
           return_error(client_msg_id, &e, &callback, callback_context);
         }
       }
-    });
+    }.instrument(tracing::info_span!("Connect Task")));
   }
 
   fn connect_local(
@@ -179,45 +187,48 @@ impl ButtplugFFIClient {
     };
 
     let device_mgrs = connect_local_msg.comm_manager_types;
-    #[cfg(not(feature = "wasm"))]
+    #[cfg(not(feature = "wasm-backend"))]
     {
-      if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0
-        || device_mgrs == 0
-      {
-        server
-          .device_manager()
-          .add_comm_manager(LovenseHIDDongleCommunicationManagerBuilder::default())
-          .unwrap();
-      }
-      if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0
-        || device_mgrs == 0
-      {
-        server
-          .device_manager()
-          .add_comm_manager(LovenseSerialDongleCommunicationManagerBuilder::default())
-          .unwrap();
-      }
       if device_mgrs & DeviceCommunicationManagerTypes::Btleplug as u32 > 0 || device_mgrs == 0 {
         server
           .device_manager()
           .add_comm_manager(BtlePlugCommunicationManagerBuilder::default())
           .unwrap();
       }
-      #[cfg(target_os = "windows")]
-      if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
-        server
-          .device_manager()
-          .add_comm_manager(XInputDeviceCommunicationManagerBuilder::default())
-          .unwrap();
-      }
-      if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
-        server
-          .device_manager()
-          .add_comm_manager(SerialPortCommunicationManagerBuilder::default())
-          .unwrap();
+      #[cfg(feature = "tokio-backend")]
+      {
+        if device_mgrs & DeviceCommunicationManagerTypes::LovenseHidDongle as u32 > 0
+          || device_mgrs == 0
+        {
+          server
+            .device_manager()
+            .add_comm_manager(LovenseHIDDongleCommunicationManagerBuilder::default())
+            .unwrap();
+        }
+        if device_mgrs & DeviceCommunicationManagerTypes::LovenseSerialDongle as u32 > 0
+          || device_mgrs == 0
+        {
+          server
+            .device_manager()
+            .add_comm_manager(LovenseSerialDongleCommunicationManagerBuilder::default())
+            .unwrap();
+        }
+        if device_mgrs & DeviceCommunicationManagerTypes::SerialPort as u32 > 0 || device_mgrs == 0 {
+          server
+            .device_manager()
+            .add_comm_manager(SerialPortCommunicationManagerBuilder::default())
+            .unwrap();
+        }
+        #[cfg(target_os = "windows")]
+        if device_mgrs & DeviceCommunicationManagerTypes::XInput as u32 > 0 || device_mgrs == 0 {
+          server
+            .device_manager()
+            .add_comm_manager(XInputDeviceCommunicationManagerBuilder::default())
+            .unwrap();
+        }
       }
     }
-    #[cfg(feature = "wasm")]
+    #[cfg(feature = "wasm-backend")]
     {
       server
         .device_manager()
@@ -228,7 +239,7 @@ impl ButtplugFFIClient {
     self.connect(msg_id, connector, callback, callback_context);
   }
 
-  #[cfg(not(feature = "wasm"))]
+  #[cfg(not(feature = "wasm-backend"))]
   fn connect_websocket(
     &self,
     msg_id: u32,
@@ -251,7 +262,7 @@ impl ButtplugFFIClient {
     self.connect(msg_id, connector, callback, callback_context);
   }
 
-  #[cfg(feature = "wasm")]
+  #[cfg(feature = "wasm-backend")]
   fn connect_websocket(
     &self,
     msg_id: u32,

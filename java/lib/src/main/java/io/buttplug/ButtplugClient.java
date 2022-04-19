@@ -1,7 +1,7 @@
 package io.buttplug;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.sun.jna.Pointer;
+import com.sun.jna.*;
 import io.buttplug.exceptions.ButtplugDeviceException;
 import io.buttplug.exceptions.ButtplugException;
 import io.buttplug.exceptions.ButtplugPingException;
@@ -75,7 +75,7 @@ public class ButtplugClient implements AutoCloseable {
 
     public ButtplugClient(String client_name) {
         systemCallbackCtx = clientReferenceManager.add(this);
-        this.pointer = ButtplugFFI.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
+        this.pointer = ButtplugFFI.buttplug_create_protobuf_client(JNIEnv.CURRENT, client_name, systemCallback, systemCallbackCtx);
         this.name = client_name;
     }
 

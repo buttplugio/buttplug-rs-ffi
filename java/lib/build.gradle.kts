@@ -11,16 +11,41 @@ import com.google.protobuf.gradle.*
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    `maven-publish`
     idea
     id("com.google.protobuf") version "0.8.8"
 }
 
 group = "io.buttplug"
-version = "0.0.1"
+version = "0.0.1-SNAPSHOT"
 
 java {
     sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
     targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = "buttplug-rs-ffi"
+            from(components["java"])
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+                usage("java-runtime") {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name.set("buttplug-rs-ffi")
+                description.set("Buttplug FFI")
+                url.set("http://www.example.com/library")
+            }
+        }
+    }
 }
 
 // Workaround for JDK16+ issues with gradle
@@ -34,6 +59,7 @@ tasks {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    mavenLocal()
     // grab and cache things from buttplug github releases
     val github = ivy {
         url = uri("https://github.com/")
@@ -71,7 +97,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     // ffi
-    implementation("net.java.dev.jna:jna:5.8.0")
+    implementation("net.java.dev.jna:jna:5.11.0")
     implementation("com.google.protobuf:protobuf-java:3.6.1")
 
     // ffi shared objects, classifiers represent the target directory.

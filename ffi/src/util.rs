@@ -26,11 +26,11 @@ use buttplug::{
   core::errors::ButtplugError,
   device::Endpoint,
 };
-#[cfg(feature = "wasm")]
+#[cfg(feature = "wasm-backend")]
 use js_sys::Uint8Array;
 use prost::Message;
 use std::{convert::TryFrom, error::Error};
-#[cfg(feature = "wasm")]
+#[cfg(feature = "wasm-backend")]
 use wasm_bindgen::prelude::*;
 
 pub fn send_server_message(
@@ -40,9 +40,9 @@ pub fn send_server_message(
 ) {
   let mut buf = vec![];
   message.encode(&mut buf).unwrap();
-  #[cfg(not(feature = "wasm"))]
+  #[cfg(not(feature = "wasm-backend"))]
   callback(callback_context.0, buf.as_ptr(), buf.len() as u32);
-  #[cfg(feature = "wasm")]
+  #[cfg(feature = "wasm-backend")]
   {
     let this = JsValue::null();
     let uint8buf = unsafe { Uint8Array::new(&Uint8Array::view(&buf)) };

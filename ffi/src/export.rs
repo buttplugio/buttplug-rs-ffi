@@ -2,13 +2,15 @@ use super::{
   client::ButtplugFFIClient,
   device::ButtplugFFIDevice,
   logging::{ButtplugFFILogHandle, LogFFICallback},
-  FFICallback,
-  FFICallbackContext,
-  FFICallbackContextWrapper,
+  FFICallback, FFICallbackContext, FFICallbackContextWrapper,
 };
+#[cfg(feature = "android-backend")]
+use jni::{objects::GlobalRef, sys::jint, JNIEnv, JavaVM};
 use libc::c_char;
+#[cfg(feature = "android-backend")]
+use once_cell::sync::OnceCell;
 use std::{
-  ffi::CStr,
+  ffi::{c_void, CStr},
   slice,
   sync::{Arc, Mutex, Weak},
 };
@@ -18,6 +20,23 @@ lazy_static! {
   static ref RUNTIME: Mutex<Weak<tokio::runtime::Runtime>> = Mutex::new(Weak::new());
 }
 
+#[cfg(feature = "android-backend")]
+lazy_static! {
+  static ref JAVAVM: OnceCell<JavaVM> = OnceCell::new();
+  static ref CLASS_LOADER: OnceCell<GlobalRef> = OnceCell::new();
+}
+
+#[cfg(feature = "android-backend")]
+#[no_mangle]
+pub extern "C" fn JNI_OnLoad(vm: JavaVM, _res: *const c_void) -> jint {
+  buttplug_activate_env_logger();
+  let env = vm.get_env().unwrap();
+  jni_utils::init(&env).unwrap();
+  btleplug::platform::init(&env).unwrap();
+  jni::JNIVersion::V6.into()
+}
+
+#[cfg(feature = "tokio-backend")]
 fn get_or_create_runtime() -> Arc<Runtime> {
   // See if we have a runtime. If so, copy and pass to the client. Otherwise,
   // spin one up, sending it to the client while also storing it in our static
@@ -33,8 +52,92 @@ fn get_or_create_runtime() -> Arc<Runtime> {
   }
 }
 
+#[cfg(feature = "android-backend")]
+fn get_or_create_runtime(env: JNIEnv) -> Arc<Runtime> {
+  // See if we have a runtime. If so, copy and pass to the client. Otherwise,
+  // spin one up, sending it to the client while also storing it in our static
+  // Weak<> just in case someone tries to create multiple clients.
+  let mut static_runtime = RUNTIME.lock().unwrap();
+  match static_runtime.upgrade() {
+    Some(rt) => rt,
+    None => {
+      let new_runtime = {
+        let class = env
+          .find_class("com/nonpolynomial/btleplug/android/impl/Peripheral")
+          .unwrap();
+        JAVAVM.set(env.get_java_vm().unwrap());
+        let thread = env
+          .call_static_method(
+            "java/lang/Thread",
+            "currentThread",
+            "()Ljava/lang/Thread;",
+            &[],
+          )
+          .unwrap()
+          .l()
+          .unwrap();
+        let class_loader = env
+          .call_method(
+            thread,
+            "getContextClassLoader",
+            "()Ljava/lang/ClassLoader;",
+            &[],
+          )
+          .unwrap()
+          .l()
+          .unwrap();
+
+        CLASS_LOADER.set(env.new_global_ref(class_loader).unwrap());
+        Arc::new(
+          tokio::runtime::Builder::new_multi_thread()
+            .enable_time()
+            .enable_io()
+            .on_thread_start(|| {
+              info!("WRAPPING NEW THREAD IN VM");
+              let vm = JAVAVM.get().unwrap();
+
+              // We now need to call the following code block via JNI calls. God help us.
+              //
+              //  java.lang.Thread.currentThread().setContextClassLoader(
+              //    java.lang.ClassLoader.getSystemClassLoader()
+              //  );
+              info!("Adding classloader to thread");
+
+              let new_env = vm.attach_current_thread_permanently().unwrap();
+
+              let thread = new_env
+                .call_static_method(
+                  "java/lang/Thread",
+                  "currentThread",
+                  "()Ljava/lang/Thread;",
+                  &[],
+                )
+                .unwrap()
+                .l()
+                .unwrap();
+              new_env
+                .call_method(
+                  thread,
+                  "setContextClassLoader",
+                  "(Ljava/lang/ClassLoader;)V",
+                  &[CLASS_LOADER.get().unwrap().as_obj().into()],
+                )
+                .unwrap();
+              info!("Classloader added to thread");
+            })
+            .build()
+            .unwrap(),
+        )
+      };
+      *static_runtime = Arc::downgrade(&new_runtime);
+      new_runtime
+    }
+  }
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn buttplug_create_protobuf_client(
+  #[cfg(feature = "android-backend")] env: jni::JNIEnv,
   client_name_ptr: *const c_char,
   callback: FFICallback,
   callback_context: FFICallbackContext,
@@ -45,7 +148,10 @@ pub unsafe extern "C" fn buttplug_create_protobuf_client(
   let client_name = c_str.to_str().unwrap();
 
   Box::into_raw(Box::new(ButtplugFFIClient::new(
+    #[cfg(feature = "tokio-backend")]
     get_or_create_runtime(),
+    #[cfg(feature = "android-backend")]
+    get_or_create_runtime(env),
     client_name,
     callback,
     callback_context,
@@ -118,13 +224,31 @@ pub unsafe extern "C" fn buttplug_free_device(ptr: *mut ButtplugFFIDevice) {
 
 #[no_mangle]
 pub extern "C" fn buttplug_activate_env_logger() {
-  if tracing_subscriber::fmt::try_init().is_err() {
-    error!("Cannot re-init env logger, this should only be called once");
+  #[cfg(feature = "tokio-backend")]
+  {
+    if tracing_subscriber::fmt::try_init().is_err() {
+      error!("Cannot re-init env logger, this should only be called once");
+    }
+  }
+  #[cfg(feature = "android-backend")]
+  {
+    log_panics::init();
+    use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+    let fmt_layer = tracing_subscriber::fmt::Layer::default();
+    let android_layer = tracing_android::layer("buttplug").unwrap();
+
+    tracing_subscriber::registry()
+      .with(tracing_subscriber::filter::LevelFilter::DEBUG)
+      .with(fmt_layer)
+      .with(android_layer)
+      .init();
+    info!("Logging enabled");
   }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn buttplug_create_log_handle(
+  #[cfg(feature = "android-backend")] env: jni::JNIEnv,
   callback: LogFFICallback,
   ctx: FFICallbackContext,
   max_level: *const c_char,
@@ -136,7 +260,10 @@ pub unsafe extern "C" fn buttplug_create_log_handle(
   // If we were handed a wrong client name, just panic.
   let max_level_str = max_level_cstr.to_str().unwrap();
   Box::into_raw(Box::new(ButtplugFFILogHandle::new(
+    #[cfg(feature = "tokio-backend")]
     get_or_create_runtime(),
+    #[cfg(feature = "android-backend")]
+    get_or_create_runtime(env),
     callback,
     ctx,
     max_level_str,

@@ -30,23 +30,23 @@ use buttplug::{
   util::async_manager,
 };
 use prost::Message;
-use std::{collections::HashMap, iter::FromIterator, sync::Arc};
-#[cfg(not(feature = "wasm"))]
+use std::{sync::Arc, collections::HashMap, iter::FromIterator};
+
 use tokio::runtime::Runtime;
 
 pub struct ButtplugFFIDevice {
   device: Arc<ButtplugClientDevice>,
-  #[cfg(not(feature = "wasm"))]
+  #[cfg(not(feature = "wasm-backend"))]
   runtime: Arc<Runtime>,
 }
 
 impl ButtplugFFIDevice {
-  #[cfg(not(feature = "wasm"))]
+  #[cfg(not(feature = "wasm-backend"))]
   pub fn new(runtime: Arc<Runtime>, device: Arc<ButtplugClientDevice>) -> Self {
     Self { runtime, device }
   }
 
-  #[cfg(feature = "wasm")]
+  #[cfg(feature = "wasm-backend")]
   pub fn new(device: Arc<ButtplugClientDevice>) -> Self {
     Self { device: device }
   }
@@ -57,7 +57,7 @@ impl ButtplugFFIDevice {
     callback: FFICallback,
     callback_context: FFICallbackContextWrapper,
   ) {
-    #[cfg(not(feature = "wasm"))]
+    #[cfg(not(feature = "wasm-backend"))]
     let _guard = self.runtime.enter();
     let device_msg = DeviceMessage::decode(msg_ptr).unwrap();
     let msg_id = device_msg.id;
