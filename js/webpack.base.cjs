@@ -44,18 +44,27 @@ const base = {
       }
     ]
   },
+  experiments: {
+    syncWebAssembly: true
+  },
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".ts", ".js"],
+    fallback: {
+      buffer: require.resolve('buffer/'),
+    },
   },
   devServer: {
     historyApiFallback: true,
-    noInfo: true
   },
   performance: {
     hints: false
   },
   devtool: 'inline-source-map',
   plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+
     // ES Module imports require file extensions, but Webpack 4.x/ts-loader doesn't understand
     // how to handle that. Instead, we rewrite those imports to use a '.ts' extension instead,
     // if one exists.
@@ -92,16 +101,15 @@ const production = {
     minimize: true,
     mangleWasmImports: false
   },
-  devtool: '#source-map',
+  devtool: 'source-map',
 };
 
-module.exports = env => {
-  switch(env) {
-    case 'development':
-      return base;
-    case 'production':
-      return merge(base, production);
-    default:
-      throw new Error('No matching configuration was found!');
+module.exports = (env, _argv) => {
+  if (env.development) {
+    return base;
+  } else if (env.production) {
+    return merge(base, production);
+  } else {
+    throw new Error('No matching configuration was found!');
   }
 }

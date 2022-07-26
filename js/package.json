@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "webpack-dev-server --hot --config webpack.base.cjs --env development",
     "build:publish": "rimraf dist && yarn build:rust && yarn build:webpack && yarn build:webpack:production",
-    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && node scripts/modularize.cjs wasm-pack && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
+    "build:rust": "rimraf src/buttplug-rs-ffi && cd ../ffi && cross-env RUSTFLAGS=\"--cfg=web_sys_unstable_apis\" wasm-pack build -d ../js/src/buttplug-rs-ffi --release -- --features wasm --no-default-features && cd ../js && node scripts/modularize.cjs wasm-pack && rimraf src/buttplug-rs-ffi/.gitignore src/buttplug-rs-ffi/package.json src/buttplug-rs-ffi/README.md",
     "build:main": "tsc -p tsconfig.json && copyfiles -u 1 \"src/**/*.js\" dist/module && copyfiles -u 1 \"src/**/*.d.ts\" dist/module && copyfiles -u 1 \"src/**/*.wasm\" dist/module",
     "build:proto": "pbjs -t static-module -w es6 -o src/buttplug_ffi.js ../protobuf_schemas/buttplug_rs_ffi.proto && node scripts/modularize.cjs pbjs && pbjs -t static-module ../protobuf_schemas/buttplug_rs_ffi.proto | pbts -o src/buttplug_ffi.d.ts -",
     "build:webpack": "yarn build:main && webpack --progress --config webpack.base.cjs --env development",
@@ -27,6 +27,7 @@
   "type": "module",
   "main": "./dist/module/index.js",
   "exports": {
+    "types": "./dist/module/index.d.ts",
     "node": "./dist/module/index.js",
     "browser": "./dist/web/buttplug.min.js"
   },
@@ -41,6 +42,7 @@
     "websocket": "^1.0.34"
   },
   "devDependencies": {
+    "buffer": "^6.0.3",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "fork-ts-checker-webpack-plugin": "^6.5.0",
@@ -51,9 +53,9 @@
     "ts-proto": "^1.93.1",
     "typescript": "^4.5.2",
     "uglify-js": "^3.14.4",
-    "webpack": "^4",
-    "webpack-cli": "^3",
-    "webpack-dev-server": "^3.11.2",
+    "webpack": "~5.74.0",
+    "webpack-cli": "^4",
+    "webpack-dev-server": "^4.9.3",
     "webpack-merge": "^5.8.0",
     "yarn": "^1.22.17"
   }
