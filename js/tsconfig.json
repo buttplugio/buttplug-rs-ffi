@@ -11,7 +11,7 @@
     "strictNullChecks": true,
     "noImplicitThis": true,
     "declaration": true,
-    "outDir": "./dist/module",
+    "outDir": "./dist/node",
     "esModuleInterop": true,
   },
   "include": [
