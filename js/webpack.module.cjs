@@ -18,13 +18,10 @@ const base = {
   },
   entry: path.resolve('./src/index.ts'),
   output: {
-    path: path.resolve('./dist/web'),
+    path: path.resolve('./dist/module'),
     filename: 'buttplug.js',
-    libraryTarget: 'umd',
     library: {
-      root: "Buttplug",
-      amd: "buttplug-amd",
-      commonjs: "buttplug-commonjs"
+      type: "module"
     }
   },
   externals: {
@@ -45,7 +42,8 @@ const base = {
     ]
   },
   experiments: {
-    syncWebAssembly: true
+    syncWebAssembly: true,
+    outputModule: true,
   },
   resolve: {
     extensions: [".ts", ".js"],

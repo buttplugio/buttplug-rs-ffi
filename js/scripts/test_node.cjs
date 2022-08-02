@@ -20,7 +20,7 @@ if (!process.execArgv.includes("--experimental-wasm-modules")) {
 
 
 async function main() {
-    const { buttplugInit, ButtplugWebsocketConnectorOptions, ButtplugClient } = await import("../dist/module/index.js");
+    const { buttplugInit, ButtplugWebsocketConnectorOptions, ButtplugClient } = await import("../dist/node/index.js");
     await buttplugInit();
     const connector = new ButtplugWebsocketConnectorOptions(socketAddress);
     const client = new ButtplugClient("test_node");
