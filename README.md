@@ -21,21 +21,19 @@ If you find this project helpful, you can [support us via Patreon](http://patreo
 
 ## FFI Implementations
 
-Finished FFI implementations available in this repo:
+The library currently implements FFI from Rust to the following languages:
 
-- [C#](https://github.com/buttplugio/buttplug-rs-ffi/tree/master/csharp)
-- [Javascript/Typescript (Web Only)](https://github.com/buttplugio/buttplug-rs-ffi/tree/master/js)
+- Java
 
-Implementations currently in the works:
+Our current plans are to possibly expand to the following list of languages:
 
-- Python
 - C/C++
 
-Implementations we'd like to see:
+However, for most languages, we recommend natively implementing at Buttplug Client and having it connect to [Intiface Central](https://intiface.com/central). This approach is outlined in the [Buttplug Developer Guide](https://docs.buttplug.io/docs/dev-guide).
 
-- Java/Kotlin
-- Swift
-- Idris
+## Where's C# and JS go?
+
+C# and JS have been moved back to the [Buttplug C#](https://github.com/buttplugio/buttplug-csharp) and [Buttplug JS](https://github.com/buttplugio/buttplug-js) repos, respectively. Usage of the FFI with these projects didn't work out for users very well, so they've been returned to being completely native client-only implementations, with embedded connections being deprecrecated in preference to having programs connect to [Intiface Central](https://intiface.com/central).
 
 ## Implementation Details
 
@@ -71,69 +69,57 @@ The actual FFI layer consists of a few exposed cdecl functions (see the [export.
 definitions) that serve as message passing interfaces in and out of the system. These functions
 should handle being called from different threads.
 
-## Implementation Plans
-
-The library currently implements FFI from Rust to the following languages:
-
-- C#
-- JS/Typescript for web via WASM and Typescript
-
-Our current plans are to expand to the following list of languages:
-
-- JS/Typescript for Node
-- Python
-- C/C++
-- Swift
-- Java
-- Go
-- Haskell
-
-If you have any languages you would like to see supported, please [file an issue](https://github.com/buttplugio/buttplug-rs-ffi/issues) and let us know.
-
-## Support
-
-If you have questions, support is available via:
-
-- [Discord](https://discord.buttplug.io) - This is the best choice for support
-- [Mentions/DMs to @buttplugio on twitter](https://twitter.com/buttplugio)
-
 ## Contributing
 
-If you would like to help provide language implementations for buttplug-rs-ffi, [please create an
-issue or comment on a related issue in our
-tracker](https://github.com/buttplugio/buttplug-rs-ffi/issues).
+If you have issues or feature requests, [please feel free to file an issue on this repo](issues/).
 
-Please discuss any interest in providing implementations in an issue (or privately with [qdot](https://github.com/qdot) on [discord](https://discord.buttplug.io) or [twitter DMs](https://twitter.com/buttplugio) if you would like to stay anonymous and out of recorded info on the repo) before submitting PRs. Random PRs without matching issues and discussion are likely to be closed without merging.
+We are not looking for code contributions or pull requests at this time, and will not accept pull
+requests that do not have a matching issue where the matter was previously discussed. Pull requests
+should only be submitted after talking to [qdot](https://github.com/qdot) via issues on this repo
+(or on [discourse](https://discuss.buttplug.io) or [discord](https://discord.buttplug.io) if you
+would like to stay anonymous and out of recorded info on the repo) before submitting PRs. Random PRs
+without matching issues and discussion are likely to be closed without merging. and receiving
+approval to develop code based on an issue. Any random or non-issue pull requests will most likely
+be closed without merging.
+
+If you'd like to contribute in a non-technical way, we need money to keep up with supporting the
+latest and greatest hardware. We have multiple ways to donate!
+
+- [Patreon](https://patreon.com/qdot)
+- [Github Sponsors](https://github.com/sponsors/qdot)
+- [Ko-Fi](https://ko-fi.com/qdot76367)
 
 ## License
 
-buttplug-rs-ffi is BSD licensed.
+This project is BSD 3-Clause licensed.
 
-    Copyright (c) 2016-2020, Nonpolynomial Labs, LLC
-    All rights reserved.
+```text
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+Copyright (c) 2016-2023, Nonpolynomial, LLC
+All rights reserved.
 
-    * Redistributions of source code must retain the above copyright notice, this
-      list of conditions and the following disclaimer.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-    * Redistributions in binary form must reproduce the above copyright notice,
-      this list of conditions and the following disclaimer in the documentation
-      and/or other materials provided with the distribution.
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
 
-    * Neither the name of buttplug nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-    OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+* Neither the name of buttplug nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
