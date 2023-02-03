@@ -12,12 +12,6 @@
 FFI Implementations from the [buttplug-rs](https://github.com/buttplugio/buttplug-rs) Rust Sex Toy
 Control Library to other langauges.
 
-If you don't work in Rust but still want to control sex toys, you're in the right place!
-
-## Support The Project
-
-If you find this project helpful, you can [support us via Patreon](http://patreon.com/qdot) or
-[Github Sponsors](https://github.com/sponsors/qdot)! Every donation helps us afford more research materials (sex toys).
 
 ## FFI Implementations
 
@@ -31,7 +25,7 @@ Our current plans are to possibly expand to the following list of languages:
 
 However, for most languages, we recommend natively implementing at Buttplug Client and having it connect to [Intiface Central](https://intiface.com/central). This approach is outlined in the [Buttplug Developer Guide](https://docs.buttplug.io/docs/dev-guide).
 
-## Where's C# and JS go?
+## Where did C# and JS go?
 
 C# and JS have been moved back to the [Buttplug C#](https://github.com/buttplugio/buttplug-csharp) and [Buttplug JS](https://github.com/buttplugio/buttplug-js) repos, respectively. Usage of the FFI with these projects didn't work out for users very well, so they've been returned to being completely native client-only implementations, with embedded connections being deprecrecated in preference to having programs connect to [Intiface Central](https://intiface.com/central).
 
