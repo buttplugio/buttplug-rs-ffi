@@ -63,10 +63,6 @@ public class ButtplugFFI {
     static native void buttplug_activate_env_logger();
 
     static {
-        try {
-            Native.register("buttplug_rs_ffi");
-        } catch (Throwable ex) {
-            throw new RuntimeException("Missing natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
-        }
+        Native.register("buttplug_rs_ffi");
     }
 }
