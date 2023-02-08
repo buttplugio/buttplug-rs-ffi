@@ -30,7 +30,7 @@ public class ButtplugLogHandler implements AutoCloseable {
         try {
             ButtplugFFI.buttplug_activate_env_logger();
         } catch (Throwable ex) {
-            throw new RuntimeException("Missing natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
+            throw new RuntimeException("Failed to load natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
         }
     }
 
@@ -70,7 +70,7 @@ public class ButtplugLogHandler implements AutoCloseable {
             log_handle = ButtplugFFI
                     .buttplug_create_log_handle(callback, null, level.value, use_json);
         } catch (Throwable ex) {
-            throw new RuntimeException("Missing natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
+            throw new RuntimeException("Failed to load natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
         }
     }
 

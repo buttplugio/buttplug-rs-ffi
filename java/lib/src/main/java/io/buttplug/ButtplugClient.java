@@ -79,7 +79,7 @@ public class ButtplugClient implements AutoCloseable {
         try {
             this.pointer = ButtplugFFI.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
         } catch (Throwable ex) {
-            throw new RuntimeException("Missing natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
+            throw new RuntimeException("Failed to load natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
         }
         this.name = client_name;
     }
