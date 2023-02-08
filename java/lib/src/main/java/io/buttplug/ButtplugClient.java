@@ -1,6 +1,7 @@
 package io.buttplug;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import io.buttplug.exceptions.ButtplugDeviceException;
 import io.buttplug.exceptions.ButtplugException;
@@ -75,7 +76,11 @@ public class ButtplugClient implements AutoCloseable {
 
     public ButtplugClient(String client_name) {
         systemCallbackCtx = clientReferenceManager.add(this);
-        this.pointer = ButtplugFFI.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
+        try {
+            this.pointer = ButtplugFFI.buttplug_create_protobuf_client(client_name, systemCallback, systemCallbackCtx);
+        } catch (Throwable ex) {
+            throw new RuntimeException("Failed to load natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
+        }
         this.name = client_name;
     }
 

@@ -1,5 +1,6 @@
 package io.buttplug;
 
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,7 +27,11 @@ public class ButtplugLogHandler implements AutoCloseable {
         if (!logHandlerActive.compareAndSet(false, true)) {
             throw new IllegalStateException("There is already an active log handler!");
         }
-        ButtplugFFI.buttplug_activate_env_logger();
+        try {
+            ButtplugFFI.buttplug_activate_env_logger();
+        } catch (Throwable ex) {
+            throw new RuntimeException("Failed to load natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
+        }
     }
 
     public enum Level {
@@ -61,8 +66,12 @@ public class ButtplugLogHandler implements AutoCloseable {
         }
 
         callback = (ctx, str) -> cb.log(str);
-        log_handle = ButtplugFFI
-                .buttplug_create_log_handle(callback, null, level.value, use_json);
+        try {
+            log_handle = ButtplugFFI
+                    .buttplug_create_log_handle(callback, null, level.value, use_json);
+        } catch (Throwable ex) {
+            throw new RuntimeException("Failed to load natives for platform: '" + Platform.RESOURCE_PREFIX + "'", ex);
+        }
     }
 
     @Override
